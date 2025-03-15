@@ -16,9 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include,path
+from . import views
 
-
+#URLConf de nuestra web
 urlpatterns = [
+    path("", views.homepage),
+
+    #cada vez que creemos una nueva app, hay que añadir un path como el siguiente:
     path("hello/",include("hello.urls")),
+    #esto permite que desde aquí podamos definir las rutas a todas las aplicaciónes que creemos.
+    #individualmente, cada app tendrá sus rutas. Ejemplo: definimos /hello/ aqui como aplicación
+    #posteriormente, en la carpeta de la aplicación en cuestión tendremos otro archivo urls.py donde
+    #definir todas las extensiones de esta URL como /hello/pruebas.
+
     path('admin/', admin.site.urls),
 ]

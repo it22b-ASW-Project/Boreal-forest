@@ -1,3 +1,3 @@
 from django.contrib import admin
 
-# Register your models here.
+# Aqui definimos como verá la interfaz un usuario con privilegios de administrador.

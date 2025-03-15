@@ -1,3 +1,3 @@
 from django.test import TestCase
 
-# Create your tests here.
+# Definimos los test de la aplicación

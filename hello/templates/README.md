@@ -1,0 +1,1 @@
+En esta carpeta se añade html que se pueden usar posteriormente en views.py con render().
