@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Boreal Forest</title>
+</head>
+<body>
+  {% for issue in issues %}
+    <p>{{issue.subject}} {{issue.description}}</p>
+  {% empty %}
+    <p>No hay issues registrados.</p>
+  {% endfor %}
+</body>
+</html>
