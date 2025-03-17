@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5c69e840-ce17-480c-963b-49680163a853" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/homepage/templates/showAllIssues.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/homepage/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boreal_forest/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/boreal_forest/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/boreal_forest/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/boreal_forest/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/homepage/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/homepage/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
