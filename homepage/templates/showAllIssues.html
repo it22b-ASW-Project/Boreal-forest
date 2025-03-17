@@ -5,8 +5,14 @@
   <title>Boreal Forest</title>
 </head>
 <body>
+    <div><h1>Boreal forest</h1></div>
   {% for issue in issues %}
-    <p>{{issue.subject}} {{issue.description}}</p>
+    <div>
+      <p><b> Issue numero {{issue.id}}: </b></p>
+      <p>{{issue.subject}} - {{issue.description}}</p>
+      <p>{{issue.status}} , {{issue.type}} , {{issue.severity}}, {{issue.priority}}</p>
+      <br>
+    </div>
   {% empty %}
     <p>No hay issues registrados.</p>
   {% endfor %}
