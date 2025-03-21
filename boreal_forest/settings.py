@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-4e26pic+us_pb*c-6iy6!y*5gaa-4xqn@2e$(5hqxzt(px5a*-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [boreal-forest.onrender.com]
+ALLOWED_HOSTS = ['boreal-forest.onrender.com']
 
 
 # Application definition
