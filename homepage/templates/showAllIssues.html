@@ -7,6 +7,15 @@
 </head>
 
 <body>
+  <style> 
+    .colorDot {
+      width: 12px; 
+      height: 12px; 
+      border-radius: 50%; 
+      display: inline-block;
+    }
+  </style>
+
   <div>
     <h1>Boreal forest</h1>
   </div>
@@ -16,7 +25,13 @@
   {% for issue in issues %}
   <div>
     <p><b> #{{issue.id}} <a href="/issue/{{issue.id}}">{{issue.subject}}<a></b></p>
-    <p>{{issue.status}} , {{issue.type}} , {{issue.severity}}, {{issue.priority}}</p>
+    <span class="colorDot" style="background-color: {{ issue.priority.color }}">
+    </span>
+    <span class="colorDot" style="background-color: {{issue.type.color}}">
+    </span>
+    <span class="colorDot" style="background-color: {{issue.severity.color}}">
+    </span>
+    <p style="color: {{issue.status.color}}">{{issue.status.name}}</p>
     <br>
   </div>
   {% empty %}

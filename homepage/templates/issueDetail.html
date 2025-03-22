@@ -13,12 +13,12 @@
         <form id="subject-form" method="POST" style="display: none;">
             {% csrf_token %}
             <input type="text" name="subject" id="subject-input" value="{{ issue.subject }}">
-            <button type="submit">💾 Guardar</button>
+            <button type="submit">💾</button>
             <button type="button" onclick="cancelEdit()">❌</button>
         </form>
     
         <!-- Botón de edición -->
-        <button id="edit-btn" onclick="enableEdit()">✏️ Editar</button>
+        <button id="edit-btn" onclick="enableEdit()">✏️</button>
     </h1>
     
     <script>
