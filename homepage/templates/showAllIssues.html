@@ -13,11 +13,16 @@
   <form action="new/" method="get">
     <button type="submit">+ NEW ISSUE</button>
   </form>
-  {% for issue in issues %}
+  <br><br>
+  <form method = "GET">
+    <input type="text" name = "q" placeholder="Buscar issues..." value="{{ request.GET.q }}">
+    <button type="submit">Buscar</button>
+  </form>
+  {% for issue in filter.qs %}
   <div>
     <p><b> Issue numero {{issue.id}}: </b></p>
     <p>{{issue.subject}} - {{issue.description}}</p>
-    <p>{{issue.status}} , {{issue.type}} , {{issue.severity}}, {{issue.priority}}</p>
+    <p>{{issue.status}}, {{issue.type}}, {{issue.severity}}, {{issue.priority}}</p>
     <br>
   </div>
   {% empty %}
