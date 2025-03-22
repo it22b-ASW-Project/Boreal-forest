@@ -15,8 +15,7 @@
   </form>
   {% for issue in issues %}
   <div>
-    <p><b> Issue numero {{issue.id}}: </b></p>
-    <p>{{issue.subject}} - {{issue.description}}</p>
+    <p><b> #{{issue.id}} <a href="/issue/{{issue.id}}">{{issue.subject}}<a></b></p>
     <p>{{issue.status}} , {{issue.type}} , {{issue.severity}}, {{issue.priority}}</p>
     <br>
   </div>
