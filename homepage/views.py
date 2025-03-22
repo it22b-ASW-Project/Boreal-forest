@@ -4,9 +4,14 @@ from django.shortcuts import redirect
 
 from .models import Issue
 
+from django_filters.views import FilterView
+from .filters import IssueFilter
+
+
 def showAllIssues(request):
-    issues = Issue.objects.all().order_by('-id')
-    return render(request, "showAllIssues.html", {'issues': issues})
+    issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
+    return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues})
+
 def createIssue(request):
     if request.method == 'POST':
         # Procesa los datos del formulario aquí
