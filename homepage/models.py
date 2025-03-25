@@ -4,17 +4,29 @@ class Priority(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
     color = models.CharField(max_length=7, default="#808080")  
 
+    def __str__(self):
+        return self.name
+
 class Type(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
     color = models.CharField(max_length=7, default="#808080") 
+
+    def __str__(self):
+        return self.name
 
 class Severity(models.Model):
     name = models.CharField(max_length=20, primary_key=True) 
     color = models.CharField(max_length=7, default="#808080")  
 
+    def __str__(self):
+        return self.name
+
 class Status(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
     color = models.CharField(max_length=7, default="#808080") 
+
+    def __str__(self):
+        return self.name
 
 class Issue(models.Model):
     subject = models.CharField(max_length=30)

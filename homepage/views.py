@@ -4,6 +4,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from .models import Issue
+from .models import Priority
+from .forms import EditParamsForm
 
 def showAllIssues(request):
     issues = Issue.objects.all().order_by('-id')
@@ -23,12 +25,21 @@ def createIssue(request):
 
 def issueDetail(request, id):
     issue = Issue.objects.get(id=id)
+    paramform = EditParamsForm(initial={
+        "priority": issue.priority.name,
+        "type": issue.type.name,
+        "severity": issue.severity.name,
+        "status": issue.status.name
+    })
+
+
 
     if request.method == "POST":
         issue.subject = request.POST.get("subject", issue.subject)
         issue.save()
         return redirect(reverse("issueDetail", args=[issue.id])) # Redirige a la misma página
 
-    return render(request, "issueDetail.html", {"issue": issue})
+
+    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform})
 
 
