@@ -7,6 +7,7 @@
 </head>
 <body>
     <h1>
+        #{{ issue.id }} -
         <span id="subject-text">{{ issue.subject }}</span>
     
         <!-- Formulario oculto por defecto -->
@@ -16,10 +17,17 @@
             <button type="submit">💾</button>
             <button type="button" onclick="cancelEdit()">❌</button>
         </form>
-    
+        
         <!-- Botón de edición -->
         <button id="edit-btn" onclick="enableEdit()">✏️</button>
     </h1>
+
+    <p>{{ issue.description }}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ paramform.as_p }}
+    </form>
     
     <script>
     function enableEdit() {
