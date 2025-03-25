@@ -32,12 +32,22 @@ def issueDetail(request, id):
         "status": issue.status.name
     })
 
-
-
     if request.method == "POST":
-        issue.subject = request.POST.get("subject", issue.subject)
-        issue.save()
-        return redirect(reverse("issueDetail", args=[issue.id])) # Redirige a la misma página
+        if 'close' in request.POST: 
+            form = EditParamsForm(request.POST)
+            if form.is_valid():
+                # Guardar los cambios en la base de datos
+                issue.priority = form.cleaned_data['priority']
+                issue.type = form.cleaned_data['type']
+                issue.severity = form.cleaned_data['severity']
+                issue.status = form.cleaned_data['status']
+                issue.save()
+            return redirect('/')
+        
+        else:     
+            issue.subject = request.POST.get("subject", issue.subject)
+            issue.save()
+            return redirect(reverse("issueDetail", args=[issue.id])) # Redirige a la misma página
 
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform})
