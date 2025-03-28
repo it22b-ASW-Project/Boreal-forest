@@ -14,7 +14,7 @@ from .filters import IssueFilter
 def showAllIssues(request):
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
     return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues})
-
+    
 def createIssue(request):
     if request.method == 'POST':
         # Procesa los datos del formulario aquí
@@ -55,5 +55,3 @@ def issueDetail(request, id):
 
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform})
-
-

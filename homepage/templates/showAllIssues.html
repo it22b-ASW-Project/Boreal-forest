@@ -26,7 +26,24 @@
   <form method = "GET">
     <input type="text" name = "q" placeholder="Buscar issues..." value="{{ request.GET.q }}">
     <button type="submit">Buscar</button>
+
+    <label for="id_type">Type:</label>
+    {{filter.form.type}}
+
+    <label for="id_severity">Severity:</label>
+    {{ filter.form.severity }}
+
+    <label for="id_priority">Priority:</label>
+    {{ filter.form.priority }}
+
+    <label for="id_status">Status:</label>
+    {{ filter.form.status }}
+
+    <button type="submit">Filtrar</button>
+
   </form>
+
+
   {% for issue in filter.qs %}
   <div>
     <p><b> #{{issue.id}} <a href="/issue/{{issue.id}}">{{issue.subject}}<a></b></p>
@@ -42,6 +59,7 @@
   {% empty %}
   <p>No hay issues registrados.</p>
   {% endfor %}
+
 </body>
 
 </html>
