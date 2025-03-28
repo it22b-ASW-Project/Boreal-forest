@@ -4,6 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <title>New Issue</title>
+    <style>
+        .colorDot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        .option-with-color {
+            display: flex;
+            align-items: center;
+        }
+
+        select option {
+            padding-left: 20px;
+            position: relative;
+        }
+    </style>
 </head>
 
 <body>
@@ -11,18 +31,86 @@
         <h1>New Issue</h1>
     </div>
     <form action="" method="POST">
+        {% csrf_token %}
         <label for="Subject">Subject:</label>
         <input type="text" id="Subject" name="Subject" required>
 
         <br><br>
-        {% csrf_token %}
-        <label for="description">description:</label>
+
+        <label for="description">Description:</label>
         <input type="text" id="description" name="description" required>
+
+        <br><br>
+
+        <label for="type">Type: </label>
+        <select id="type" name="type" required>
+            {% for type in types %}
+            <option value="{{ type.name }}" data-color="{{ type.color }}">
+                <span class="colorDot" style="background-color: {{ type.color }}"></span>
+                {{ type.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <span class="colorDot" id="typeDot" style="background-color: {{ types.0.color }}"></span>
+
+        <br><br>
+
+        <label for="severity">Severity: </label>
+        <select id="severity" name="severity" required>
+            {% for severity in severities %}
+            <option value="{{ severity.name }}" data-color="{{ severity.color }}">{{ severity.name }}</option>
+            {% endfor %}
+        </select>
+        <span class="colorDot" id="severityDot" style="background-color: {{ severities.0.color }}"></span>
+
+        <br><br>
+
+        <label for="priority">Priority: </label>
+        <select id="priority" name="priority" required>
+            {% for priority in priorities %}
+            <option value="{{ priority.name }}" data-color="{{ priority.color }}">{{ priority.name }}</option>
+            {% endfor %}
+        </select>
+        <span class="colorDot" id="priorityDot" style="background-color: {{ priorities.0.color }}"></span>
+
+        <br><br>
+
+        <label for="status">Status: </label>
+        <select id="status" name="status" required>
+            {% for s in status %}
+            <option value="{{ s.name }}" data-color="{{ s.color }}">{{ s.name }}</option>
+            {% endfor %}
+        </select>
+        <span class="colorDot" id="statusDot" style="background-color: {{ status.0.color }}"></span>
+
 
         <br><br>
 
         <button type="submit">Create</button>
     </form>
+
+    <script>
+        // Actualizar el color de los dots cuando cambia la selección
+        document.getElementById('type').addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            document.getElementById('typeDot').style.backgroundColor = selectedOption.getAttribute('data-color');
+        });
+
+        document.getElementById('severity').addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            document.getElementById('severityDot').style.backgroundColor = selectedOption.getAttribute('data-color');
+        });
+
+        document.getElementById('priority').addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            document.getElementById('priorityDot').style.backgroundColor = selectedOption.getAttribute('data-color');
+        });
+
+        document.getElementById('status').addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            document.getElementById('statusDot').style.backgroundColor = selectedOption.getAttribute('data-color');
+        });
+    </script>
 </body>
 
 </html>
