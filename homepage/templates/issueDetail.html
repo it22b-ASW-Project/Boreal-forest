@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{issue.subject}} - Issue #{{issue.id}}</title>
+</head>
+<body>
+    <h1>
+        #{{ issue.id }} -
+        <span id="subject-text">{{ issue.subject }}</span>
+    
+        <!-- Formulario oculto por defecto -->
+        <form id="subject-form" method="POST" style="display: none;">
+            {% csrf_token %}
+            <input type="text" name="subject" id="subject-input" value="{{ issue.subject }}">
+            <button type="submit">💾</button>
+            <button type="button" onclick="cancelEdit()">❌</button>
+        </form>
+        
+        <!-- Botón de edición -->
+        <button id="edit-btn" onclick="enableEdit()">✏️</button>
+    </h1>
+
+    <p>{{ issue.description }}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ paramform.as_p }}
+        <button type="submit" class="btn btn-secondary" name="close" value="true" method="POST">Cerrar</button>
+    </form>
+
+   
+    
+    <script>
+    function enableEdit() {
+        document.getElementById("subject-text").style.display = "none";
+        document.getElementById("edit-btn").style.display = "none";
+        document.getElementById("subject-form").style.display = "inline";
+        document.getElementById("subject-input").focus();
+    }
+    
+    function cancelEdit() {
+        document.getElementById("subject-text").style.display = "inline";
+        document.getElementById("edit-btn").style.display = "inline";
+        document.getElementById("subject-form").style.display = "none";
+    }
+    </script>
+    
+</body>
+</html>
