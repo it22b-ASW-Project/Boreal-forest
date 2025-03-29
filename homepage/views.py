@@ -38,7 +38,7 @@ def createIssue(request):
             status=status
         )
         new_issue.save()
-        return redirect('/')  # Redirige a la página principal
+        return redirect('/issues')  # Redirige a la página principal
 
     # Obtener datos para los selectores
     priorities = Priority.objects.all()
