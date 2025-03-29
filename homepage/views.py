@@ -74,14 +74,20 @@ def issueDetail(request, id):
                 issue.severity = form.cleaned_data['severity']
                 issue.status = form.cleaned_data['status']
                 issue.save()
-            return redirect('/')
+            return redirect('/issues')
         
-        else:     
+        elif 'subject' in request.POST:    
             issue.subject = request.POST.get("subject", issue.subject)
             issue.save()
             return redirect(reverse("issueDetail", args=[issue.id])) # Redirige a la misma página
+        
+        elif 'description' in request.POST:
+            issue.description = request.POST.get("description", issue.description)
+            issue.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
 
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform})
 
-
+def login(request):
+    return render(request, "login.html")
