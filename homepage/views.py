@@ -20,7 +20,7 @@ def createIssue(request):
         new_issue = Issue(subject=subject, description=description)
         new_issue.save()
         # ...
-        return redirect('/')  # Redirige a la página principal después de crear el issue
+        return redirect('/issues')  # Redirige a la página principal después de crear el issue
     return render(request, 'createIssue.html')
 
 def issueDetail(request, id):
@@ -42,7 +42,7 @@ def issueDetail(request, id):
                 issue.severity = form.cleaned_data['severity']
                 issue.status = form.cleaned_data['status']
                 issue.save()
-            return redirect('/')
+            return redirect('/issues')
         
         elif 'subject' in request.POST:    
             issue.subject = request.POST.get("subject", issue.subject)
@@ -57,4 +57,5 @@ def issueDetail(request, id):
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform})
 
-
+def login(request):
+    return render(request, "login.html")

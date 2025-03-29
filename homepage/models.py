@@ -45,7 +45,6 @@ class Issue(models.Model):
     def get_type_color(self):
             return self.type.color if self.type else "#808080"  # Gris por defecto
     
-    
     def get_priority_color(self):
             return self.severity.color if self.severity else "#808080"  # Gris por defecto
     
