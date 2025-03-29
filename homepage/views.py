@@ -6,7 +6,7 @@ from django.urls import reverse
 from .models import Issue, Type, Severity, Status, Priority
 from .forms import EditParamsForm
 
-
+from .filters import IssueFilter
 
 def showAllIssues(request):
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
