@@ -14,6 +14,7 @@
       border-radius: 50%; 
       display: inline-block;
     }
+
   </style>
 
   <div>
@@ -23,26 +24,35 @@
     <button type="submit">+ NEW ISSUE</button>
   </form>
   <br><br>
-  <form method = "GET">
-    <input type="text" name = "q" placeholder="Buscar issues..." value="{{ request.GET.q }}">
-    <button type="submit">Buscar</button>
+  <form method = "GET" class="filter-form">
 
-    <label for="id_type">Type:</label>
-    {{filter.form.type}}
+    <div >
+        <label for="id_q"></label>
+        {{ filter.form.q }}
+  
+      <button type="submit">Buscar</button>
+    </div>
+    
+    <br>
+    <div>
+      <label for="id_priority">Prioridad:</label>
+      {{ filter.form.priority }}
+  
+      <label for="id_type">Tipo:</label>
+      {{ filter.form.type }}
+  
+      <label for="id_severity">Severidad:</label>
+      {{ filter.form.severity }}
+  
+      <label for="id_status">Estado:</label>
+      {{ filter.form.status }}
 
-    <label for="id_severity">Severity:</label>
-    {{ filter.form.severity }}
-
-    <label for="id_priority">Priority:</label>
-    {{ filter.form.priority }}
-
-    <label for="id_status">Status:</label>
-    {{ filter.form.status }}
-
-    <button type="submit">Filtrar</button>
+    </div>
 
   </form>
 
+<!-- Font Awesome -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"-->
 
   {% for issue in filter.qs %}
   <div>
