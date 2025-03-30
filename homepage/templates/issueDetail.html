@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{issue.subject}} - Issue #{{issue.id}}</title>
 </head>
+
 <body>
     <h1>
         #{{ issue.id }} -
-    
+
         <!-- Formulario oculto por defecto -->
         <form id="subject-form" method="POST" style="display: none;">
             {% csrf_token %}
@@ -16,7 +18,7 @@
             <button type="submit">💾</button>
             <button type="button" onclick="cancelEditTitle()">❌</button>
         </form>
-        
+
         <span id="edit-btn" onclick="enableEditTitle()">{{ issue.subject }}</span>
     </h1>
 
@@ -26,40 +28,46 @@
         <button type="submit">Save</button>
         <button type="button" onclick="cancelEditDesc()">Cancel</button>
     </form>
-        
+
     <span id="editDesc-btn" onclick="enableEditDesc()">{{ issue.description }}</span>
 
     <form method="POST">
         {% csrf_token %}
         {{ paramform.as_p }}
         <button type="submit" class="btn btn-secondary" name="close" value="true" method="POST">Cerrar</button>
+        <button type="submit" class="btn btn-danger" name="delete" value="true"
+            onclick="return confirmDelete();">Eliminar</button>
     </form>
 
-   
-    
+
     <script>
-    function enableEditTitle() {
-        document.getElementById("edit-btn").style.display = "none";
-        document.getElementById("subject-form").style.display = "inline";
-        document.getElementById("subject-input").focus();
-    }
-    
-    function cancelEditTitle() {
-        document.getElementById("edit-btn").style.display = "inline";
-        document.getElementById("subject-form").style.display = "none";
-    }
+        function enableEditTitle() {
+            document.getElementById("edit-btn").style.display = "none";
+            document.getElementById("subject-form").style.display = "inline";
+            document.getElementById("subject-input").focus();
+        }
 
-    function enableEditDesc() {
-        document.getElementById("editDesc-btn").style.display = "none";
-        document.getElementById("description-form").style.display = "inline";
-        document.getElementById("description-input").focus();
-    }
+        function cancelEditTitle() {
+            document.getElementById("edit-btn").style.display = "inline";
+            document.getElementById("subject-form").style.display = "none";
+        }
 
-    function cancelEditDesc() {
-        document.getElementById("editDesc-btn").style.display = "inline";
-        document.getElementById("description-form").style.display = "none";
-    }
+        function enableEditDesc() {
+            document.getElementById("editDesc-btn").style.display = "none";
+            document.getElementById("description-form").style.display = "inline";
+            document.getElementById("description-input").focus();
+        }
+
+        function cancelEditDesc() {
+            document.getElementById("editDesc-btn").style.display = "inline";
+            document.getElementById("description-form").style.display = "none";
+        }
+
+        function confirmDelete() {
+            return confirm("¿Estás seguro que quieres eliminar el issue?");
+        }
     </script>
-    
+
 </body>
+
 </html>
