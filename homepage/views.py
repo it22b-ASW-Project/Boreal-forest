@@ -2,9 +2,10 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.urls import reverse
+from allauth.socialaccount.models import SocialAccount
 
 from .models import Issue, Type, Severity, Status, Priority
-from .forms import EditParamsForm
+from .forms import EditParamsForm, EditAssigne
 
 from .filters import IssueFilter
 
@@ -38,6 +39,7 @@ def createIssue(request):
             severity=severity,
             status=status,
             deadline=deadline or None # Asignar None si no se proporciona una fecha
+            created_by= SocialAccount.objects.filter(user=request.user, provider="google").first()  # Asignar el usuario que crea el issue
         )
         new_issue.save()
         return redirect('/issues')  # Redirige a la página principal
@@ -67,6 +69,10 @@ def issueDetail(request, id):
         # Quitamos la deadline de aquí para evitar edición duplicada
     })
 
+    assignar = EditAssigne(initial={
+        "assigned": issue.assigned
+    })
+
     if request.method == "POST":
         if 'close' in request.POST: 
             form = EditParamsForm(request.POST)
@@ -77,6 +83,10 @@ def issueDetail(request, id):
                 issue.severity = form.cleaned_data['severity']
                 issue.status = form.cleaned_data['status']
                 # No guardamos deadline aquí, se maneja por separado
+                issue.save()
+            assigned_to = EditAssigne(request.POST)
+            if assigned_to.is_valid():
+                issue.assigned = assigned_to.cleaned_data['assigned']
                 issue.save()
             return redirect('/issues')
         
@@ -101,7 +111,7 @@ def issueDetail(request, id):
             issue.delete()
             return redirect('/issues')
 
-    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform})
+    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, "assignar": assignar})
 
 def login(request):
     return render(request, "login.html")
