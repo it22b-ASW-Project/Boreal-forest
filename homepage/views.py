@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.urls import reverse
+from allauth.socialaccount.models import SocialAccount
 
 from .models import Issue, Type, Severity, Status, Priority
 from .forms import EditParamsForm, EditAssigne
@@ -35,7 +36,8 @@ def createIssue(request):
             priority=priority,
             type=typeT,
             severity=severity,
-            status=status
+            status=status,
+            created_by= SocialAccount.objects.filter(user=request.user, provider="google").first()  # Asignar el usuario que crea el issue
         )
         new_issue.save()
         return redirect('/issues')  # Redirige a la página principal
