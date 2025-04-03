@@ -94,6 +94,10 @@ def issueDetail(request, id):
             issue.save()
             return redirect(reverse("issueDetail", args=[issue.id]))
 
+        elif 'delete' in request.POST:
+            issue.delete()
+            return redirect('/issues')
+
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, "assignar": assignar})
 
