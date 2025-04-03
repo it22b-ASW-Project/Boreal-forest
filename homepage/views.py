@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from .models import Issue, Type, Severity, Status, Priority
-from .forms import EditParamsForm
+from .forms import EditParamsForm, EditAssigne
 
 from .filters import IssueFilter
 
@@ -64,6 +64,10 @@ def issueDetail(request, id):
         "status": issue.status.name
     })
 
+    assignar = EditAssigne(initial={
+        "assigned": issue.assigned
+    })
+
     if request.method == "POST":
         if 'close' in request.POST: 
             form = EditParamsForm(request.POST)
@@ -73,6 +77,10 @@ def issueDetail(request, id):
                 issue.type = form.cleaned_data['type']
                 issue.severity = form.cleaned_data['severity']
                 issue.status = form.cleaned_data['status']
+                issue.save()
+            assigned_to = EditAssigne(request.POST)
+            if assigned_to.is_valid():
+                issue.assigned = assigned_to.cleaned_data['assigned']
                 issue.save()
             return redirect('/issues')
         
@@ -87,7 +95,7 @@ def issueDetail(request, id):
             return redirect(reverse("issueDetail", args=[issue.id]))
 
 
-    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform})
+    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, "assignar": assignar})
 
 def login(request):
     return render(request, "login.html")

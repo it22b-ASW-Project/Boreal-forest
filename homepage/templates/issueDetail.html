@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<title>{{issue.subject}} - Issue #{{issue.id}}</title>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,13 +30,20 @@
         
     <span id="editDesc-btn" onclick="enableEditDesc()">{{ issue.description }}</span>
 
+    <br>
+
+    <span>Created by - {{ issue.created_by.extra_data.name }} </span>
+    <img src="{{issue.created_by.extra_data.picture}}" width="25" height="25"/> 
+
     <form method="POST">
         {% csrf_token %}
         {{ paramform.as_p }}
-        <button type="submit" class="btn btn-secondary" name="close" value="true" method="POST">Cerrar</button>
+        {{ assignar.as_p}}
+        <button type="submit" class="btn btn-secondary" name="close" value="true" method="POST">Guardar canvis</button>
     </form>
 
-   
+
+
     
     <script>
     function enableEditTitle() {
