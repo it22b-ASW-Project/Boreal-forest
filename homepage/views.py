@@ -36,7 +36,7 @@ def createIssue(request):
             priority=priority,
             type=typeT,
             severity=severity,
-            status=status
+            status=status,
             deadline=deadline or None # Asignar None si no se proporciona una fecha
         )
         new_issue.save()
@@ -63,8 +63,8 @@ def issueDetail(request, id):
         "priority": issue.priority.name,
         "type": issue.type.name,
         "severity": issue.severity.name,
-        "status": issue.status.name
-        "deadline": issue.deadline
+        "status": issue.status.name,
+        # Quitamos la deadline de aquí para evitar edición duplicada
     })
 
     if request.method == "POST":
@@ -76,7 +76,7 @@ def issueDetail(request, id):
                 issue.type = form.cleaned_data['type']
                 issue.severity = form.cleaned_data['severity']
                 issue.status = form.cleaned_data['status']
-                issue.deadline = form.cleaned_data['deadline']
+                # No guardamos deadline aquí, se maneja por separado
                 issue.save()
             return redirect('/issues')
         
@@ -90,10 +90,16 @@ def issueDetail(request, id):
             issue.save()
             return redirect(reverse("issueDetail", args=[issue.id]))
 
+        elif 'deadline' in request.POST:
+            deadline = request.POST.get("deadline", "")
+            # Si se deja en blanco, establecemos a None
+            issue.deadline = deadline if deadline else None
+            issue.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+
         elif 'delete' in request.POST:
             issue.delete()
             return redirect('/issues')
-
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform})
 
