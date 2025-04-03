@@ -41,6 +41,7 @@
         <button type="button" onclick="enableEditDeadline()">✏️</button>
     </p>
 
+    <!-- Formulario para editar deadline -->
     <form id="deadline-form" method="POST" style="display: none;">
         {% csrf_token %}
         <input type="date" name="deadline" id="deadline-input"
@@ -53,7 +54,23 @@
 
     <form method="POST">
         {% csrf_token %}
-        {{ paramform.as_p }}
+        <!-- Excluir el campo deadline del paramform -->
+        <p>
+            <label for="id_priority">Priority:</label>
+            {{ paramform.priority }}
+        </p>
+        <p>
+            <label for="id_type">Type:</label>
+            {{ paramform.type }}
+        </p>
+        <p>
+            <label for="id_severity">Severity:</label>
+            {{ paramform.severity }}
+        </p>
+        <p>
+            <label for="id_status">Status:</label>
+            {{ paramform.status }}
+        </p>
         <button type="submit" class="btn btn-secondary" name="close" value="true" method="POST">Cerrar</button>
         <button type="submit" class="btn btn-danger" name="delete" value="true"
             onclick="return confirmDelete();">Eliminar</button>
@@ -86,6 +103,7 @@
         function confirmDelete() {
             return confirm("¿Estás seguro que quieres eliminar el issue?");
         }
+
         function enableEditDeadline() {
             document.getElementById("deadline-display").style.display = "none";
             document.getElementById("deadline-form").style.display = "inline";
@@ -96,6 +114,26 @@
             document.getElementById("deadline-display").style.display = "inline";
             document.getElementById("deadline-form").style.display = "none";
         }
+        document.addEventListener("DOMContentLoaded", function () {
+            const deadlineDisplay = document.getElementById("deadline-display");
+            const deadlineText = deadlineDisplay.innerText.trim();
+
+            if (deadlineText !== "No deadline set") {
+                const parts = deadlineText.split("/"); // Asumiendo formato dd/mm/yyyy
+                const deadlineDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                const today = new Date();
+                const diffTime = deadlineDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays < 0) {
+                    deadlineDisplay.style.color = "red"; // Pasado
+                } else if (diffDays <= 2) {
+                    deadlineDisplay.style.color = "orange"; // Próximos 2 días
+                } else {
+                    deadlineDisplay.style.color = "green"; // A futuro
+                }
+            }
+        });
     </script>
 
 </body>

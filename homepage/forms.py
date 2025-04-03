@@ -23,7 +23,7 @@ class EditParamsForm(forms.Form):
         required=True,
         empty_label=None
     )
-        deadline = forms.DateField(
+    deadline = forms.DateField(
         required=False,
         widget=forms.DateInput(attrs={'type': 'date'})
     )
