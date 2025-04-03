@@ -29,6 +29,26 @@
         <button type="button" onclick="cancelEditDesc()">Cancel</button>
     </form>
 
+    <p>
+        <strong>Deadline:</strong>
+        <span id="deadline-display">
+            {% if issue.deadline %}
+            {{ issue.deadline|date:"d/m/Y" }}
+            {% else %}
+            No deadline set
+            {% endif %}
+        </span>
+        <button type="button" onclick="enableEditDeadline()">✏️</button>
+    </p>
+
+    <form id="deadline-form" method="POST" style="display: none;">
+        {% csrf_token %}
+        <input type="date" name="deadline" id="deadline-input"
+            value="{% if issue.deadline %}{{ issue.deadline|date:'Y-m-d' }}{% endif %}">
+        <button type="submit">Save</button>
+        <button type="button" onclick="cancelEditDeadline()">Cancel</button>
+    </form>
+
     <span id="editDesc-btn" onclick="enableEditDesc()">{{ issue.description }}</span>
 
     <form method="POST">
@@ -65,6 +85,16 @@
 
         function confirmDelete() {
             return confirm("¿Estás seguro que quieres eliminar el issue?");
+        }
+        function enableEditDeadline() {
+            document.getElementById("deadline-display").style.display = "none";
+            document.getElementById("deadline-form").style.display = "inline";
+            document.getElementById("deadline-input").focus();
+        }
+
+        function cancelEditDeadline() {
+            document.getElementById("deadline-display").style.display = "inline";
+            document.getElementById("deadline-form").style.display = "none";
         }
     </script>
 

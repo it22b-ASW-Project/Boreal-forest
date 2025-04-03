@@ -21,6 +21,7 @@ def createIssue(request):
         type_name = request.POST.get('type')
         severity_name = request.POST.get('severity')
         status_name = request.POST.get('status')
+        deadline = request.POST.get('deadline')
 
         # Recuperar objetos de la base de datos
         priority = Priority.objects.get(name=priority_name)
@@ -36,6 +37,7 @@ def createIssue(request):
             type=typeT,
             severity=severity,
             status=status
+            deadline=deadline or None # Asignar None si no se proporciona una fecha
         )
         new_issue.save()
         return redirect('/issues')  # Redirige a la página principal
@@ -62,6 +64,7 @@ def issueDetail(request, id):
         "type": issue.type.name,
         "severity": issue.severity.name,
         "status": issue.status.name
+        "deadline": issue.deadline
     })
 
     if request.method == "POST":
@@ -73,6 +76,7 @@ def issueDetail(request, id):
                 issue.type = form.cleaned_data['type']
                 issue.severity = form.cleaned_data['severity']
                 issue.status = form.cleaned_data['status']
+                issue.deadline = form.cleaned_data['deadline']
                 issue.save()
             return redirect('/issues')
         
