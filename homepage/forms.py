@@ -24,6 +24,10 @@ class EditParamsForm(forms.Form):
         required=True,
         empty_label=None
     )
+    deadline = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
