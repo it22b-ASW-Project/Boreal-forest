@@ -7,14 +7,13 @@
 </head>
 
 <body>
-  <style> 
+  <style>
     .colorDot {
-      width: 12px; 
-      height: 12px; 
-      border-radius: 50%; 
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
       display: inline-block;
     }
-
   </style>
 
   <div>
@@ -24,26 +23,26 @@
     <button type="submit">+ NEW ISSUE</button>
   </form>
   <br><br>
-  <form method = "GET" class="filter-form">
+  <form method="GET" class="filter-form">
 
-    <div >
-        <label for="id_q"></label>
-        {{ filter.form.q }}
-  
+    <div>
+      <label for="id_q"></label>
+      {{ filter.form.q }}
+
       <button type="submit">Buscar</button>
     </div>
-    
+
     <br>
     <div>
       <label for="id_priority">Prioridad:</label>
       {{ filter.form.priority }}
-  
+
       <label for="id_type">Tipo:</label>
       {{ filter.form.type }}
-  
+
       <label for="id_severity">Severidad:</label>
       {{ filter.form.severity }}
-  
+
       <label for="id_status">Estado:</label>
       {{ filter.form.status }}
 
@@ -51,12 +50,14 @@
 
   </form>
 
-<!-- Font Awesome -->
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"-->
+  <!-- Font Awesome -->
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"-->
 
   {% for issue in filter.qs %}
   <div>
-    <p><b> #{{issue.id}} <a href="/issue/{{issue.id}}">{{issue.subject}}<a></b></p>
+    <p><b> #{{issue.id}} <a href="/issue/{{issue.id}}">{{issue.subject}}</a>
+        {% if issue.deadline %} ⏰{% endif %}
+      </b></p>
     <span class="colorDot" style="background-color: {{ issue.priority.color }}">
     </span>
     <span class="colorDot" style="background-color: {{issue.type.color}}">
