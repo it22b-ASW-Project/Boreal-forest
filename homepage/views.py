@@ -38,7 +38,7 @@ def createIssue(request):
             type=typeT,
             severity=severity,
             status=status,
-            deadline=deadline or None # Asignar None si no se proporciona una fecha
+            deadline=deadline or None,
             created_by= SocialAccount.objects.filter(user=request.user, provider="google").first()  # Asignar el usuario que crea el issue
         )
         new_issue.save()
