@@ -35,6 +35,8 @@ class Issue(models.Model):
     type = models.ForeignKey(Type, on_delete=models.SET_NULL, null=True, blank=True)
     severity =models.ForeignKey(Severity, on_delete=models.SET_NULL, null=True, blank=True)
     priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='creator')
+    assigned = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_to')
 
     def get_priority_color(self):
             return self.priority.color if self.priority else "#808080"  # Gris por defecto
