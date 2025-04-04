@@ -3,6 +3,10 @@ import django_filters
 from django import forms
 from .models import Issue
 
+from allauth.socialaccount.models import SocialAccount
+
+from .models import Priority, Type, Severity, Status, Assigned
+
 from .models import Priority, Type, Severity, Status
 
 class IssueFilter(django_filters.FilterSet):
@@ -13,6 +17,24 @@ class IssueFilter(django_filters.FilterSet):
             "placeholder": "Subject or description", 
             "onchange": "this.form.submit();"
             })
+    )
+
+    created_by = django_filters.ChoiceFilter(
+        choices=lambda: [
+            (account.user_id, f"{account.extra_data.get('name', 'Unknown')}")
+            for account in SocialAccount.objects.filter(user_id__in=Issue.objects.values_list('created_by', flat=True).distinct())
+        ],
+        empty_label="All",
+        widget=forms.Select(attrs={"onchange": "this.form.submit();"})
+    )
+    
+    assigned_to = django_filters.ChoiceFilter(
+        choices=lambda: [
+            (account.user_id, f"{account.extra_data.get('name', 'Unknown')}")
+            for account in SocialAccount.objects.filter(user_id__in=Assigned.objects.values_list('assigned', flat=True).distinct())
+       ],
+        empty_label="All",
+        widget=forms.Select(attrs={"onchange": "this.form.submit();"})
     )
     
     priority = django_filters.ModelChoiceFilter(
