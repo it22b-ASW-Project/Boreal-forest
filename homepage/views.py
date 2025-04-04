@@ -4,8 +4,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
-from .models import Issue, Type, Severity, Status, Priority
-from .forms import EditParamsForm, EditAssigne
+from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned
+from .forms import EditParamsForm
 
 from .filters import IssueFilter
 
@@ -61,16 +61,17 @@ def createIssue(request):
 
 def issueDetail(request, id):
     issue = Issue.objects.get(id=id)
+    watchers = list(Watch.objects.filter(issue=issue))
+    is_watching = Watch.objects.filter(watcher=SocialAccount.objects.filter(user=request.user, provider="google").first(), issue=issue).exists()
+    assigneds = list(Assigned.objects.filter(issue=issue))
+    is_assigned = Assigned.objects.filter(assigned=SocialAccount.objects.filter(user=request.user, provider="google").first(), issue=issue).exists()
+
     paramform = EditParamsForm(initial={
         "priority": issue.priority.name,
         "type": issue.type.name,
         "severity": issue.severity.name,
         "status": issue.status.name,
         # Quitamos la deadline de aquí para evitar edición duplicada
-    })
-
-    assignar = EditAssigne(initial={
-        "assigned": issue.assigned
     })
 
     if request.method == "POST":
@@ -83,10 +84,6 @@ def issueDetail(request, id):
                 issue.severity = form.cleaned_data['severity']
                 issue.status = form.cleaned_data['status']
                 # No guardamos deadline aquí, se maneja por separado
-                issue.save()
-            assigned_to = EditAssigne(request.POST)
-            if assigned_to.is_valid():
-                issue.assigned = assigned_to.cleaned_data['assigned']
                 issue.save()
             return redirect('/issues')
         
@@ -110,8 +107,39 @@ def issueDetail(request, id):
         elif 'delete' in request.POST:
             issue.delete()
             return redirect('/issues')
+        
+        elif 'setWatcher' in request.POST:
+            watcher = SocialAccount.objects.filter(user=request.user, provider="google").first()
+            if not Watch.objects.filter(watcher=watcher, issue=issue).exists():
+                watch = Watch(watcher=watcher, issue=issue)
+                watch.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+        
+        elif 'unsetWatcher' in request.POST:
+            watcher = SocialAccount.objects.filter(user=request.user, provider="google").first()
+            watch = Watch.objects.filter(watcher=watcher, issue=issue).first()
+            if watch:
+                watch.delete()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+        
+        elif 'setAssigned' in request.POST:
+            assigned = SocialAccount.objects.filter(user=request.user, provider="google").first()
+            if not Assigned.objects.filter(assigned=assigned, issue=issue).exists():
+                assign = Assigned(assigned=assigned, issue=issue)
+                assign.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
 
-    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, "assignar": assignar})
+        elif 'unsetAssigned' in request.POST:
+            assigned = SocialAccount.objects.filter(user=request.user, provider="google").first()
+            assign = Assigned.objects.filter(assigned=assigned, issue=issue).first()
+            if assign:
+                assign.delete()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+
+
+    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
+                                                "assigneds": assigneds, "is_assigned": is_assigned,
+                                                "watchers": watchers, "is_watching" : is_watching})
 
 def login(request):
     return render(request, "login.html")
