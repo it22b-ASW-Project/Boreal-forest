@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from .models import Issue, Type, Severity, Status, Priority
+from .models import Issue, Type, Severity, Status, Priority, Watch
 from .forms import EditParamsForm, EditAssigne
 
 from .filters import IssueFilter
@@ -57,6 +57,7 @@ def createIssue(request):
 
 def issueDetail(request, id):
     issue = Issue.objects.get(id=id)
+    watchers = list(Watch.objects.filter(issue=issue))
     paramform = EditParamsForm(initial={
         "priority": issue.priority.name,
         "type": issue.type.name,
@@ -99,7 +100,7 @@ def issueDetail(request, id):
             return redirect('/issues')
 
 
-    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, "assignar": assignar})
+    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, "assignar": assignar, "watchers": watchers})
 
 def login(request):
     return render(request, "login.html")

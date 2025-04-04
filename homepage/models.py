@@ -50,3 +50,6 @@ class Issue(models.Model):
     def get_priority_color(self):
             return self.severity.color if self.severity else "#808080"  # Gris por defecto
     
+class Watch(models.Model):
+        watcher = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='watcher')
+        issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
