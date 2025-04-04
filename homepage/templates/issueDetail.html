@@ -44,6 +44,15 @@
         <button type="submit" class="btn btn-danger" name="delete" value="true"
             onclick="return confirmDelete();">Eliminar</button>
     </form>
+
+    <ul>
+        {% for watcher in watchers %}
+            <li>{{ watcher.name }}</li>  <!-- Muestra los datos del watcher -->
+        {% endfor %}
+    </ul>
+  
+    <button type="submit" class="btn btn-danger" name="addWatcher" value="true">+ Add Watcher</button>
+
     <script>
         function enableEditTitle() {
             document.getElementById("edit-btn").style.display = "none";

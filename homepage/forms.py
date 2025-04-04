@@ -42,3 +42,4 @@ class EditAssigne(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['assigned'].label_from_instance = lambda obj: obj.extra_data.get('name', None) if obj else None 
+
