@@ -22,6 +22,7 @@ def createIssue(request):
         type_name = request.POST.get('type')
         severity_name = request.POST.get('severity')
         status_name = request.POST.get('status')
+        deadline = request.POST.get('deadline')
 
         # Recuperar objetos de la base de datos
         priority = Priority.objects.get(name=priority_name)
@@ -37,6 +38,7 @@ def createIssue(request):
             type=typeT,
             severity=severity,
             status=status,
+            deadline=deadline or None,
             created_by= SocialAccount.objects.filter(user=request.user, provider="google").first()  # Asignar el usuario que crea el issue
         )
         new_issue.save()
@@ -63,7 +65,8 @@ def issueDetail(request, id):
         "priority": issue.priority.name,
         "type": issue.type.name,
         "severity": issue.severity.name,
-        "status": issue.status.name
+        "status": issue.status.name,
+        # Quitamos la deadline de aquí para evitar edición duplicada
     })
 
     assignar = EditAssigne(initial={
@@ -79,6 +82,7 @@ def issueDetail(request, id):
                 issue.type = form.cleaned_data['type']
                 issue.severity = form.cleaned_data['severity']
                 issue.status = form.cleaned_data['status']
+                # No guardamos deadline aquí, se maneja por separado
                 issue.save()
             assigned_to = EditAssigne(request.POST)
             if assigned_to.is_valid():
@@ -96,10 +100,16 @@ def issueDetail(request, id):
             issue.save()
             return redirect(reverse("issueDetail", args=[issue.id]))
 
+        elif 'deadline' in request.POST:
+            deadline = request.POST.get("deadline", "")
+            # Si se deja en blanco, establecemos a None
+            issue.deadline = deadline if deadline else None
+            issue.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+
         elif 'delete' in request.POST:
             issue.delete()
             return redirect('/issues')
-
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, "assignar": assignar})
 
