@@ -80,6 +80,47 @@
         <button type="submit" class="btn btn-danger" name="delete" value="true"
             onclick="return confirmDelete();">Eliminar</button>
     </form>
+  
+    <div>
+        <h3>Watchers</h1>
+            <ul>
+                {% for watcher in watchers %}
+                    <li>{{ watcher.watcher.extra_data.name }}</li>  <!-- Muestra los datos del watcher -->
+                {% empty %}
+                    <li>No watchers</li> 
+                {% endfor %}
+            </ul>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" name="addWatcher" value="true">+ Add Watcher</button>
+            {% if is_watching %}
+            <button type="submit" class="btn btn-danger" name="unsetWatcher" value="true">Unwatch</button>
+            {% else %}
+            <button type="submit" class="btn btn-danger" name="setWatcher" value="true">Watch</button>
+            {% endif %}
+        </form>
+    </div>
+
+    <div>
+        <h3>Assigned</h3>
+        <ul>
+            {% for assigned in assigneds %}
+                <li>{{ assigned.assigned.extra_data.name }}</li>  <!-- Muestra los datos del watcher -->
+            {% empty %}
+                <li>Not assigned</li> 
+            {% endfor %}
+        </ul>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" name="addAssigned" value="true">+ Add Assigned</button>
+            {% if is_assigned %}
+            <button type="submit" class="btn btn-danger" name="unsetAssigned" value="true">Unassign</button>
+            {% else %}
+            <button type="submit" class="btn btn-danger" name="setAssigned" value="true">Assigne to me</button>
+            {% endif %}
+        </form>
+    </div>
+
     <script>
         function enableEditTitle() {
             document.getElementById("edit-btn").style.display = "none";
