@@ -57,3 +57,27 @@ class Watch(models.Model):
 class Assigned(models.Model):
     assigned = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned')
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+
+def get_upload_path(instance, filename):
+    return f'issues/{instance.issue.id}/{filename}'
+
+class Attachment(models.Model):
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField(upload_to=get_upload_path)
+    filename = models.CharField(max_length=255)
+    filesize = models.IntegerField(default=0)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.filename
+    
+    def formatted_filesize(self):
+        """Devuelve el tamaño del archivo en formato legible."""
+        if self.filesize < 1024:
+            return f"{self.filesize} bytes"
+        elif self.filesize < 1024 * 1024:
+            return f"{self.filesize / 1024:.1f} KB"
+        else:
+            return f"{self.filesize / (1024 * 1024):.1f} MB"
