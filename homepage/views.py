@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
@@ -159,14 +159,20 @@ def user_settings(request):
     }
     return render(request, 'user_settings.html', context)
 
-def change_password(request):
-    return render(request, 'change_password.html')
-
-def email_notifications(request):
-    return render(request, 'email_notifications.html')
-
-def desktop_notifications(request):
-    return render(request, 'desktop_notifications.html')
-
-def events(request):
-    return render(request, 'events.html')
+def user_profile(request, id):
+    user = get_object_or_404(SocialAccount, id=id)  # Obtiene el usuario por ID
+    assigned_issues = Issue.objects.filter(assigned__assigned=user)
+    watched_issues = Watch.objects.filter(watcher=user)
+    context = {
+        'username': user.user.username,
+        'email': user.user.email,
+        'full_name': f"{user.user.first_name} {user.user.last_name}",
+        'language': 'English (US)',  # Puedes obtener esto de un modelo o configuración
+        'theme': 'dark',  # Ejemplo de un valor predeterminado
+        'bio': 'Computer Engineering student',  # Puedes obtener esto de un modelo personalizado
+        'watched_issues': watched_issues,
+        'assigned_issues': assigned_issues,
+        'Numassigned_issues': len(assigned_issues),
+        'Numwatched_issues': len(watched_issues),
+    }
+    return render(request, 'user_profile.html', context)
