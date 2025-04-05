@@ -74,9 +74,18 @@
                     <tbody>
                         {% for issue in assigned_issues %}
                         <tr>
-                            <td>{{ issue.type }}</td>
-                            <td>{{ issue.severity }}</td>
-                            <td>{{ issue.priority }}</td>
+                            <td>
+                                <span class="colorDot" style="background-color: {{ issue.type.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="colorDot" style="background-color: {{ issue.severity.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="colorDot" style="background-color: {{ issue.priority.color|default:'#ccc' }}">
+                                </span>
+                            </td>
                             <td>#{{ issue.id }} {{ issue.subject }}</td>
                             <td>{{ issue.status }}</td>
                             <td>{{ issue.modified }}</td>
@@ -103,12 +112,21 @@
                     <tbody>
                         {% for issue in watched_issues %}
                         <tr>
-                            <td>{{ issue.type }}</td>
-                            <td>{{ issue.severity }}</td>
-                            <td>{{ issue.priority }}</td>
-                            <td>#{{ issue.id }} {{ issue.subject }}</td>
-                            <td>{{ issue.status }}</td>
-                            <td>{{ issue.modified }}</td>
+                            <td>
+                                <span class="colorDot" style="background-color: {{ issue.issue.type.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="colorDot" style="background-color: {{ issue.issue.severity.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="colorDot" style="background-color: {{ issue.issue.priority.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>#{{ issue.issue.id }} {{ issue.issue.subject }}</td>
+                            <td>{{ issue.issue.status }}</td>
+                            <td>{{ issue.issue.modified }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
