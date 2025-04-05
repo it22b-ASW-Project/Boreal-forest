@@ -85,7 +85,14 @@
         <h3>Watchers</h1>
             <ul>
                 {% for watcher in watchers %}
-                    <li>{{ watcher.watcher.extra_data.name }}</li>  <!-- Muestra los datos del watcher -->
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_watcher_id" value="{{ watcher.id }}">
+                        <li>
+                        {{ watcher.watcher.extra_data.name }}
+                        <button type="submit" name="deleteWatcher">✕</button>
+                        </li>
+                    </form>               
                 {% empty %}
                     <li>No watchers</li> 
                 {% endfor %}
@@ -117,7 +124,14 @@
         <h3>Assigned</h3>
         <ul>
             {% for assigned in assigneds %}
-                <li>{{ assigned.assigned.extra_data.name }}</li>  <!-- Muestra los datos del watcher -->
+                <form method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete_assigned_id" value="{{ assigned.id }}">
+                    <li>
+                    {{ assigned.assigned.extra_data.name }}
+                    <button type="submit" name="deleteAssigned">✕</button>
+                    </li>
+                </form>  
             {% empty %}
                 <li>Not assigned</li> 
             {% endfor %}
