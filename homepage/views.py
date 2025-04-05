@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
-from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments
+from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment
 from .forms import EditParamsForm, CommentForm
 
 from .filters import IssueFilter
@@ -56,7 +56,6 @@ def createIssue(request):
                 filename=file.name,
                 filesize=filesize,
                 description=attachments_description,
-                uploaded_by=current_user
             )
             attachment.save()
 
@@ -193,7 +192,6 @@ def issueDetail(request, id):
         elif 'upload_attachment' in request.POST:
             files = request.FILES.getlist('new_attachments')
             description = request.POST.get('attachment_description', '')
-            current_user = SocialAccount.objects.filter(user=request.user, provider="google").first()
             
             for file in files:
                 filesize = file.size
@@ -203,7 +201,6 @@ def issueDetail(request, id):
                     filename=file.name,
                     filesize=filesize,
                     description=description,
-                    uploaded_by=current_user
                 )
                 attachment.save()
             return redirect(reverse("issueDetail", args=[issue.id]))
@@ -218,13 +215,6 @@ def issueDetail(request, id):
                 pass
             return redirect(reverse("issueDetail", args=[issue.id]))
             
-
-
-    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
-                                                "assigneds": assigneds, "is_assigned": is_assigned,
-                                                "watchers": watchers, "is_watching" : is_watching, 
-                                                "attachments": attachments
-                                                })
         elif 'add_comment' in request.POST:
             commentForm = CommentForm(request.POST)
             if commentForm.is_valid():
@@ -239,7 +229,8 @@ def issueDetail(request, id):
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
                                                 "assigneds": assigneds, "is_assigned": is_assigned,
                                                 "watchers": watchers, "is_watching" : is_watching,
-                                                "users": users, 'comments':comments, 'commentForm':commentForm })
+                                                "users": users, 'comments':comments, 'commentForm':commentForm,
+                                                "attachments": attachments })
 
 def login(request):
     return render(request, "login.html")
