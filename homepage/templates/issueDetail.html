@@ -7,6 +7,7 @@
     <title>{{issue.subject}} - Issue #{{issue.id}}</title>
 </head>
 
+
 <body>
     <h1>
         #{{ issue.id }} -
@@ -159,6 +160,23 @@
         </form>
     </div>
 
+    <div>
+        <h3>Comments</h3>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ commentForm.comment }}
+            <br>
+            <button type="submit" name="add_comment" class="add_comment">Save</button>
+        </form>
+
+        {% for comment in comments %}
+            <p>{{ comment.comment }} <p>
+            <p><img src="{{comment.user.extra_data.picture}}" width="25" height="25"/>
+            {{comment.user.extra_data.name}} -
+            {{comment.created_at}} </p>
+        {% endfor %}
+    </div>
 
     <script>
         function enableEditTitle() {

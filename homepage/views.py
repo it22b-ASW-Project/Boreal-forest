@@ -4,10 +4,12 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
-from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned
-from .forms import EditParamsForm
+from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments
+from .forms import EditParamsForm, CommentForm
 
 from .filters import IssueFilter
+
+from django.utils import timezone
 
 def showAllIssues(request):
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
@@ -66,6 +68,9 @@ def issueDetail(request, id):
     assigneds = list(Assigned.objects.filter(issue=issue))
     is_assigned = Assigned.objects.filter(assigned=SocialAccount.objects.filter(user=request.user, provider="google").first(), issue=issue).exists()
     users = SocialAccount.objects.all()
+    
+    comments = Comments.objects.filter(issue=issue)
+    commentForm = CommentForm()
 
     paramform = EditParamsForm(initial={
         "priority": issue.priority.name,
@@ -167,11 +172,21 @@ def issueDetail(request, id):
                 assigned.delete()
             return redirect(reverse("issueDetail", args=[issue.id]))
 
+        elif 'add_comment' in request.POST:
+            commentForm = CommentForm(request.POST)
+            if commentForm.is_valid():
+                com = Comments(comment = commentForm.cleaned_data['comment'], issue = issue)
+                com = commentForm.save(commit=False)
+                com.user = SocialAccount.objects.filter(user=request.user, provider="google").first()
+                com.issue = issue
+                print(timezone.now())
+                com.save()
+        return redirect(reverse("issueDetail", args=[issue.id]))
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
                                                 "assigneds": assigneds, "is_assigned": is_assigned,
                                                 "watchers": watchers, "is_watching" : is_watching,
-                                                "users": users, })
+                                                "users": users, 'comments':comments, 'commentForm':commentForm })
 
 def login(request):
     return render(request, "login.html")
