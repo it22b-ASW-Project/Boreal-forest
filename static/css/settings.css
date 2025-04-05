@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f9;
-    color: #333;
+    color: white;
 }
 
 .settings-container {
@@ -14,8 +14,8 @@ body {
 /* Sidebar */
 .sidebar {
     width: 20%;
-    background-color: #333;
-    color: white;
+    background-color: white;
+    color: grey;
     padding: 20px;
     box-sizing: border-box;
 }
@@ -35,7 +35,7 @@ body {
 
 .sidebar li.active,
 .sidebar li:hover {
-    background-color: #4CAF50;
+    background-color: #98ede1;
 }
 
 /* Main Content */
@@ -43,8 +43,8 @@ body {
     width: 80%;
     padding: 20px;
     box-sizing: border-box;
-    background-color: #1e1e1e;
-    color: white;
+    background-color: white;
+    color: grey;
 }
 
 .main-content h1 {
@@ -65,25 +65,26 @@ body {
     height: 150px;
     border-radius: 50%;
     margin-bottom: 10px;
+    background-color: grey;
 }
 
 .profile-photo button {
     display: block;
     margin: 10px auto;
     padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
+    background-color: #98ede1;
+    color: grey;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .profile-photo button:hover {
-    background-color: #45a049;
+    background-color: #98ede1;
 }
 
 .profile-photo a {
-    color: #4CAF50;
+    color: black;
     text-decoration: none;
     font-size: 14px;
 }
@@ -114,7 +115,7 @@ form textarea {
 }
 
 .save-button {
-    background-color: #4CAF50;
+    background-color: #98ede1;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -123,5 +124,5 @@ form textarea {
 }
 
 .save-button:hover {
-    background-color: #45a049;
+    background-color: #98ede1;
 }
