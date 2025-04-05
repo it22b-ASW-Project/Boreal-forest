@@ -4,10 +4,12 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
-from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned
-from .forms import EditParamsForm
+from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments
+from .forms import EditParamsForm, CommentForm
 
 from .filters import IssueFilter
+
+from django.utils import timezone
 
 def showAllIssues(request):
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
@@ -81,6 +83,10 @@ def issueDetail(request, id):
     is_watching = Watch.objects.filter(watcher=SocialAccount.objects.filter(user=request.user, provider="google").first(), issue=issue).exists()
     assigneds = list(Assigned.objects.filter(issue=issue))
     is_assigned = Assigned.objects.filter(assigned=SocialAccount.objects.filter(user=request.user, provider="google").first(), issue=issue).exists()
+    users = SocialAccount.objects.all()
+    
+    comments = Comments.objects.filter(issue=issue)
+    commentForm = CommentForm()
 
     attachments = Attachment.objects.filter(issue=issue)
     
@@ -153,6 +159,36 @@ def issueDetail(request, id):
             if assign:
                 assign.delete()
             return redirect(reverse("issueDetail", args=[issue.id]))
+        
+        elif 'addAssigned' in request.POST:
+            assigned_id = request.POST.get("assigned_user")
+            assigned = SocialAccount.objects.filter(id=assigned_id).first()
+            if not Assigned.objects.filter(assigned=assigned, issue=issue).exists():
+                assign = Assigned(assigned=assigned, issue=issue)
+                assign.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+        
+        elif 'watcher_user' in request.POST:
+            watcher_id = request.POST.get("watcher_user")
+            watcher = SocialAccount.objects.filter(id=watcher_id).first()
+            if not Watch.objects.filter(watcher=watcher, issue=issue).exists():
+                watch = Watch(watcher=watcher, issue=issue)
+                watch.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+        
+        elif 'deleteWatcher' in request.POST:
+            watcher_id = request.POST.get('delete_watcher_id')
+            watcher = Watch.objects.filter(id=watcher_id)
+            if watcher:
+                watcher.delete()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+        
+        elif 'deleteAssigned' in request.POST:
+            assigned_id = request.POST.get('delete_assigned_id')
+            assigned = Assigned.objects.filter(id=assigned_id)
+            if assigned:
+                assigned.delete()
+            return redirect(reverse("issueDetail", args=[issue.id]))
 
         elif 'upload_attachment' in request.POST:
             files = request.FILES.getlist('new_attachments')
@@ -189,6 +225,21 @@ def issueDetail(request, id):
                                                 "watchers": watchers, "is_watching" : is_watching, 
                                                 "attachments": attachments
                                                 })
+        elif 'add_comment' in request.POST:
+            commentForm = CommentForm(request.POST)
+            if commentForm.is_valid():
+                com = Comments(comment = commentForm.cleaned_data['comment'], issue = issue)
+                com = commentForm.save(commit=False)
+                com.user = SocialAccount.objects.filter(user=request.user, provider="google").first()
+                com.issue = issue
+                print(timezone.now())
+                com.save()
+        return redirect(reverse("issueDetail", args=[issue.id]))
+
+    return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
+                                                "assigneds": assigneds, "is_assigned": is_assigned,
+                                                "watchers": watchers, "is_watching" : is_watching,
+                                                "users": users, 'comments':comments, 'commentForm':commentForm })
 
 def login(request):
     return render(request, "login.html")

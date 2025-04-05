@@ -3,7 +3,9 @@ import django_filters
 from django import forms
 from .models import Issue
 
-from .models import Priority, Type, Severity, Status
+from allauth.socialaccount.models import SocialAccount
+
+from .models import Priority, Type, Severity, Status, Assigned
 
 class IssueFilter(django_filters.FilterSet):
     q = django_filters.CharFilter(
@@ -14,36 +16,72 @@ class IssueFilter(django_filters.FilterSet):
             "onchange": "this.form.submit();"
             })
     )
+
+    created_by = django_filters.ChoiceFilter(
+        choices=lambda: [
+            (account.user_id, f"{account.extra_data.get('name', 'Unknown')}")
+            for account in SocialAccount.objects.filter(user_id__in=Issue.objects.values_list('created_by', flat=True).distinct())
+        ],
+        empty_label="All",
+        widget=forms.Select(attrs={"onchange": "this.form.submit();"})
+    )
     
+    assigned = django_filters.ChoiceFilter(
+        method='filter_assigned',
+        choices=[],
+        empty_label="All",
+        widget=forms.Select(attrs={"onchange": "this.form.submit();"})
+    )
+
     priority = django_filters.ModelChoiceFilter(
-        queryset=Priority.objects.all(), 
-        label="Prioridad", 
-        empty_label="Todas",
+        queryset=Priority.objects.all(),  
+        empty_label="All",
         widget=forms.Select(attrs={"onchange": "this.form.submit();"})
     )
     type = django_filters.ModelChoiceFilter(
         queryset=Type.objects.all(), 
-        label="Tipo", 
-        empty_label="Todos",
+        empty_label="All",
         widget=forms.Select(attrs={"onchange": "this.form.submit();"})
     )
     severity = django_filters.ModelChoiceFilter(
         queryset=Severity.objects.all(), 
-        label="Severidad", 
-        empty_label="Todas",
+        empty_label="All",
         widget=forms.Select(attrs={"onchange": "this.form.submit();"})
     )
     status = django_filters.ModelChoiceFilter(
         queryset=Status.objects.all(), 
-        label="Estado", 
-        empty_label="Todos",
+        empty_label="All",
         widget=forms.Select(attrs={"onchange": "this.form.submit();"})
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    
+        self.filters['assigned'].extra['choices'] = [('0', 'Unassigned')] + [
+            (account.user_id, f"{account.extra_data.get('name', 'Unknown')}")
+            #for account in SocialAccount.objects.filter(user_id__in=Assigned.objects.values_list('assigned', flat=True).distinct())
+            for account in SocialAccount.objects.all().order_by('extra_data__name')
+        
+        ]
+
+    def filter_assigned(self, queryset, name, value):
+        if value == '0':
+            # Filtra los problemas que no tienen ninguna relación en la tabla `Assigned`
+            return queryset.exclude(
+                id__in=Assigned.objects.values('issue')  # Excluye problemas que están asignados
+            )
+        if value:
+            # Filtra los problemas asignados a un usuario específico basado en `user_id`
+            return queryset.filter(
+                assigned__assigned__user_id=value  # Busca los problemas asignados a ese `user_id`
+            )
+        # Si no se selecciona nada, devolver el queryset sin filtrar
+        return queryset
 
     def filter_search(self, queryset, name, value):
         return queryset.filter(Q(subject__icontains=value) | Q(description__icontains=value))
 
     class Meta:
         model = Issue
-        fields = ['priority', 'type', 'severity', 'status']
+        fields = ['created_by', 'assigned','priority', 'type', 'severity', 'status']
+    
