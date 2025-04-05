@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'boreal_forest.middleware.TimezoneMiddleware',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -139,10 +140,10 @@ AUTHENTICATION_BACKENDS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
+USE_TZ = True
 
 USE_I18N = True
-
-USE_TZ = True
+USE_L10N = True
 
 
 # Static files (CSS, JavaScript, Images)

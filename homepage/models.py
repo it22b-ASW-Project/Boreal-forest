@@ -1,5 +1,7 @@
 from django.db import models
 
+from django.utils import timezone
+
 class Priority(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
     color = models.CharField(max_length=7, default="#808080")  
@@ -57,3 +59,9 @@ class Watch(models.Model):
 class Assigned(models.Model):
     assigned = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned')
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+
+class Comments(models.Model):
+        comment= models.CharField (max_length = 280)
+        issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+        user = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='comment_owner')
+        created_at = models.DateTimeField(default=timezone.now)
