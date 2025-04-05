@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <title>{{issue.subject}} - Issue #{{issue.id}}</title>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,7 +56,7 @@
     <br>
 
     <span>Created by - {{ issue.created_by.extra_data.name }} </span>
-    <img src="{{issue.created_by.extra_data.picture}}" width="25" height="25"/> 
+    <img src="{{issue.created_by.extra_data.picture}}" width="25" height="25" />
 
     <form method="POST">
         {% csrf_token %}
@@ -80,34 +81,34 @@
         <button type="submit" class="btn btn-danger" name="delete" value="true"
             onclick="return confirmDelete();">Eliminar</button>
     </form>
-  
+
     <div>
         <h3>Watchers</h1>
             <ul>
                 {% for watcher in watchers %}
-                    <li>{{ watcher.watcher.extra_data.name }}</li>  <!-- Muestra los datos del watcher -->
+                <li>{{ watcher.watcher.extra_data.name }}</li> <!-- Muestra los datos del watcher -->
                 {% empty %}
-                    <li>No watchers</li> 
+                <li>No watchers</li>
                 {% endfor %}
             </ul>
-        <form method="POST">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger" name="addWatcher" value="true">+ Add Watcher</button>
-            {% if is_watching %}
-            <button type="submit" class="btn btn-danger" name="unsetWatcher" value="true">Unwatch</button>
-            {% else %}
-            <button type="submit" class="btn btn-danger" name="setWatcher" value="true">Watch</button>
-            {% endif %}
-        </form>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" name="addWatcher" value="true">+ Add Watcher</button>
+                {% if is_watching %}
+                <button type="submit" class="btn btn-danger" name="unsetWatcher" value="true">Unwatch</button>
+                {% else %}
+                <button type="submit" class="btn btn-danger" name="setWatcher" value="true">Watch</button>
+                {% endif %}
+            </form>
     </div>
 
     <div>
         <h3>Assigned</h3>
         <ul>
             {% for assigned in assigneds %}
-                <li>{{ assigned.assigned.extra_data.name }}</li>  <!-- Muestra los datos del watcher -->
+            <li>{{ assigned.assigned.extra_data.name }}</li> <!-- Muestra los datos del watcher -->
             {% empty %}
-                <li>Not assigned</li> 
+            <li>Not assigned</li>
             {% endfor %}
         </ul>
         <form method="POST">
@@ -118,6 +119,34 @@
             {% else %}
             <button type="submit" class="btn btn-danger" name="setAssigned" value="true">Assigne to me</button>
             {% endif %}
+        </form>
+    </div>
+
+    <div>
+        <h3>Attachments</h3>
+        <ul>
+            {% for attachment in attachments %}
+            <li>
+                <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.filename }}</a>
+                ({{ attachment.formatted_filesize }})
+                {% if attachment.description %} - {{ attachment.description }}{% endif %}
+                <form method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
+                    <button type="submit" name="delete_attachment" value="true"
+                        onclick="return confirm('¿Estás seguro que quieres eliminar este archivo?');">✖</button>
+                </form>
+            </li>
+            {% empty %}
+            <li>No attachments</li>
+            {% endfor %}
+        </ul>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="new_attachments" multiple>
+            <input type="text" name="attachment_description" placeholder="Description (optional)">
+            <button type="submit" name="upload_attachment" value="true">Upload</button>
         </form>
     </div>
 
