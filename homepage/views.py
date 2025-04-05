@@ -65,6 +65,7 @@ def issueDetail(request, id):
     is_watching = Watch.objects.filter(watcher=SocialAccount.objects.filter(user=request.user, provider="google").first(), issue=issue).exists()
     assigneds = list(Assigned.objects.filter(issue=issue))
     is_assigned = Assigned.objects.filter(assigned=SocialAccount.objects.filter(user=request.user, provider="google").first(), issue=issue).exists()
+    users = SocialAccount.objects.all()
 
     paramform = EditParamsForm(initial={
         "priority": issue.priority.name,
@@ -135,11 +136,27 @@ def issueDetail(request, id):
             if assign:
                 assign.delete()
             return redirect(reverse("issueDetail", args=[issue.id]))
-
+        
+        elif 'addAssigned' in request.POST:
+            assigned_id = request.POST.get("assigned_user")
+            assigned = SocialAccount.objects.filter(id=assigned_id).first()
+            if not Assigned.objects.filter(assigned=assigned, issue=issue).exists():
+                assign = Assigned(assigned=assigned, issue=issue)
+                assign.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+        
+        elif 'watcher_user' in request.POST:
+            watcher_id = request.POST.get("watcher_user")
+            watcher = SocialAccount.objects.filter(id=watcher_id).first()
+            if not Watch.objects.filter(watcher=watcher, issue=issue).exists():
+                watch = Watch(watcher=watcher, issue=issue)
+                watch.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
                                                 "assigneds": assigneds, "is_assigned": is_assigned,
-                                                "watchers": watchers, "is_watching" : is_watching})
+                                                "watchers": watchers, "is_watching" : is_watching,
+                                                "users": users, })
 
 def login(request):
     return render(request, "login.html")

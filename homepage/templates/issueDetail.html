@@ -92,12 +92,24 @@
             </ul>
         <form method="POST">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger" name="addWatcher" value="true">+ Add Watcher</button>
+            <button type="button"  onclick="document.getElementById('watchForm').style.display = 'block';">+ Add Watcher</button>
             {% if is_watching %}
             <button type="submit" class="btn btn-danger" name="unsetWatcher" value="true">Unwatch</button>
             {% else %}
             <button type="submit" class="btn btn-danger" name="setWatcher" value="true">Watch</button>
             {% endif %}
+        </form>
+    </div>
+
+    <div id="watchForm" style="display: none; margin-top: 1em;">
+        <form method="post">
+            {% csrf_token %}
+            <select name="watcher_user" required>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" name="addWatcher" value="true">Watch</button>
         </form>
     </div>
 
@@ -112,7 +124,7 @@
         </ul>
         <form method="POST">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger" name="addAssigned" value="true">+ Add Assigned</button>
+            <button type="button"  onclick="document.getElementById('assignForm').style.display = 'block';">+ Add Assigned</button>
             {% if is_assigned %}
             <button type="submit" class="btn btn-danger" name="unsetAssigned" value="true">Unassign</button>
             {% else %}
@@ -120,6 +132,19 @@
             {% endif %}
         </form>
     </div>
+
+    <div id="assignForm" style="display: none; margin-top: 1em;">
+        <form method="post">
+            {% csrf_token %}
+            <select name="assigned_user" required>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" name="addAssigned" value="true">Assigne</button>
+        </form>
+    </div>
+
 
     <script>
         function enableEditTitle() {
