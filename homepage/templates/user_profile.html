@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Settings</title>
+    <link rel="stylesheet" href="{% static 'css/user.css' %}">
+</head>
+<script>
+    function showTab(tabId) {
+        // Ocultar todas las pestañas
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => tab.classList.remove('active'));
+
+        // Desactivar todos los botones
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(button => button.classList.remove('active'));
+
+        // Mostrar la pestaña seleccionada
+        document.getElementById(tabId).classList.add('active');
+
+        // Activar el botón correspondiente
+        event.target.classList.add('active');
+    }
+</script>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="profile-sidebar">
+            <img src="{% static 'img/default-profile.png' %}" alt="Profile Picture">
+            <h2>{{ full_name }}</h2>
+            <p>@{{ username }}</p>
+            <div class="stats">
+                <div>
+                    <span>{{Numassigned_issues}}</span>
+                    Open Assigned Issues
+                </div>
+                <div>
+                    <span>{{Numwatched_issues }}</span>
+                    Watched Issues
+                </div>
+                <div>
+                    <span>{{ comments }}</span>
+                    Comments
+                </div>
+            </div>
+            <p>{{ bio }}</p>
+            <a href="#" class="edit-bio">Edit Bio</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="profile-content">
+            <div class="tabs">
+                <button class="tab-button active" onclick="showTab('assigned-issues')">Open Assigned Issues</button>
+                <button class="tab-button" onclick="showTab('watched-issues')">Watched Issues</button>
+                <button class="tab-button" onclick="showTab('comments')">Comments</button>
+            </div>
+        
+            <!-- Open Assigned Issues -->
+            <div id="assigned-issues" class="tab-content active">
+                <h3>Open Assigned Issues</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>T</th>
+                            <th>S</th>
+                            <th>P</th>
+                            <th>Issue</th>
+                            <th>Status</th>
+                            <th>Modified</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for issue in assigned_issues %}
+                        <tr>
+                            <td>{{ issue.type }}</td>
+                            <td>{{ issue.severity }}</td>
+                            <td>{{ issue.priority }}</td>
+                            <td>#{{ issue.id }} {{ issue.subject }}</td>
+                            <td>{{ issue.status }}</td>
+                            <td>{{ issue.modified }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        
+            <!-- Watched Issues -->
+            <div id="watched-issues" class="tab-content">
+                <h3>Watched Issues</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>T</th>
+                            <th>S</th>
+                            <th>P</th>
+                            <th>Issue</th>
+                            <th>Status</th>
+                            <th>Modified</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for issue in watched_issues %}
+                        <tr>
+                            <td>{{ issue.type }}</td>
+                            <td>{{ issue.severity }}</td>
+                            <td>{{ issue.priority }}</td>
+                            <td>#{{ issue.id }} {{ issue.subject }}</td>
+                            <td>{{ issue.status }}</td>
+                            <td>{{ issue.modified }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        
+            <!-- Comments -->
+            <div id="comments" class="tab-content">
+                <h3>Comments</h3>
+                <ul>
+                    {% for comment in comments %}
+                    <li>{{ comment.text }} - <strong>{{ comment.date }}</strong></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
