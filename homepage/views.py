@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
-from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments
+from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment
 from .forms import EditParamsForm, CommentForm
 
 from .filters import IssueFilter
@@ -25,6 +25,7 @@ def createIssue(request):
         severity_name = request.POST.get('severity')
         status_name = request.POST.get('status')
         deadline = request.POST.get('deadline')
+        attachments_description = request.POST.get('attachments_description', '')
 
         # Recuperar objetos de la base de datos
         priority = Priority.objects.get(name=priority_name)
@@ -44,6 +45,20 @@ def createIssue(request):
             created_by= SocialAccount.objects.filter(user=request.user, provider="google").first()  # Asignar el usuario que crea el issue
         )
         new_issue.save()
+
+        # Procesar archivos adjuntos
+        files = request.FILES.getlist('attachments')
+        for file in files:
+            filesize = file.size
+            attachment = Attachment(
+                issue=new_issue,
+                file=file,
+                filename=file.name,
+                filesize=filesize,
+                description=attachments_description,
+            )
+            attachment.save()
+
         return redirect('/issues')  # Redirige a la página principal
 
     # Obtener datos para los selectores
@@ -72,6 +87,8 @@ def issueDetail(request, id):
     comments = Comments.objects.filter(issue=issue)
     commentForm = CommentForm()
 
+    attachments = Attachment.objects.filter(issue=issue)
+    
     paramform = EditParamsForm(initial={
         "priority": issue.priority.name,
         "type": issue.type.name,
@@ -172,6 +189,32 @@ def issueDetail(request, id):
                 assigned.delete()
             return redirect(reverse("issueDetail", args=[issue.id]))
 
+        elif 'upload_attachment' in request.POST:
+            files = request.FILES.getlist('new_attachments')
+            description = request.POST.get('attachment_description', '')
+            
+            for file in files:
+                filesize = file.size
+                attachment = Attachment(
+                    issue=issue,
+                    file=file,
+                    filename=file.name,
+                    filesize=filesize,
+                    description=description,
+                )
+                attachment.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+            
+        elif 'delete_attachment' in request.POST:
+            attachment_id = request.POST.get('attachment_id')
+            try:
+                attachment = Attachment.objects.get(id=attachment_id, issue=issue)
+                attachment.file.delete()
+                attachment.delete()
+            except Attachment.DoesNotExist:
+                pass
+            return redirect(reverse("issueDetail", args=[issue.id]))
+            
         elif 'add_comment' in request.POST:
             commentForm = CommentForm(request.POST)
             if commentForm.is_valid():
@@ -186,7 +229,8 @@ def issueDetail(request, id):
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
                                                 "assigneds": assigneds, "is_assigned": is_assigned,
                                                 "watchers": watchers, "is_watching" : is_watching,
-                                                "users": users, 'comments':comments, 'commentForm':commentForm })
+                                                "users": users, 'comments':comments, 'commentForm':commentForm,
+                                                "attachments": attachments })
 
 def login(request):
     return render(request, "login.html")
