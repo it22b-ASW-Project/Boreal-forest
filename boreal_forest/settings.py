@@ -53,7 +53,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'boreal_forest.middleware.TimezoneMiddleware',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
