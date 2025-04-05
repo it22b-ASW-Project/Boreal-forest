@@ -143,3 +143,30 @@ def issueDetail(request, id):
 
 def login(request):
     return render(request, "login.html")
+
+def settings(request):
+    return render(request, 'settings.html')
+
+def user_settings(request):
+    user = request.user  # Obtiene el usuario autenticado
+    context = {
+        'username': user.username,
+        'email': user.email,
+        'full_name': f"{user.first_name} {user.last_name}",
+        'language': 'English (US)',  # Puedes obtener esto de un modelo o configuración
+        'theme': 'dark',  # Ejemplo de un valor predeterminado
+        'bio': 'Computer Engineering student',  # Puedes obtener esto de un modelo personalizado
+    }
+    return render(request, 'user_settings.html', context)
+
+def change_password(request):
+    return render(request, 'change_password.html')
+
+def email_notifications(request):
+    return render(request, 'email_notifications.html')
+
+def desktop_notifications(request):
+    return render(request, 'desktop_notifications.html')
+
+def events(request):
+    return render(request, 'events.html')

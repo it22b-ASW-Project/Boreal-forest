@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="{% static 'css/settings.css' %}">
+</head>
+<body>
+    <div class="settings-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <ul>
+                <li data-page="user-settings" class="active">USER SETTINGS</li>
+                <li data-page="change-password">CHANGE PASSWORD</li>
+                <li data-page="email-notifications">EMAIL NOTIFICATIONS</li>
+                <li data-page="desktop-notifications">DESKTOP NOTIFICATIONS</li>
+                <li data-page="events">EVENTS</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="main-content">
+            <!-- Aquí se cargará el contenido dinámico -->
+            <h1>Welcome to Settings</h1>
+            <p>Selecciona una opción de la barra lateral para ver más detalles.</p>
+        </div>
+    </div>
+    <script src="{% static 'js/settings.js' %}"></script>
+</body>
+</html>
