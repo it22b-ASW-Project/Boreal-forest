@@ -1,5 +1,7 @@
 from django.db import models
 
+from django.utils import timezone
+
 class Priority(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
     color = models.CharField(max_length=7, default="#808080")  
@@ -47,7 +49,7 @@ class Issue(models.Model):
     def get_type_color(self):
             return self.type.color if self.type else "#808080"  # Gris por defecto
     
-    def get_priority_color(self):
+    def get_severity_color(self):
             return self.severity.color if self.severity else "#808080"  # Gris por defecto
     
 class Watch(models.Model):
@@ -81,3 +83,8 @@ class Attachment(models.Model):
             return f"{self.filesize / 1024:.1f} KB"
         else:
             return f"{self.filesize / (1024 * 1024):.1f} MB"
+class Comments(models.Model):
+        comment= models.CharField (max_length = 280)
+        issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+        user = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='comment_owner')
+        created_at = models.DateTimeField(default=timezone.now)
