@@ -148,28 +148,26 @@ def settings(request):
     return render(request, 'settings.html')
 
 def user_settings(request):
-    user = request.user  # Obtiene el usuario autenticado
+    user = request.user
     context = {
         'username': user.username,
         'email': user.email,
         'full_name': f"{user.first_name} {user.last_name}",
-        'language': 'English (US)',  # Puedes obtener esto de un modelo o configuración
-        'theme': 'dark',  # Ejemplo de un valor predeterminado
-        'bio': 'Computer Engineering student',  # Puedes obtener esto de un modelo personalizado
+        'language': 'English (US)',
+        'theme': 'dark',
+        'bio': 'Computer Engineering student',
     }
     return render(request, 'user_settings.html', context)
 
 def user_profile(request, id):
-    user = get_object_or_404(SocialAccount, id=id)  # Obtiene el usuario por ID
+    user = SocialAccount.objects.get(id=id)
     assigned_issues = Issue.objects.filter(assigned__assigned=user)
     watched_issues = Watch.objects.filter(watcher=user)
     context = {
         'username': user.user.username,
         'email': user.user.email,
         'full_name': f"{user.user.first_name} {user.user.last_name}",
-        'language': 'English (US)',  # Puedes obtener esto de un modelo o configuración
-        'theme': 'dark',  # Ejemplo de un valor predeterminado
-        'bio': 'Computer Engineering student',  # Puedes obtener esto de un modelo personalizado
+        'bio': 'Computer Engineering student',
         'watched_issues': watched_issues,
         'assigned_issues': assigned_issues,
         'Numassigned_issues': len(assigned_issues),
