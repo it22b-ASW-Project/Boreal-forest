@@ -152,6 +152,21 @@ def issueDetail(request, id):
                 watch = Watch(watcher=watcher, issue=issue)
                 watch.save()
             return redirect(reverse("issueDetail", args=[issue.id]))
+        
+        elif 'deleteWatcher' in request.POST:
+            watcher_id = request.POST.get('delete_watcher_id')
+            watcher = Watch.objects.filter(id=watcher_id)
+            if watcher:
+                watcher.delete()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+        
+        elif 'deleteAssigned' in request.POST:
+            assigned_id = request.POST.get('delete_assigned_id')
+            assigned = Assigned.objects.filter(id=assigned_id)
+            if assigned:
+                assigned.delete()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
                                                 "assigneds": assigneds, "is_assigned": is_assigned,
