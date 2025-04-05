@@ -10,4 +10,5 @@ urlpatterns = [
     path('issues/', views.showAllIssues),
     path('', views.login), 
     path('issues/new/', views.createIssue),
+    path('issue/<int:id>/', views.issueDetail, name='issueDetail'),
 ]
