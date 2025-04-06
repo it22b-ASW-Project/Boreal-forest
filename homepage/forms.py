@@ -1,7 +1,6 @@
 from django import forms
 
 from .models import Priority, Type, Severity, Status
-from allauth.socialaccount.models import SocialAccount
 
 class EditParamsForm(forms.Form):
     priority = forms.ModelChoiceField(
