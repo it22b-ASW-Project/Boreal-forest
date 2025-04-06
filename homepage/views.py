@@ -284,6 +284,7 @@ def user_profile(request, id):
 
     assigned_issues = Assigned.objects.filter(assigned=user).select_related('issue').order_by(order_by_field)
     watched_issues = Watch.objects.filter(watcher=user).select_related('issue').order_by(order_by_field)
+    comments = Comments.objects.filter(user=user).select_related('issue').order_by(f'-created_at')
 
     context = {
         'username': user.user.username,
@@ -292,7 +293,9 @@ def user_profile(request, id):
         'bio': 'Computer Engineering student',
         'watched_issues': watched_issues,
         'assigned_issues': assigned_issues,
+        'comments': comments,
         'Numassigned_issues': len(assigned_issues),
         'Numwatched_issues': len(watched_issues),
+        'Numcomments': len(comments),
     }
     return render(request, 'user_profile.html', context)

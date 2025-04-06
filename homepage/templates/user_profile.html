@@ -55,7 +55,7 @@
                     Watched Issues
                 </div>
                 <div>
-                    <span>{{ comments }}</span>
+                    <span>{{ Numcomments }}</span>
                     Comments
                 </div>
             </div>
@@ -192,7 +192,15 @@
                 <h3>Comments</h3>
                 <ul>
                     {% for comment in comments %}
-                    <li>{{ comment.text }} - <strong>{{ comment.date }}</strong></li>
+                    <div class="comment-container">
+                        <h3 class="comment-title">
+                            <a href="/issue/{{ comment.issue.id }}">#{{ comment.issue.id }} {{ comment.issue.subject }}</a>
+                            <span class="comment-date">{{ comment.created_at|date:"d M Y H:i" }}</span>
+                        </h3>
+                        <p class="comment-text">{{ comment.comment }}</p>
+                    </div>
+                    {% empty %}
+                    <li>No comments available.</li>
                     {% endfor %}
                 </ul>
             </div>
