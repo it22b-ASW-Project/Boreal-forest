@@ -24,6 +24,14 @@
         <span id="edit-btn" onclick="enableEditTitle()">{{ issue.subject }}</span>
     </h1>
 
+    <span id="editDesc-btn" onclick="enableEditDesc()">
+        {% if issue.description %}
+        {{ issue.description }}
+        {% else %}
+        No description set - Write something!
+        {% endif %}
+    </span>
+
     <form id="description-form" method="POST" style="display: none;">
         {% csrf_token %}
         <input type="text" name="description" id="description-input" value="{{ issue.description }}">
@@ -50,11 +58,8 @@
             value="{% if issue.deadline %}{{ issue.deadline|date:'Y-m-d' }}{% endif %}">
         <button type="submit">Save</button>
         <button type="button" onclick="cancelEditDeadline()">Cancel</button>
+        <br>
     </form>
-
-    <span id="editDesc-btn" onclick="enableEditDesc()">{{ issue.description }}</span>
-
-    <br>
 
     <span>Created by - {{ issue.created_by.extra_data.name }} </span>
     <img src="{{issue.created_by.extra_data.picture}}" width="25" height="25" />
