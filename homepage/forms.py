@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Priority, Type, Severity, Status, Comments
+from .models import Priority, Type, Severity, Status, Comments, UserProfile
 
 class EditParamsForm(forms.Form):
     priority = forms.ModelChoiceField(
@@ -56,3 +56,14 @@ class BulkIssueForm(forms.Form):
             'cols': 40,
         })
     )
+class EditBioForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['bio']
+        widgets = {
+            'bio': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 3, 
+                'placeholder': 'Write your bio here...'
+            }),
+        }
