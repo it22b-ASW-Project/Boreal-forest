@@ -270,7 +270,7 @@ def user_settings(request):
 
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
-
+    profile = UserProfile.objects.get(user=user.user)
     # Obtener el parámetro de ordenación de la solicitud GET
     sort_by = request.GET.get('sort_by', '-modified')  # Por defecto, ordenar por 'modified'
 
@@ -290,7 +290,7 @@ def user_profile(request, id):
         'username': user.user.username,
         'email': user.user.email,
         'full_name': f"{user.user.first_name} {user.user.last_name}",
-        'bio': 'Computer Engineering student',
+        'bio': profile.bio,
         'watched_issues': watched_issues,
         'assigned_issues': assigned_issues,
         'comments': comments,

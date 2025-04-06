@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from django.utils.timezone import now
 
 from django.utils import timezone
@@ -97,3 +98,6 @@ class Comments(models.Model):
         issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
         user = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='comment_owner')
         created_at = models.DateTimeField(auto_now_add=True)
+
+class CustomUser(AbstractUser):
+    bio = models.TextField(null=True, blank=True)  # Campo bio
