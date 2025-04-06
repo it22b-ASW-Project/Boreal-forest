@@ -21,8 +21,22 @@
         document.getElementById(tabId).classList.add('active');
 
         // Activar el botón correspondiente
-        event.target.classList.add('active');
+        const activeButton = document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
     }
+    // Función para obtener el valor de un parámetro de la URL
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Al cargar la página, activar la pestaña correspondiente
+    document.addEventListener('DOMContentLoaded', () => {
+        const activeTab = getQueryParam('tab') || 'assigned-issues'; // Por defecto, 'assigned-issues'
+        showTab(activeTab);
+    });
 </script>
 <body>
     <div class="container">
@@ -63,32 +77,52 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>T</th>
-                            <th>S</th>
-                            <th>P</th>
+                            <th>
+                                <span>T</span>
+                                <a href="?sort_by=type__name&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-type__name&tab=assigned-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>S</span>
+                                <a href="?sort_by=severity__name&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-severity__name&tab=assigned-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>P</span>
+                                <a href="?sort_by=priority__name&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-priority__name&tab=assigned-issues">↓</a>
+                            </th>
                             <th>Issue</th>
-                            <th>Status</th>
-                            <th>Modified</th>
+                            <th>
+                                <span>Status</span>
+                                <a href="?sort_by=status&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-status&tab=assigned-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>Modified</span>
+                                <a href="?sort_by=modified_at&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-modified_at&tab=assigned-issues">↓</a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for issue in assigned_issues %}
                         <tr>
                             <td>
-                                <span class="colorDot" style="background-color: {{ issue.type.color|default:'#ccc' }}">
+                                <span class="colorDot" style="background-color: {{ issue.issue.type.color|default:'#ccc' }}">
                                 </span>
                             </td>
                             <td>
-                                <span class="colorDot" style="background-color: {{ issue.severity.color|default:'#ccc' }}">
+                                <span class="colorDot" style="background-color: {{ issue.issue.severity.color|default:'#ccc' }}">
                                 </span>
                             </td>
                             <td>
-                                <span class="colorDot" style="background-color: {{ issue.priority.color|default:'#ccc' }}">
+                                <span class="colorDot" style="background-color: {{ issue.issue.priority.color|default:'#ccc' }}">
                                 </span>
                             </td>
-                            <td>#{{ issue.id }} {{ issue.subject }}</td>
-                            <td>{{ issue.status }}</td>
-                            <td>{{ issue.modified }}</td>
+                            <td>#{{ issue.issue.id }} {{ issue.issue.subject }}</td>
+                            <td>{{ issue.issue.status }}</td>
+                            <td>{{ issue.issue.modified_at }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -101,12 +135,32 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>T</th>
-                            <th>S</th>
-                            <th>P</th>
+                            <th>
+                                <span>T</span>
+                                <a href="?sort_by=type__name&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-type__name&tab=watched-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>S</span>
+                                <a href="?sort_by=severity__name&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-severity__name&tab=watched-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>P</span>
+                                <a href="?sort_by=priority__name&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-priority__name&tab=watched-issues">↓</a>
+                            </th>
                             <th>Issue</th>
-                            <th>Status</th>
-                            <th>Modified</th>
+                            <th>
+                                <span>Status</span>
+                                <a href="?sort_by=status&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-status&tab=watched-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>Modified</span>
+                                <a href="?sort_by=modified_at&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-modified_at&tab=watched-issues">↓</a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -126,7 +180,7 @@
                             </td>
                             <td>#{{ issue.issue.id }} {{ issue.issue.subject }}</td>
                             <td>{{ issue.issue.status }}</td>
-                            <td>{{ issue.issue.modified }}</td>
+                            <td>{{ issue.issue.modified_at }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
