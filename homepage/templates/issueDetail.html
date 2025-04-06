@@ -101,8 +101,7 @@
             </ul>
             <form method="POST">
                 {% csrf_token %}
-                <button type="button" onclick="document.getElementById('watchForm').style.display = 'block';">+ Add
-                    Watcher</button>
+                <button type="button" onclick="document.getElementById('watchForm').style.display = 'block';">+ Add Watcher</button>
                 {% if is_watching %}
                 <button type="submit" class="btn btn-danger" name="unsetWatcher" value="true">Unwatch</button>
                 {% else %}

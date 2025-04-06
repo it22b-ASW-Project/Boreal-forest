@@ -5,16 +5,34 @@ from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
 from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment
-from .forms import EditParamsForm, CommentForm
+from .forms import EditParamsForm, CommentForm, BulkIssueForm
 
 from .filters import IssueFilter
 
 from django.utils import timezone
 
 def showAllIssues(request):
+    bulkForm = BulkIssueForm()
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
-    return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues})
+
+    if request.method == "POST":
+        form = BulkIssueForm(request.POST)
+        if form.is_valid():
+            crearIssues(request, form)
+            return redirect("/")  # Cambia a tu vista/listado real
+    else:
+        form = BulkIssueForm()
+
+    return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues, 'bulkForm': bulkForm})
     
+def crearIssues(request, form):
+    lines = form.cleaned_data["bulk_text"].splitlines()
+    issues = [Issue(subject=line.strip(), status=Status.objects.order_by('id').first(), type=Type.objects.order_by('id').first(),
+                    severity=Severity.objects.order_by('id').first(), priority=Priority.objects.order_by('id').first(), 
+                    created_by=SocialAccount.objects.filter(user=request.user, provider="google").first()) for line in lines if line.strip()]
+    Issue.objects.bulk_create(issues)
+
+
 def createIssue(request):
     if request.method == 'POST':
         # Obtener valores del formulario
