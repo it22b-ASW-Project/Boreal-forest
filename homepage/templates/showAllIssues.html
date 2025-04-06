@@ -71,6 +71,7 @@
     <span class="colorDot" style="background-color: {{issue.severity.color}}">
     </span>
     <p style="color: {{issue.status.color}}">{{issue.status.name}}</p>
+    <p><strong>Last Modified:</strong> {{ issue.modified_at|date:"d/m/Y H:i" }}</p>
     <br>
   </div>
   {% empty %}

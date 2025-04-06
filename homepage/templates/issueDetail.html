@@ -54,7 +54,7 @@
 
     <br>
 
-    <span>Created by - {{ issue.created_by.extra_data.name }} </span>
+    <span>Created by - {{ issue.created_by.extra_data.name }} at {{issue.created_at}}</span>
     <img src="{{issue.created_by.extra_data.picture}}" width="25" height="25"/> 
 
     <form method="POST">

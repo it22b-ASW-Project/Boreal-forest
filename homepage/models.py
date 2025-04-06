@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 class Priority(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
@@ -37,6 +38,8 @@ class Issue(models.Model):
     priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True)
     deadline = models.DateField(null=True, blank=True)
     created_by = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='creator')
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
 
     def get_priority_color(self):
             return self.priority.color if self.priority else "#808080"  # Gris por defecto
@@ -49,7 +52,13 @@ class Issue(models.Model):
     
     def get_severity_color(self):
             return self.severity.color if self.severity else "#808080"  # Gris por defecto
-    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+             self.modified_at = created_at = now()
+        else:
+            self.modified_at = now()
+        super().save(*args, **kwargs)
+
 class Watch(models.Model):
         watcher = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='watcher')
         issue = models.ForeignKey(Issue, on_delete=models.CASCADE)

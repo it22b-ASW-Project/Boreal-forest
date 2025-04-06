@@ -171,7 +171,7 @@ def issueDetail(request, id):
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
                                                 "assigneds": assigneds, "is_assigned": is_assigned,
                                                 "watchers": watchers, "is_watching" : is_watching,
-                                                "users": users, })
+                                                "users": users,})
 
 def login(request):
     return render(request, "login.html")
@@ -193,8 +193,21 @@ def user_settings(request):
 
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
-    assigned_issues = Issue.objects.filter(assigned__assigned=user)
-    watched_issues = Watch.objects.filter(watcher=user)
+
+    # Obtener el parámetro de ordenación de la solicitud GET
+    sort_by = request.GET.get('sort_by', '-modified')  # Por defecto, ordenar por 'modified'
+
+    valid_sort_fields = ['type__name', 'severity__name', 'priority__name', 'status', 'modified_at']
+    if sort_by.lstrip('-') not in valid_sort_fields:
+        sort_by = '-modified_at'
+
+    order_by_field = f'issue__{sort_by.lstrip("-")}'
+    if sort_by.startswith('-'):
+        order_by_field = f'-{order_by_field}'
+
+    assigned_issues = Assigned.objects.filter(assigned=user).select_related('issue').order_by(order_by_field)
+    watched_issues = Watch.objects.filter(watcher=user).select_related('issue').order_by(order_by_field)
+
     context = {
         'username': user.user.username,
         'email': user.user.email,
