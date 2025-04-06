@@ -96,4 +96,4 @@ class Comments(models.Model):
         comment= models.CharField (max_length = 280)
         issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
         user = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='comment_owner')
-        created_at = models.DateTimeField(default=timezone.now)
+        created_at = models.DateTimeField(auto_now_add=True)
