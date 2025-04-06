@@ -30,7 +30,7 @@
     <div>
         <h1>New Issue</h1>
     </div>
-    <form action="" method="POST">
+    <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <label for="Subject">Subject:</label>
         <input type="text" id="Subject" name="Subject" required>
@@ -82,6 +82,16 @@
             {% endfor %}
         </select>
         <span class="colorDot" id="statusDot" style="background-color: {{ status.0.color }}"></span>
+
+        <br><br>
+
+        <label for="attachments">Attachments (you can select multiple files): </label>
+        <input type="file" id="attachments" name="attachments" multiple>
+
+        <br><br>
+
+        <label for="attachments_description">Description (optional): </label>
+        <input type="text" id="attachments_description" name="attachments_description">
 
         <br><br>
 
