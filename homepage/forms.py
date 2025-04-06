@@ -46,3 +46,13 @@ class CommentForm(forms.ModelForm):
                 'placeholder': 'Escribe tu comentario aquí...',  
             }),
         }
+
+class BulkIssueForm(forms.Form):
+    bulk_text = forms.CharField(
+        label='',
+        widget=forms.Textarea(attrs={
+            'placeholder': 'Escribe cada issue en una línea diferente...',
+            'rows': 6,
+            'cols': 40,
+        })
+    )
