@@ -4,7 +4,7 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Settings</title>
+    <title>User Profile</title>
     <link rel="stylesheet" href="{% static 'css/user.css' %}">
 </head>
 <script>
@@ -38,6 +38,31 @@
         showTab(activeTab);
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const editBioButton = document.getElementById('editBioButton');
+        const editBioForm = document.getElementById('editBioForm');
+
+        editBioButton.addEventListener('click', () => {
+            if (editBioForm.style.display === 'none' || editBioForm.style.display === '') {
+                editBioForm.style.display = 'block'; // Mostrar el formulario
+                editBioButton.style.display = 'none'; // Cambiar el texto del botón
+            } else {
+                editBioForm.style.display = 'none'; // Ocultar el formulario
+                editBioButton.textContent = 'Edit Bio'; // Restaurar el texto del botón
+            }
+        });
+        CancelBioButton.addEventListener('click', () => {
+            if (editBioForm.style.display === 'none' || editBioForm.style.display === '') {
+                editBioForm.style.display = 'block'; // Mostrar el formulario
+                editBioButton.style.display = 'none'; // Cambiar el texto del botón
+            } else {
+                editBioForm.style.display = 'none'; // Ocultar el formulario
+                editBioButton.style.display = 'block'; // Restaurar el texto del botón
+            }
+        });
+    });
+</script>
 <body>
     <div class="container">
         <!-- Sidebar -->
@@ -47,20 +72,31 @@
             <p>@{{ username }}</p>
             <div class="stats">
                 <div>
-                    <span>{{Numassigned_issues}}</span>
-                    Open Assigned Issues
+                    <p class="num"><strong>{{Numassigned_issues}}</strong></p>
+                    <p >Open Assigned Issues</p>
                 </div>
                 <div>
-                    <span>{{Numwatched_issues }}</span>
-                    Watched Issues
+                    <p class="num"><strong>{{Numwatched_issues }}</strong></p>
+                    <p>Watched Issues</p>
                 </div>
                 <div>
-                    <span>{{ Numcomments }}</span>
-                    Comments
+                    <p class="num"><strong>{{ Numcomments }}</strong></p>
+                    <p>Comments</p>
                 </div>
             </div>
-            <p>{{ bio }}</p>
-            <a href="#" class="edit-bio">Edit Bio</a>
+            <p class="break-word">{{ bio }}</p>
+            <!-- Botón para editar la biografía -->
+            <button id="editBioButton" class="edit-bio">Edit Bio</button>
+
+            <!-- Formulario para editar la biografía -->
+            <div id="editBioForm" style ="display:none;">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.bio }}
+                    <button type="submit" id="SaveBioButton">Save</button>
+                    <button type="reset" id="CancelBioButton">Cancel</button>
+                </form>
+            </div>
         </div>
 
         <!-- Main Content -->

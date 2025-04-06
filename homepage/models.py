@@ -1,8 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 from django.utils.timezone import now
-
-from django.utils import timezone
 
 class Priority(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
@@ -99,5 +97,10 @@ class Comments(models.Model):
         user = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='comment_owner')
         created_at = models.DateTimeField(auto_now_add=True)
 
-class CustomUser(AbstractUser):
-    bio = models.TextField(null=True, blank=True)  # Campo bio
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    bio = models.TextField(null=True, blank=True)  # Campo adicional para la biografía
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"

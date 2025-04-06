@@ -37,18 +37,32 @@ body {
 }
 
 .profile-sidebar h2 {
-    font-size: 24px;
+    font-size: 30px;
     margin-bottom: 10px;
     color: #153859;
 }
 
 .profile-sidebar p {
-    font-size: 14px;
-    color: #666;
+    font-size: 21px;
+    color: black;
     margin-bottom: 20px;
 }
-
+.profile-sidebar .stats div p,
+.profile-sidebar .stats div span {
+    margin-top: 10px;
+    font-size: 20px; /* Tamaño de la fuente */
+    color: black; /* Color del texto */
+    white-space: pre-line; /* Permitir saltos de línea */
+    display: block; /* Asegurar que cada palabra ocupe su propia línea */
+    line-height: 1; /* Espaciado entre líneas */
+    text-align: center; /* Alinear el texto al centro */
+}
+.profile-sidebar .stats div .num{
+    font-size: 50px;
+}
 .profile-sidebar .stats {
+    padding: 10px;
+    border: 1px solid #ddd;
     display: flex;
     justify-content: space-around;
     margin-bottom: 20px;
@@ -58,14 +72,12 @@ body {
     text-align: center;
 }
 
-.profile-sidebar .stats div span {
-    display: block;
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-}
-
 .profile-sidebar .edit-bio {
+    margin-top: 10px;
+    top : 65%;
+    left: 12.5%;
+    height: 50px;
+    width: 100px;
     display: inline-block;
     padding: 10px 20px;
     background-color: #98ede1;
@@ -154,8 +166,6 @@ body {
     height: 25px;
     border-radius: 50%;
 }
-
-
 .comment-title {
     margin: 0;
     font-size: 1.1em;
@@ -173,4 +183,38 @@ body {
 
 .comment-text {
     margin: 5px 0;
+}
+#editBioForm {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+#editBioForm textarea {
+    width: 90%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: none;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+#editBioForm button {
+    display: center-block;
+    padding: 10px 20px;
+    background-color: #98ede1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.break-word {
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
 }
