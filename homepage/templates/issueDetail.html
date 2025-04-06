@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <title>{{issue.subject}} - Issue #{{issue.id}}</title>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{issue.subject}} - Issue #{{issue.id}}</title>
 </head>
+
 
 <body>
     <h1>
@@ -21,6 +23,14 @@
 
         <span id="edit-btn" onclick="enableEditTitle()">{{ issue.subject }}</span>
     </h1>
+
+    <span id="editDesc-btn" onclick="enableEditDesc()">
+        {% if issue.description %}
+        {{ issue.description }}
+        {% else %}
+        No description set - Write something!
+        {% endif %}
+    </span>
 
     <form id="description-form" method="POST" style="display: none;">
         {% csrf_token %}
@@ -48,6 +58,7 @@
             value="{% if issue.deadline %}{{ issue.deadline|date:'Y-m-d' }}{% endif %}">
         <button type="submit">Save</button>
         <button type="button" onclick="cancelEditDeadline()">Cancel</button>
+        <br>
     </form>
 
     <span id="editDesc-btn" onclick="enableEditDesc()">{{ issue.description }}</span>
@@ -80,32 +91,32 @@
         <button type="submit" class="btn btn-danger" name="delete" value="true"
             onclick="return confirmDelete();">Eliminar</button>
     </form>
-  
+
     <div>
         <h3>Watchers</h1>
             <ul>
                 {% for watcher in watchers %}
-                    <form method="POST" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="delete_watcher_id" value="{{ watcher.id }}">
-                        <li>
+                <form method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete_watcher_id" value="{{ watcher.id }}">
+                    <li>
                         {{ watcher.watcher.extra_data.name }}
                         <button type="submit" name="deleteWatcher">✕</button>
-                        </li>
-                    </form>               
+                    </li>
+                </form>
                 {% empty %}
-                    <li>No watchers</li> 
+                <li>No watchers</li>
                 {% endfor %}
             </ul>
-        <form method="POST">
-            {% csrf_token %}
-            <button type="button"  onclick="document.getElementById('watchForm').style.display = 'block';">+ Add Watcher</button>
-            {% if is_watching %}
-            <button type="submit" class="btn btn-danger" name="unsetWatcher" value="true">Unwatch</button>
-            {% else %}
-            <button type="submit" class="btn btn-danger" name="setWatcher" value="true">Watch</button>
-            {% endif %}
-        </form>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="button" onclick="document.getElementById('watchForm').style.display = 'block';">+ Add Watcher</button>
+                {% if is_watching %}
+                <button type="submit" class="btn btn-danger" name="unsetWatcher" value="true">Unwatch</button>
+                {% else %}
+                <button type="submit" class="btn btn-danger" name="setWatcher" value="true">Watch</button>
+                {% endif %}
+            </form>
     </div>
 
     <div id="watchForm" style="display: none; margin-top: 1em;">
@@ -113,7 +124,7 @@
             {% csrf_token %}
             <select name="watcher_user" required>
                 {% for user in users %}
-                    <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
+                <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
                 {% endfor %}
             </select>
             <button type="submit" name="addWatcher" value="true">Watch</button>
@@ -124,21 +135,22 @@
         <h3>Assigned</h3>
         <ul>
             {% for assigned in assigneds %}
-                <form method="POST" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="delete_assigned_id" value="{{ assigned.id }}">
-                    <li>
+            <form method="POST" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="delete_assigned_id" value="{{ assigned.id }}">
+                <li>
                     {{ assigned.assigned.extra_data.name }}
                     <button type="submit" name="deleteAssigned">✕</button>
-                    </li>
-                </form>  
+                </li>
+            </form>
             {% empty %}
-                <li>Not assigned</li> 
+            <li>Not assigned</li>
             {% endfor %}
         </ul>
         <form method="POST">
             {% csrf_token %}
-            <button type="button"  onclick="document.getElementById('assignForm').style.display = 'block';">+ Add Assigned</button>
+            <button type="button" onclick="document.getElementById('assignForm').style.display = 'block';">+ Add
+                Assigned</button>
             {% if is_assigned %}
             <button type="submit" class="btn btn-danger" name="unsetAssigned" value="true">Unassign</button>
             {% else %}
@@ -147,18 +159,64 @@
         </form>
     </div>
 
+    <div>
+        <h3>Attachments</h3>
+        <ul>
+            {% for attachment in attachments %}
+            <li>
+                <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.filename }}</a>
+                ({{ attachment.formatted_filesize }})
+                {% if attachment.description %} - {{ attachment.description }}{% endif %}
+                <form method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
+                    <button type="submit" name="delete_attachment" value="true"
+                        onclick="return confirm('¿Estás seguro que quieres eliminar este archivo?');">✖</button>
+                </form>
+            </li>
+            {% empty %}
+            <li>No attachments</li>
+            {% endfor %}
+        </ul>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="new_attachments" multiple>
+            <input type="text" name="attachment_description" placeholder="Description (optional)">
+            <button type="submit" name="upload_attachment" value="true">Upload</button>
+        </form>
+    </div>
+
     <div id="assignForm" style="display: none; margin-top: 1em;">
         <form method="post">
             {% csrf_token %}
             <select name="assigned_user" required>
                 {% for user in users %}
-                    <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
+                <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
                 {% endfor %}
             </select>
             <button type="submit" name="addAssigned" value="true">Assigne</button>
         </form>
     </div>
 
+    <div>
+        <h3>Comments</h3>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ commentForm.comment }}
+            <br>
+            <button type="submit" name="add_comment" class="add_comment">Save</button>
+        </form>
+
+        {% for comment in comments %}
+        <p>{{ comment.comment }}
+        <p>
+        <p><img src="{{comment.user.extra_data.picture}}" width="25" height="25" />
+            {{comment.user.extra_data.name}} -
+            {{comment.created_at}} </p>
+        {% endfor %}
+    </div>
 
     <script>
         function enableEditTitle() {
