@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Priority, Type, Severity, Status
+from .models import Priority, Type, Severity, Status, Comments
 
 class EditParamsForm(forms.Form):
     priority = forms.ModelChoiceField(
@@ -34,3 +34,25 @@ class EditParamsForm(forms.Form):
         self.fields['type'].label_from_instance = lambda obj: obj.name
         self.fields['severity'].label_from_instance = lambda obj: obj.name
         self.fields['status'].label_from_instance = lambda obj: obj.name
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comments
+        fields = ['comment']  
+        widgets = {
+            'comment': forms.Textarea(attrs={
+                'rows': 5, 
+                'cols': 40, 
+                'placeholder': 'Escribe tu comentario aquí...',  
+            }),
+        }
+
+class BulkIssueForm(forms.Form):
+    bulk_text = forms.CharField(
+        label='',
+        widget=forms.Textarea(attrs={
+            'placeholder': 'Escribe cada issue en una línea diferente...',
+            'rows': 6,
+            'cols': 40,
+        })
+    )

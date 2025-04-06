@@ -4,15 +4,35 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
-from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned
-from .forms import EditParamsForm
+from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment
+from .forms import EditParamsForm, CommentForm, BulkIssueForm
 
 from .filters import IssueFilter
 
+from django.utils import timezone
+
 def showAllIssues(request):
+    bulkForm = BulkIssueForm()
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
-    return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues})
+
+    if request.method == "POST":
+        form = BulkIssueForm(request.POST)
+        if form.is_valid():
+            crearIssues(request, form)
+            return redirect("/")  # Cambia a tu vista/listado real
+    else:
+        form = BulkIssueForm()
+
+    return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues, 'bulkForm': bulkForm})
     
+def crearIssues(request, form):
+    lines = form.cleaned_data["bulk_text"].splitlines()
+    issues = [Issue(subject=line.strip(), status=Status.objects.order_by('id').first(), type=Type.objects.order_by('id').first(),
+                    severity=Severity.objects.order_by('id').first(), priority=Priority.objects.order_by('id').first(), 
+                    created_by=SocialAccount.objects.filter(user=request.user, provider="google").first()) for line in lines if line.strip()]
+    Issue.objects.bulk_create(issues)
+
+
 def createIssue(request):
     if request.method == 'POST':
         # Obtener valores del formulario
@@ -23,6 +43,7 @@ def createIssue(request):
         severity_name = request.POST.get('severity')
         status_name = request.POST.get('status')
         deadline = request.POST.get('deadline')
+        attachments_description = request.POST.get('attachments_description', '')
 
         # Recuperar objetos de la base de datos
         priority = Priority.objects.get(name=priority_name)
@@ -42,6 +63,20 @@ def createIssue(request):
             created_by= SocialAccount.objects.filter(user=request.user, provider="google").first()  # Asignar el usuario que crea el issue
         )
         new_issue.save()
+
+        # Procesar archivos adjuntos
+        files = request.FILES.getlist('attachments')
+        for file in files:
+            filesize = file.size
+            attachment = Attachment(
+                issue=new_issue,
+                file=file,
+                filename=file.name,
+                filesize=filesize,
+                description=attachments_description,
+            )
+            attachment.save()
+
         return redirect('/issues')  # Redirige a la página principal
 
     # Obtener datos para los selectores
@@ -66,7 +101,12 @@ def issueDetail(request, id):
     assigneds = list(Assigned.objects.filter(issue=issue))
     is_assigned = Assigned.objects.filter(assigned=SocialAccount.objects.filter(user=request.user, provider="google").first(), issue=issue).exists()
     users = SocialAccount.objects.all()
+    
+    comments = Comments.objects.filter(issue=issue)
+    commentForm = CommentForm()
 
+    attachments = Attachment.objects.filter(issue=issue)
+    
     paramform = EditParamsForm(initial={
         "priority": issue.priority.name,
         "type": issue.type.name,
@@ -167,11 +207,48 @@ def issueDetail(request, id):
                 assigned.delete()
             return redirect(reverse("issueDetail", args=[issue.id]))
 
+        elif 'upload_attachment' in request.POST:
+            files = request.FILES.getlist('new_attachments')
+            description = request.POST.get('attachment_description', '')
+            
+            for file in files:
+                filesize = file.size
+                attachment = Attachment(
+                    issue=issue,
+                    file=file,
+                    filename=file.name,
+                    filesize=filesize,
+                    description=description,
+                )
+                attachment.save()
+            return redirect(reverse("issueDetail", args=[issue.id]))
+            
+        elif 'delete_attachment' in request.POST:
+            attachment_id = request.POST.get('attachment_id')
+            try:
+                attachment = Attachment.objects.get(id=attachment_id, issue=issue)
+                attachment.file.delete()
+                attachment.delete()
+            except Attachment.DoesNotExist:
+                pass
+            return redirect(reverse("issueDetail", args=[issue.id]))
+            
+        elif 'add_comment' in request.POST:
+            commentForm = CommentForm(request.POST)
+            if commentForm.is_valid():
+                com = Comments(comment = commentForm.cleaned_data['comment'], issue = issue)
+                com = commentForm.save(commit=False)
+                com.user = SocialAccount.objects.filter(user=request.user, provider="google").first()
+                com.issue = issue
+                print(timezone.now())
+                com.save()
+        return redirect(reverse("issueDetail", args=[issue.id]))
 
     return render(request, "issueDetail.html", {"issue": issue, "paramform": paramform, 
                                                 "assigneds": assigneds, "is_assigned": is_assigned,
                                                 "watchers": watchers, "is_watching" : is_watching,
-                                                "users": users,})
+                                                "users": users, 'comments':comments, 'commentForm':commentForm,
+                                                "attachments": attachments })
 
 def login(request):
     return render(request, "login.html")
