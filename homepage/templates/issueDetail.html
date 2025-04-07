@@ -61,8 +61,12 @@
         <br>
     </form>
 
-    <span>Created by - {{ issue.created_by.extra_data.name }} </span>
-    <img src="{{issue.created_by.extra_data.picture}}" width="25" height="25" />
+    <span id="editDesc-btn" onclick="enableEditDesc()">{{ issue.description }}</span>
+
+    <br>
+
+    <span>Created by - {{ issue.created_by.extra_data.name }} at {{issue.created_at}}</span>
+    <img src="{{issue.created_by.extra_data.picture}}" width="25" height="25"/> 
 
     <form method="POST">
         {% csrf_token %}

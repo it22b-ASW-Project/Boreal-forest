@@ -85,12 +85,18 @@
     <span class="colorDot" style="background-color: {{issue.severity.color}}">
     </span>
     <p style="color: {{issue.status.color}}">{{issue.status.name}}</p>
+    <p><strong>Last Modified:</strong> {{ issue.modified_at|date:"d/m/Y H:i" }}</p>
     <br>
   </div>
   {% empty %}
   <p>No hay issues registrados.</p>
   {% endfor %}
-
+  <div>
+    <form action="/settings/" method="get">
+      <button type="submit">SETTINGS</button>
+    </form>
+    <button onclick="location.href='{% url 'user_profile' user.id %}'">View Profile</button>
+  </div>
 </body>
 
 </html>
