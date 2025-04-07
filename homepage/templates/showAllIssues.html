@@ -32,7 +32,7 @@
     <form method="POST">
       {% csrf_token %}
       {{ bulkForm }}
-      <button type="submit">Crear Issues</button>
+      <button type="submit">Crear Issues</button> <button onclick="document.getElementById('bulkForm').style.display = 'none';">Cerrar</button> 
     </form>
   </div>
 
