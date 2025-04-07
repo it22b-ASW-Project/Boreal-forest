@@ -1,0 +1,158 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Contenido principal */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    background-color: white;
+}
+
+/* Sidebar derecha */
+.extra-info {
+    width: 300px;
+    background-color: #f9f9fb;
+    border-left: 1px solid #ddd;
+    padding: 20px;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.param-field {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+  
+.param-field label {
+    display: block;
+    font-size: 11px;
+    text-transform: lowercase;
+    color: #888;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.param-value {
+    margin-left: auto;
+}
+
+.colorDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.param-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.param-status label {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: bold;
+}
+
+.add-people {
+    display: block;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.add-people h3 {
+    font-size: 10px;
+    color: #333;    
+    margin-bottom: 0;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.added-user {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.added-user form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    width: 100%;
+    transition: 0.3s
+}
+
+.added-user form:hover {
+    background-color: #f7f7f7;
+    border-radius: 5px;;
+    color: #2596be;
+}
+
+.added-user button {
+    margin-left: auto;
+    border: none;
+    background-color: transparent; 
+}
+
+.added-user button:hover {
+    cursor: pointer;
+    color:chocolate;
+}
+
+.add-usr-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.add-usr-btn form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.add-usr-btn button {
+    background-color: white;
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+    width: 100%;
+}
+
+.add-usr-btn button:hover {
+    color: #2596be;
+}
