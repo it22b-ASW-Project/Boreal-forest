@@ -2,8 +2,6 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
     height: 100vh;
 }
 
@@ -17,6 +15,153 @@ body {
     flex: 1;
     padding: 30px;
     background-color: white;
+}
+
+.issue-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.issue-header h1 {
+    font-size: 24px;
+    color: #008aa8;
+    margin: 0;
+
+}
+
+.issue-header h2 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+}
+
+.issue-header h2:hover {
+    cursor: pointer;
+}
+
+.issue-header form{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.issue-header form input[type="text"] {
+    width: 85%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+.issue-header form input[type="text"]:focus {
+    border-color: #008aa8;
+    outline: none;
+}
+
+.issue-header form button {
+    background-color: transparent;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.issue-header form button:hover {
+    color: #2596be;
+}
+
+.creation-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.creation-info-text {
+    text-align: right;
+}
+
+.creation-info h1 {
+    font-size: 14px;
+    color: #2596be;
+    margin: 0;
+}
+
+.creation-info p {  
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+}
+
+.creation-info img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+}
+
+.issue-info {
+    display: block;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+#editDesc-btn {
+    display: flex;
+    align-items: center;
+    color: #333;
+    gap: 10px;
+    font-size: 10x;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#editDesc-btn:hover {
+    cursor: pointer;
+}
+
+.attachments-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+    background-color: #eceff4;
+}
+
+.attachments-header h3 {
+    font-size: 14px;
+    color: #4c566a;
+    margin: 0;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.comments-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+    background-color: #eceff4;
+}
+
+.comments-header h3 {
+    font-size: 14px;
+    color: #4c566a;
+    margin: 0;
+    padding: 10px;
+    font-weight: bold;
 }
 
 /* Sidebar derecha */
@@ -156,3 +301,4 @@ body {
 .add-usr-btn button:hover {
     color: #2596be;
 }
+

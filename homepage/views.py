@@ -116,8 +116,9 @@ def issueDetail(request, id):
     })
 
     if request.method == "POST":
-        if 'close' in request.POST: 
+        if 'edit_params' in request.POST:
             form = EditParamsForm(request.POST)
+            print(request.POST)
             if form.is_valid():
                 # Guardar los cambios en la base de datos
                 issue.priority = form.cleaned_data['priority']
@@ -126,7 +127,7 @@ def issueDetail(request, id):
                 issue.status = form.cleaned_data['status']
                 # No guardamos deadline aquí, se maneja por separado
                 issue.save()
-            return redirect('/issues')
+            return redirect(reverse("issueDetail", args=[issue.id]))
         
         elif 'subject' in request.POST:    
             issue.subject = request.POST.get("subject", issue.subject)
