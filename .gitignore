@@ -3,3 +3,5 @@ __pycache__/
 *.pyo
 *.pyd
 venv/*
+/staticfiles/
+boreal_forest.sqlite3

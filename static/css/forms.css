@@ -1,0 +1,31 @@
+.form-style{
+    border: none;
+    background-color: transparent;
+    text-align: right;
+    appearance: none;
+}
+
+.form-style:focus {
+    outline: none;
+    border: none;
+    background-color: transparent;
+}
+
+.textarea-comment {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border-radius: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 20px;
+    resize: none;
+    transition: 0.3s;
+}
+
+.textarea-comment:focus {
+    border-color: #008aa8;
+    outline: none;
+}

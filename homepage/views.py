@@ -1,11 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
-from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment
-from .forms import EditParamsForm, CommentForm, BulkIssueForm
+from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment, UserProfile
+from .forms import EditParamsForm, CommentForm, BulkIssueForm, EditBioForm
 
 from .filters import IssueFilter
 
@@ -116,8 +116,11 @@ def issueDetail(request, id):
     })
 
     if request.method == "POST":
-        if 'close' in request.POST: 
+        if 'back' in request.POST:
+            return redirect('/issues')
+        elif 'edit_params' in request.POST:
             form = EditParamsForm(request.POST)
+            print(request.POST)
             if form.is_valid():
                 # Guardar los cambios en la base de datos
                 issue.priority = form.cleaned_data['priority']
@@ -126,7 +129,7 @@ def issueDetail(request, id):
                 issue.status = form.cleaned_data['status']
                 # No guardamos deadline aquí, se maneja por separado
                 issue.save()
-            return redirect('/issues')
+            return redirect(reverse("issueDetail", args=[issue.id]))
         
         elif 'subject' in request.POST:    
             issue.subject = request.POST.get("subject", issue.subject)
@@ -253,6 +256,65 @@ def issueDetail(request, id):
 def login(request):
     return render(request, "login.html")
 
+def settings(request):
+    return render(request, 'settings.html')
+
+def user_settings(request):
+    user = request.user
+    context = {
+        'username': user.username,
+        'email': user.email,
+        'full_name': f"{user.first_name} {user.last_name}",
+        'language': 'English (US)',
+        'theme': 'dark',
+        'bio': 'Computer Engineering student',
+    }
+    return render(request, 'user_settings.html', context)
+
+def user_profile(request, id):
+    user = SocialAccount.objects.get(id=id)
+    profile, created = UserProfile.objects.get_or_create(user_id=id)
+    active_tab = request.GET.get('tab', 'assigned-issues')  # Tab activo por defecto
+    sort_by = request.GET.get('sort_by', '-modified')  # Por defecto, ordenar por 'modified'
+    edit_bio = request.GET.get('edit_bio', 'false') == 'true' 
+
+    valid_sort_fields = ['type__name', 'severity__name', 'priority__name', 'status', 'modified_at']
+    if sort_by.lstrip('-') not in valid_sort_fields:
+        sort_by = '-modified_at'
+
+    order_by_field = f'issue__{sort_by.lstrip("-")}'
+    if sort_by.startswith('-'):
+        order_by_field = f'-{order_by_field}'
+    
+    if request.method == 'POST':
+        form = EditBioForm(request.POST, instance=profile)
+        if form.is_valid():
+            profile.bio = form.cleaned_data['bio']
+            form.save()
+            return redirect('user_profile', id=id)  # Redirige a la misma página después de guardar
+    else:
+        form = EditBioForm(instance=profile)
+
+    assigned_issues = Assigned.objects.filter(assigned=user, issue__status__name__in=['New', 'In progress', 'Ready for test', 'Needs info', 'Rejected', 'Postponed']).select_related('issue').order_by(order_by_field)
+    watched_issues = Watch.objects.filter(watcher=user).select_related('issue').order_by(order_by_field)
+    comments = Comments.objects.filter(user=user).select_related('issue').order_by(f'-created_at')
+
+    context = {
+        'username': user.user.username,
+        'email': user.user.email,
+        'full_name': f"{user.user.first_name} {user.user.last_name}",
+        'watched_issues': watched_issues,
+        'assigned_issues': assigned_issues,
+        'comments': comments,
+        'Numassigned_issues': len(assigned_issues),
+        'Numwatched_issues': len(watched_issues),
+        'Numcomments': len(comments),
+        'bio': profile.bio,
+        'form': form,
+        'active_tab': active_tab,
+        'edit_bio': edit_bio,
+    }
+    return render(request, 'user_profile.html', context)
 
 # Añade esto al final de tu archivo views.py
 from django.http import JsonResponse
