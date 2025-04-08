@@ -271,8 +271,9 @@ def user_settings(request):
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
     profile, created = UserProfile.objects.get_or_create(user_id=id)
-    # Obtener el parámetro de ordenación de la solicitud GET
+    active_tab = request.GET.get('tab', 'assigned-issues')  # Tab activo por defecto
     sort_by = request.GET.get('sort_by', '-modified')  # Por defecto, ordenar por 'modified'
+    edit_bio = request.GET.get('edit_bio', 'false') == 'true' 
 
     valid_sort_fields = ['type__name', 'severity__name', 'priority__name', 'status', 'modified_at']
     if sort_by.lstrip('-') not in valid_sort_fields:
@@ -307,5 +308,7 @@ def user_profile(request, id):
         'Numcomments': len(comments),
         'bio': profile.bio,
         'form': form,
+        'active_tab': active_tab,
+        'edit_bio': edit_bio,
     }
     return render(request, 'user_profile.html', context)
