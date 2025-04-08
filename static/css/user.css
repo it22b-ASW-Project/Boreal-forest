@@ -29,8 +29,8 @@ body {
 }
 
 .profile-sidebar img {
-    width: 400px;
-    height: 400px;
+    width: 70%;
+    height: 40%;
     border-radius: 0;
     margin-bottom: 20px;
     background-color: grey;
@@ -73,11 +73,10 @@ body {
 }
 
 .profile-sidebar .edit-bio {
-    margin-top: 10px;
-    top : 65%;
-    left: 12.5%;
-    height: 50px;
-    width: 100px;
+    margin-top: auto;
+    margin-bottom: auto;
+    height: auto;
+    width: auto;
     display: inline-block;
     padding: 10px 20px;
     background-color: #98ede1;
@@ -86,6 +85,7 @@ body {
     border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
+    font-size: 20px;
 }
 
 .profile-sidebar .edit-bio:hover {
@@ -154,7 +154,7 @@ body {
 }
 
 .tab-content {
-    display: none;
+    display: block;
 }
 
 .tab-content.active {
@@ -185,8 +185,9 @@ body {
     margin: 5px 0;
 }
 #editBioForm {
-    display: none;
-    margin-top: 10px;
+    display: Block;
+    margin-top: auto;
+    margin-bottom: auto;
     padding: 10px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
@@ -203,8 +204,12 @@ body {
     word-wrap: break-word;
     word-break: break-word;
 }
-#editBioForm button {
-    display: center-block;
+#SaveBioButton {
+    margin-top: auto;
+    margin-bottom: auto;
+    height: auto;
+    width: 100px;
+    display: inline-block;
     padding: 10px 20px;
     background-color: #98ede1;
     color: white;
@@ -212,6 +217,7 @@ body {
     border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
+    font-size: 20px;
 }
 .break-word {
     word-wrap: break-word;
