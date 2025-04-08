@@ -4,7 +4,8 @@ from django.utils.timezone import now
 
 class Priority(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
-    color = models.CharField(max_length=7, default="#808080")  
+    color = models.CharField(max_length=7, default="#808080") 
+    position = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.name
@@ -12,20 +13,23 @@ class Priority(models.Model):
 class Type(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
     color = models.CharField(max_length=7, default="#808080") 
+    position = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.name
 
 class Severity(models.Model):
     name = models.CharField(max_length=20, primary_key=True) 
-    color = models.CharField(max_length=7, default="#808080")  
+    color = models.CharField(max_length=7, default="#808080")
+    position = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.name
 
 class Status(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
-    color = models.CharField(max_length=7, default="#808080") 
+    color = models.CharField(max_length=7, default="#808080")
+    position = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.name
