@@ -11,6 +11,8 @@ from .filters import IssueFilter
 
 from django.utils import timezone
 
+from django.db.models import Max
+
 def showAllIssues(request):
     bulkForm = BulkIssueForm()
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
@@ -253,21 +255,6 @@ def issueDetail(request, id):
 def login(request):
     return render(request, "login.html")
 
-def settings(request):
-    return render(request, 'settings.html')
-
-def user_settings(request):
-    user = request.user
-    context = {
-        'username': user.username,
-        'email': user.email,
-        'full_name': f"{user.first_name} {user.last_name}",
-        'language': 'English (US)',
-        'theme': 'dark',
-        'bio': 'Computer Engineering student',
-    }
-    return render(request, 'user_settings.html', context)
-
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
     profile, created = UserProfile.objects.get_or_create(user_id=id)
@@ -312,3 +299,75 @@ def user_profile(request, id):
         'edit_bio': edit_bio,
     }
     return render(request, 'user_profile.html', context)
+
+
+def priorities_settings(request):
+    priorities = Priority.objects.all().order_by('position')
+    if request.method == "POST":
+        action = request.POST.get('action')
+        print(request.POST)
+        if action == 'add_new':
+            max_position = priorities.aggregate(Max('position'))['position__max'] or 0
+            new_name = f"New Priority {max_position + 1}"
+
+            # Solo crear si NO existe ya
+            if not Priority.objects.filter(name=new_name).exists():
+                Priority.objects.create(
+                    name=new_name,
+                    color="#808080",
+                    position=max_position + 1
+                )
+
+            return redirect('priorities')
+
+        elif action == 'edit_name':
+            original_name = request.POST.get('original_name')
+            new_name = request.POST.get('new_name')
+
+            print(f"Editing: {original_name} -> {new_name}")  # Ver qué valores llegan
+
+            priority = Priority.objects.get(name=original_name)
+            priority.name = new_name
+            priority.save()
+
+            return redirect('priorities')
+
+        elif "moveUp" in request.POST:
+            priority_name = request.POST.get('priority_name')
+            priority = Priority.objects.get(name=priority_name)
+            if priority.position > 1:  
+                previous_priority = Priority.objects.get(position=priority.position - 1)
+                priority.position -= 1
+                previous_priority.position += 1
+                priority.save()
+                previous_priority.save()
+            print("Moved up")
+
+        elif "move_down" in request.POST:
+            priority_name = request.POST.get('priority_name')
+            priority = Priority.objects.get(name=priority_name)
+            if priority.position < len(priorities):
+                    next_priority = Priority.objects.get(position=priority.position + 1)
+                    # Intercambiar las posiciones
+                    priority.position += 1
+                    next_priority.position -= 1
+                    priority.save()
+                    next_priority.save()
+            print("Moved down")
+
+        return redirect("priorities")  # Redirigir después de la acción
+
+    return render(request, 'priorities.html', {'priorities': priorities})
+
+def statuses_settings(request):
+    statuses = Status.objects.all().order_by('position') 
+    return render(request, 'statuses.html',{'statuses': statuses})
+
+def types_settings(request):
+    types = Type.objects.all().order_by('position') 
+    return render(request, 'types.html',{'types':types})
+
+def severities_settings(request):
+    severities = Severity.objects.all().order_by('position') 
+    return render(request, 'severities.html',{'severities': severities} )
+

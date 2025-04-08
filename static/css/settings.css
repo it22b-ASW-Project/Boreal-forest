@@ -1,128 +1,151 @@
+/* Layout general */
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    background-color: #f4f4f9;
-    color: white;
-}
-
-.settings-container {
     display: flex;
     height: 100vh;
+    font-family: Arial, sans-serif;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 20%;
-    background-color: white;
-    color: grey;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.sidebar ul {
     list-style: none;
     padding: 0;
+    margin: 0;
+    width: 200px;
+    background-color: #f4f4f4;
 }
 
 .sidebar li {
-    padding: 15px;
-    margin: 10px 0;
-    cursor: pointer;
-    text-align: left;
-    border-radius: 5px;
+    padding: 0;
 }
 
-.sidebar li.active,
-.sidebar li:hover {
-    background-color: #98ede1;
-}
-
-/* Main Content */
-.main-content {
-    width: 80%;
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: white;
-    color: grey;
-}
-
-.main-content h1 {
-    margin-bottom: 20px;
-}
-
-.profile-section {
-    display: flex;
-    gap: 20px;
-}
-
-.profile-photo {
-    text-align: center;
-}
-
-.profile-photo img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    background-color: grey;
-}
-
-.profile-photo button {
-    display: block;
-    margin: 10px auto;
-    padding: 10px 20px;
-    background-color: #98ede1;
-    color: grey;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.profile-photo button:hover {
-    background-color: #98ede1;
-}
-
-.profile-photo a {
-    color: black;
+.sidebar li a {
     text-decoration: none;
-    font-size: 14px;
-}
-
-form {
-    flex: 1;
-}
-
-form label {
+    color: rgb(0, 138, 168);
     display: block;
-    margin: 10px 0 5px;
+    padding: 15px 10px;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-form input,
-form select,
-form textarea {
-    width: 100%;
-    padding: 10px;
+.sidebar li a:hover {
+    background-color: #e0e0e0;
+    color: rgb(0, 138, 168);
+}
+
+.sidebar li a.active {
+    background-color: #d3d3d3;
+    border-radius: 4px;
+    font-weight: bold;
+    color: rgb(0, 138, 168);
+}
+
+/* Main content */
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* INDIVIDUAL PAGES */
+
+.container {
+    padding: 20px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.add-button {
+    padding: 6px 12px;
+    background-color: #83eede;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end; 
+    margin: 10px 0; 
+}
+
+.add-button:hover {
+    background-color: #56a69a;
+}
+
+.table-columns {
+    display: grid;
+    grid-template-columns: 60px 100px 1fr;
+    column-gap: 30px;
+    padding: 8px;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 10px; 
+}
+
+.table-title {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;            
+    margin-bottom: 1px;           
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 60px 100px 1fr;
+    column-gap: 30px;
+    align-items: center;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    box-sizing: border-box;
+    margin-bottom: 8px;
 }
 
-form textarea {
-    resize: none;
-    height: 100px;
+.color-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    justify-self: end;  
 }
 
-.save-button {
-    background-color: #98ede1;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
+/* Estilo para los botones */
+.move-buttons {
+    display: flex;
+    justify-content: flex-start; /* Alinea los botones a la izquierda */
+    gap: 2px; /* Espacio entre los botones */
+}
+
+.move-buttons button {
+    color: #676d67;
+    background-color: #fdfdfd;  
+    border: 1px solid #c2cacb; 
+    border-radius: 3px;         
+    padding: 4px 8px;
     cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
-.save-button:hover {
-    background-color: #98ede1;
+.move-buttons button:hover {
+    background-color: #d1d0cc;  /* Cambio de color en hover */
+    transform: scale(1.05);     /* Ligera ampliación al pasar el mouse */
 }
+
+.move-buttons button:active {
+    transform: scale(0.95);     /* Pequeña animación al hacer clic */
+}
+
+.move-buttons form {
+    margin: 0; 
+}
+
