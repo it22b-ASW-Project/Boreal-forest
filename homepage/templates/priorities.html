@@ -1,0 +1,64 @@
+{% extends "settings.html" %}
+
+{% block content %}
+<div class="container">
+
+    <div class="section-header">
+        <div class="section-title">Priorities</div>
+    </div>
+    
+    <div class="table-title">
+        <p>Specify the types your issues could be</p>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_new">
+             <button type="submit" class="add-button">ADD NEW PRIORITY</button>
+        </form>
+    </div>
+    <div class="table">
+        
+        <div class="table-columns">
+            <div></div>
+            <div>Color</div>
+            <div>Name</div>
+        </div>
+
+        {% for p in priorities %}
+        <div class="table-row" data-id="{{ p.name }}">
+
+        <div class="move-buttons" >
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="priority_name" value="{{ p.name }}"> 
+                <button type="submit" class="move-up" name="moveUp" value="up">↑</button>
+            </form>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="priority_name" value="{{ p.name }}">
+                <button type="submit" name="move_down" value="down">↓</button>
+            </form>
+        </div>     
+
+        <div>
+            <span class="color-circle" style="background-color: {{ p.color }}"></span>
+        </div>
+        {% if "New Priority" in p.name %}
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="original_name" value="{{ p.name }}">
+            <input type="hidden" name="action" value="edit_name">
+            <input type="text" name="new_name" value="{{ p.name }}">
+        </form>
+        {% else %}
+            <div>{{ p.name }}</div>
+        {% endif %}
+        
+        </div>
+    
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

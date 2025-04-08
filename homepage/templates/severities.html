@@ -1,0 +1,33 @@
+{% extends "settings.html" %}
+
+{% block content %}
+<div class="container">
+
+    <div class="section-header">
+        <div class="section-title">Severities</div>
+    </div>
+
+    <div class="table-title">
+        <p>Specify the severities your issues will have</p>
+        <button class="add-button">ADD NEW SEVERITY</button>
+    </div>
+    <div class="table">
+
+        <div class="table-columns">
+            <div>Color</div>
+            <div>Name</div>
+        </div>
+
+        {% for s in severities %}
+        <div class="table-row">
+            <div>
+                <span class="color-circle" style="background-color: {{ s.color }}"></span>
+            </div>
+            <div>{{ s.name }}</div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}
