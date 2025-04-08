@@ -1,11 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
 
-from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment
-from .forms import EditParamsForm, CommentForm, BulkIssueForm
+from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment, UserProfile
+from .forms import EditParamsForm, CommentForm, BulkIssueForm, EditBioForm
 
 from .filters import IssueFilter
 
@@ -257,25 +257,55 @@ def settings(request):
     return render(request, 'settings.html')
 
 def user_settings(request):
-    user = request.user  # Obtiene el usuario autenticado
+    user = request.user
     context = {
         'username': user.username,
         'email': user.email,
         'full_name': f"{user.first_name} {user.last_name}",
-        'language': 'English (US)',  # Puedes obtener esto de un modelo o configuración
-        'theme': 'dark',  # Ejemplo de un valor predeterminado
-        'bio': 'Computer Engineering student',  # Puedes obtener esto de un modelo personalizado
+        'language': 'English (US)',
+        'theme': 'dark',
+        'bio': 'Computer Engineering student',
     }
     return render(request, 'user_settings.html', context)
 
-def change_password(request):
-    return render(request, 'change_password.html')
+def user_profile(request, id):
+    user = SocialAccount.objects.get(id=id)
+    profile, created = UserProfile.objects.get_or_create(user_id=id)
+    # Obtener el parámetro de ordenación de la solicitud GET
+    sort_by = request.GET.get('sort_by', '-modified')  # Por defecto, ordenar por 'modified'
 
-def email_notifications(request):
-    return render(request, 'email_notifications.html')
+    valid_sort_fields = ['type__name', 'severity__name', 'priority__name', 'status', 'modified_at']
+    if sort_by.lstrip('-') not in valid_sort_fields:
+        sort_by = '-modified_at'
 
-def desktop_notifications(request):
-    return render(request, 'desktop_notifications.html')
+    order_by_field = f'issue__{sort_by.lstrip("-")}'
+    if sort_by.startswith('-'):
+        order_by_field = f'-{order_by_field}'
+    
+    if request.method == 'POST':
+        form = EditBioForm(request.POST, instance=profile)
+        if form.is_valid():
+            profile.bio = form.cleaned_data['bio']
+            form.save()
+            return redirect('user_profile', id=id)  # Redirige a la misma página después de guardar
+    else:
+        form = EditBioForm(instance=profile)
 
-def events(request):
-    return render(request, 'events.html')
+    assigned_issues = Assigned.objects.filter(assigned=user, issue__status__name__in=['New', 'In progress', 'Ready for test', 'Needs info', 'Rejected', 'Postponed']).select_related('issue').order_by(order_by_field)
+    watched_issues = Watch.objects.filter(watcher=user).select_related('issue').order_by(order_by_field)
+    comments = Comments.objects.filter(user=user).select_related('issue').order_by(f'-created_at')
+
+    context = {
+        'username': user.user.username,
+        'email': user.user.email,
+        'full_name': f"{user.user.first_name} {user.user.last_name}",
+        'watched_issues': watched_issues,
+        'assigned_issues': assigned_issues,
+        'comments': comments,
+        'Numassigned_issues': len(assigned_issues),
+        'Numwatched_issues': len(watched_issues),
+        'Numcomments': len(comments),
+        'bio': profile.bio,
+        'form': form,
+    }
+    return render(request, 'user_profile.html', context)
