@@ -1,0 +1,33 @@
+{% extends "settings.html" %}
+
+{% block content %}
+<div class="container">
+
+    <div class="section-header">
+        <div class="section-title">Types</div>
+    </div>
+
+    <div class="table-title">
+        <p>Specify the types your issues could be</p>
+        <button class="add-button">ADD NEW TYPE</button>
+    </div>
+    <div class="table">
+
+        <div class="table-columns">
+            <div>Color</div>
+            <div>Name</div>
+        </div>
+
+        {% for t in types %}
+        <div class="table-row">
+            <div>
+                <span class="color-circle" style="background-color: {{ t.color }}"></span>
+            </div>
+            <div>{{ t.name }}</div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

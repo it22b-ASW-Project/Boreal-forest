@@ -1,0 +1,33 @@
+{% extends "settings.html" %}
+
+{% block content %}
+<div class="container">
+
+    <div class="section-header">
+        <div class="section-title">Statuses</div>
+    </div>
+
+    <div class="table-title">
+        <p>Add, remove or edit the color and name of the statuses your issues will go through</p>
+        <button class="add-button">ADD NEW STATUS</button>
+    </div>
+    <div class="table">
+
+        <div class="table-columns">
+            <div>Color</div>
+            <div>Name</div>
+        </div>
+
+        {% for s in statuses %}
+        <div class="table-row">
+            <div>
+                <span class="color-circle" style="background-color: {{ s.color }}"></span>
+            </div>
+            <div>{{ s.name }}</div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}
