@@ -1,27 +1,31 @@
 from django import forms
-
 from .models import Priority, Type, Severity, Status, Comments, UserProfile
+
 
 class EditParamsForm(forms.Form):
     priority = forms.ModelChoiceField(
         queryset=Priority.objects.all(),  # Debe ser un queryset de objetos
         required=True,
-        empty_label=None
+        empty_label=None,
+        widget=forms.Select(attrs={"onchange": "this.form.submit();", "class": "form-style"})
     )
     type = forms.ModelChoiceField(
         queryset=Type.objects.all(),
         required=True,
-        empty_label=None
+        empty_label=None,
+        widget=forms.Select(attrs={"onchange": "this.form.submit();" , "class": "form-style"})
     )
     severity = forms.ModelChoiceField(
         queryset=Severity.objects.all(),
         required=True,
-        empty_label=None
+        empty_label=None,
+        widget=forms.Select(attrs={"onchange": "this.form.submit();" , "class": "form-style"})
     )
     status = forms.ModelChoiceField(
         queryset=Status.objects.all(),
         required=True,
-        empty_label=None
+        empty_label=None,
+        widget=forms.Select(attrs={"onchange": "this.form.submit();"})
     )
     deadline = forms.DateField(
         required=False,

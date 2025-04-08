@@ -8,145 +8,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{issue.subject}} - Issue #{{issue.id}}</title>
     <link rel="stylesheet" href="{% static 'css/issueDetail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
 </head>
 
 
 <body>
     <div class="container">
         <div class="main-content">
-            <h1>
-                #{{ issue.id }} -
+            <div class="issue-header">
+                <h1>#{{ issue.id }}</h1>
 
                 <!-- Formulario oculto por defecto -->
                 <form id="subject-form" method="POST" style="display: none;">
                     {% csrf_token %}
                     <input type="text" name="subject" id="subject-input" value="{{ issue.subject }}">
-                    <button type="submit">💾</button>
-                    <button type="button" onclick="cancelEditTitle()">❌</button>
+                    <button type="submit">Save</button>
+                    <button type="button" onclick="cancelEditTitle()">X</button>
                 </form>
 
-                <span id="edit-btn" onclick="enableEditTitle()">{{ issue.subject }}</span>
-            </h1>
-
-            <span id="editDesc-btn" onclick="enableEditDesc()">
-                {% if issue.description %}
-                {{ issue.description }}
-                {% else %}
-                No description set - Write something!
-                {% endif %}
-            </span>
-
-            <form id="description-form" method="POST" style="display: none;">
-                {% csrf_token %}
-                <input type="text" name="description" id="description-input" value="{{ issue.description }}">
-                <button type="submit">Save</button>
-                <button type="button" onclick="cancelEditDesc()">Cancel</button>
-            </form>
-
-            <p>
-                <strong>Deadline:</strong>
-                <span id="deadline-display">
-                    {% if issue.deadline %}
-                    {{ issue.deadline|date:"d/m/Y" }}
-                    {% else %}
-                    No deadline set
-                    {% endif %}
-                </span>
-                <button type="button" onclick="enableEditDeadline()">✏️</button>
-            </p>
-
-            <!-- Formulario para editar deadline -->
-            <form id="deadline-form" method="POST" style="display: none;">
-                {% csrf_token %}
-                <input type="date" name="deadline" id="deadline-input"
-                    value="{% if issue.deadline %}{{ issue.deadline|date:'Y-m-d' }}{% endif %}">
-                <button type="submit">Save</button>
-                <button type="button" onclick="cancelEditDeadline()">Cancel</button>
-                <br>
-            </form>
-
-            <span id="editDesc-btn" onclick="enableEditDesc()">{{ issue.description }}</span>
-
-            <br>
-
-            <span>Created by - {{ issue.created_by.extra_data.name }} at {{issue.created_at}}</span>
-            <img src="{{issue.created_by.extra_data.picture}}" width="25" height="25"/> 
-
-            <div>
-                <h3>Attachments</h3>
-                <ul>
-                    {% for attachment in attachments %}
-                    <li>
-                        <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.filename }}</a>
-                        ({{ attachment.formatted_filesize }})
-                        {% if attachment.description %} - {{ attachment.description }}{% endif %}
-                        <form method="POST" style="display:inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
-                            <button type="submit" name="delete_attachment" value="true"
-                                onclick="return confirm('¿Estás seguro que quieres eliminar este archivo?');">✖</button>
-                        </form>
-                    </li>
-                    {% empty %}
-                    <li>No attachments</li>
-                    {% endfor %}
-                </ul>
-
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="file" name="new_attachments" multiple>
-                    <input type="text" name="attachment_description" placeholder="Description (optional)">
-                    <button type="submit" name="upload_attachment" value="true">Upload</button>
-                </form>
+                <h2 id="edit-btn" onclick="enableEditTitle()">{{ issue.subject }}</h2>
             </div>
 
+            <div class="creation-info">
+                <div class="creation-info-text">
+                    <h1>Created by {{ issue.created_by.extra_data.name }}</h1>
+                    <p>{{issue.created_at}}<p>
+                </div>
+                <img src="{{issue.created_by.extra_data.picture}}"/> 
+            </div>
 
-            <div>
-                <h3>Comments</h3>
+            <div class="issue-info">
+                <div id="editDesc-btn" onclick="enableEditDesc()">
+                    {% if issue.description %}
+                    {{ issue.description }}
+                    {% else %}
+                    No description set - Write something!
+                    {% endif %}
+                </div>
 
-                <form method="post">
+                <form id="description-form" method="POST" style="display: none;">
                     {% csrf_token %}
-                    {{ commentForm.comment }}
-                    <br>
-                    <button type="submit" name="add_comment" class="add_comment">Save</button>
+                    <input type="text" name="description" id="description-input" value="{{ issue.description }}">
+                    <button type="submit">Save</button>
+                    <button type="button" onclick="cancelEditDesc()">Cancel</button>
                 </form>
 
-                {% for comment in comments %}
-                <p>{{ comment.comment }}
-                <p>
-                <p><img src="{{comment.user.extra_data.picture}}" width="25" height="25" />
-                    {{comment.user.extra_data.name}} -
-                    {{comment.created_at}} </p>
-                {% endfor %}
+                <br>
 
+                <div class="attachments">
+                    <div class="attachments-header">
+                        <h3> {{ attachments|length }} Attachments</h3>
+                    </div>
+                    <ul>
+                        {% for attachment in attachments %}
+                        <li>
+                            <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.filename }}</a>
+                            ({{ attachment.formatted_filesize }})
+                            {% if attachment.description %} - {{ attachment.description }}{% endif %}
+                            <form method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
+                                <button type="submit" name="delete_attachment" value="true"
+                                    onclick="return confirm('¿Estás seguro que quieres eliminar este archivo?');">✖</button>
+                            </form>
+                        </li>
+                        {% empty %}
+                        <li>No attachments</li>
+                        {% endfor %}
+                    </ul>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" name="new_attachments" multiple>
+                        <input type="text" name="attachment_description" placeholder="Description (optional)">
+                        <button type="submit" name="upload_attachment" value="true">Upload</button>
+                    </form>
+                </div>
+
+
+                <div class="comments-section">
+                    <div class="comments-header">
+                        <h3>{{ comments|length }} Comments</h3>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ commentForm.comment }}
+                        <br>
+                        <button type="submit" name="add_comment" class="add_comment">Save</button>
+                    </form>
+
+                    {% for comment in comments %}
+                    <p>{{ comment.comment }}
+                    <p>
+                    <p><img src="{{comment.user.extra_data.picture}}" width="25" height="25" />
+                        {{comment.user.extra_data.name}} -
+                        {{comment.created_at}} </p>
+                    {% endfor %}
+
+                </div>
             </div>
         </div>
 
         <div class="extra-info">
             <form method="POST">
+            <input type="hidden" name="edit_params" value="true">
                 {% csrf_token %}
-                    <div class="param-status">
-                        <label for="status">Status</label> 
-                        <div class="param-st-value">{{ paramform.status }}</div>
+                <div class="param-status">
+                    <label for="status">Status</label> 
+                    <div class="param-st-value">
+                        {{ paramform.status }}
                     </div>
-                    <div class="param-field">
-                        <label for="priority">Priority</label>
-                        <div class="param-value">{{ paramform.priority }}</div>
-                        <span class="colorDot" style="background-color: {{ issue.priority.color }}"></span>
-                    </div>
-                    <div class="param-field">
-                        <label for="type">Type</label>
-                        <div class="param-value">{{ paramform.type }}</div>
-                        <span class="colorDot" style="background-color: {{ issue.type.color }}"></span>
-                    </div>
-                    <div class="param-field">
-                        <label for="severity">Severity</label>
-                        <div class="param-value">{{ paramform.severity }}</div>
-                        <span class="colorDot" style="background-color: {{ issue.severity.color }}"></span>
-                    </div>
-                <button type="submit" class="btn btn-secondary" name="close" value="true" method="POST">Cerrar</button>
-                <button type="submit" class="btn btn-danger" name="delete" value="true"
-                    onclick="return confirmDelete();">Eliminar</button>
+                </div>
+                <div class="param-field">
+                    <label for="priority">Priority</label>
+                    <div class="param-value">{{ paramform.priority }}</div>
+                    <span class="colorDot" style="background-color: {{ issue.priority.color }}"></span>
+                </div>
+                <div class="param-field">
+                    <label for="type">Type</label>
+                    <div class="param-value">{{ paramform.type }}</div>
+                    <span class="colorDot" style="background-color: {{ issue.type.color }}"></span>
+                </div>
+                <div class="param-field">
+                    <label for="severity">Severity</label>
+                    <div class="param-value">{{ paramform.severity }}</div>
+                    <span class="colorDot" style="background-color: {{ issue.severity.color }}"></span>
+                </div>
             </form>
             
             <div class="add-people">
@@ -230,6 +217,34 @@
                     <button type="submit" name="addWatcher" value="true">Watch</button>
                 </form>
             </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" name="delete" value="true" onclick="return confirmDelete();">Eliminar</button>
+            </form>
+
+            <p>
+                <strong>Deadline:</strong>
+                <span id="deadline-display">
+                    {% if issue.deadline %}
+                    {{ issue.deadline|date:"d/m/Y" }}
+                    {% else %}
+                    No deadline set
+                    {% endif %}
+                </span>
+                <button type="button" onclick="enableEditDeadline()">✏️</button>
+            </p>
+
+            <!-- Formulario para editar deadline -->
+            <form id="deadline-form" method="POST" style="display: none;">
+                {% csrf_token %}
+                <input type="date" name="deadline" id="deadline-input"
+                    value="{% if issue.deadline %}{{ issue.deadline|date:'Y-m-d' }}{% endif %}">
+                <button type="submit">Save</button>
+                <button type="button" onclick="cancelEditDeadline()">Cancel</button>
+                <br>
+            </form>
+
         </div>
     </div>
         
