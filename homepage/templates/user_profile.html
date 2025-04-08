@@ -7,62 +7,6 @@
     <title>User Profile</title>
     <link rel="stylesheet" href="{% static 'css/user.css' %}">
 </head>
-<script>
-    function showTab(tabId) {
-        // Ocultar todas las pestañas
-        const tabs = document.querySelectorAll('.tab-content');
-        tabs.forEach(tab => tab.classList.remove('active'));
-
-        // Desactivar todos los botones
-        const buttons = document.querySelectorAll('.tab-button');
-        buttons.forEach(button => button.classList.remove('active'));
-
-        // Mostrar la pestaña seleccionada
-        document.getElementById(tabId).classList.add('active');
-
-        // Activar el botón correspondiente
-        const activeButton = document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`);
-        if (activeButton) {
-            activeButton.classList.add('active');
-        }
-    }
-    // Función para obtener el valor de un parámetro de la URL
-    function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-    }
-
-    // Al cargar la página, activar la pestaña correspondiente
-    document.addEventListener('DOMContentLoaded', () => {
-        const activeTab = getQueryParam('tab') || 'assigned-issues'; // Por defecto, 'assigned-issues'
-        showTab(activeTab);
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const editBioButton = document.getElementById('editBioButton');
-        const editBioForm = document.getElementById('editBioForm');
-
-        editBioButton.addEventListener('click', () => {
-            if (editBioForm.style.display === 'none' || editBioForm.style.display === '') {
-                editBioForm.style.display = 'block'; // Mostrar el formulario
-                editBioButton.style.display = 'none'; // Cambiar el texto del botón
-            } else {
-                editBioForm.style.display = 'none'; // Ocultar el formulario
-                editBioButton.textContent = 'Edit Bio'; // Restaurar el texto del botón
-            }
-        });
-        CancelBioButton.addEventListener('click', () => {
-            if (editBioForm.style.display === 'none' || editBioForm.style.display === '') {
-                editBioForm.style.display = 'block'; // Mostrar el formulario
-                editBioButton.style.display = 'none'; // Cambiar el texto del botón
-            } else {
-                editBioForm.style.display = 'none'; // Ocultar el formulario
-                editBioButton.style.display = 'block'; // Restaurar el texto del botón
-            }
-        });
-    });
-</script>
 <body>
     <div class="container">
         <!-- Sidebar -->
@@ -72,11 +16,11 @@
             <p>@{{ username }}</p>
             <div class="stats">
                 <div>
-                    <p class="num"><strong>{{Numassigned_issues}}</strong></p>
-                    <p >Open Assigned Issues</p>
+                    <p class="num"><strong>{{ Numassigned_issues }}</strong></p>
+                    <p>Open Assigned Issues</p>
                 </div>
                 <div>
-                    <p class="num"><strong>{{Numwatched_issues }}</strong></p>
+                    <p class="num"><strong>{{ Numwatched_issues }}</strong></p>
                     <p>Watched Issues</p>
                 </div>
                 <div>
@@ -84,31 +28,18 @@
                     <p>Comments</p>
                 </div>
             </div>
-            <p class="break-word">{{ bio }}</p>
-            <!-- Botón para editar la biografía -->
-            <button id="editBioButton" class="edit-bio">Edit Bio</button>
-
-            <!-- Formulario para editar la biografía -->
-            <div id="editBioForm" style ="display:none;">
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form.bio }}
-                    <button type="submit" id="SaveBioButton">Save</button>
-                    <button type="reset" id="CancelBioButton">Cancel</button>
-                </form>
-            </div>
         </div>
 
         <!-- Main Content -->
         <div class="profile-content">
             <div class="tabs">
-                <button class="tab-button active" onclick="showTab('assigned-issues')">Open Assigned Issues</button>
-                <button class="tab-button" onclick="showTab('watched-issues')">Watched Issues</button>
-                <button class="tab-button" onclick="showTab('comments')">Comments</button>
+                <a href="?tab=assigned-issues" class="tab-button {% if active_tab == 'assigned-issues' %}active{% endif %}">Open Assigned Issues</a>
+                <a href="?tab=watched-issues" class="tab-button {% if active_tab == 'watched-issues' %}active{% endif %}">Watched Issues</a>
+                <a href="?tab=comments" class="tab-button {% if active_tab == 'comments' %}active{% endif %}">Comments</a>
             </div>
-        
-            <!-- Open Assigned Issues -->
-            <div id="assigned-issues" class="tab-content active">
+            <!-- Tab Content -->
+            <div class="tab-content">
+                {% if active_tab == 'assigned-issues' %}
                 <h3>Open Assigned Issues</h3>
                 <table>
                     <thead>
@@ -163,10 +94,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
-        
-            <!-- Watched Issues -->
-            <div id="watched-issues" class="tab-content">
+                {% elif active_tab == 'watched-issues' %}
                 <h3>Watched Issues</h3>
                 <table>
                     <thead>
@@ -221,10 +149,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
-        
-            <!-- Comments -->
-            <div id="comments" class="tab-content">
+                {% elif active_tab == 'comments' %}
                 <h3>Comments</h3>
                 <ul>
                     {% for comment in comments %}
@@ -239,6 +164,9 @@
                     <li>No comments available.</li>
                     {% endfor %}
                 </ul>
+                {% else %}
+                <p>Select a tab to view content.</p>
+                {% endif %}
             </div>
         </div>
     </div>
