@@ -271,6 +271,7 @@ def user_settings(request):
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
     profile, created = UserProfile.objects.get_or_create(user_id=id)
+    active_tab = request.GET.get('tab', 'assigned-issues')
     # Obtener el parámetro de ordenación de la solicitud GET
     sort_by = request.GET.get('sort_by', '-modified')  # Por defecto, ordenar por 'modified'
 
@@ -307,5 +308,6 @@ def user_profile(request, id):
         'Numcomments': len(comments),
         'bio': profile.bio,
         'form': form,
+        'active_tab': active_tab,
     }
     return render(request, 'user_profile.html', context)
