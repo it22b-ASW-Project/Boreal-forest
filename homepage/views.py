@@ -116,7 +116,9 @@ def issueDetail(request, id):
     })
 
     if request.method == "POST":
-        if 'edit_params' in request.POST:
+        if 'back' in request.POST:
+            return redirect('/issues')
+        elif 'edit_params' in request.POST:
             form = EditParamsForm(request.POST)
             print(request.POST)
             if form.is_valid():

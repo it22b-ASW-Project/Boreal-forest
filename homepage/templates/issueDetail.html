@@ -9,6 +9,7 @@
     <title>{{issue.subject}} - Issue #{{issue.id}}</title>
     <link rel="stylesheet" href="{% static 'css/issueDetail.css' %}">
     <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 
@@ -22,11 +23,18 @@
                 <form id="subject-form" method="POST" style="display: none;">
                     {% csrf_token %}
                     <input type="text" name="subject" id="subject-input" value="{{ issue.subject }}">
-                    <button type="submit">Save</button>
-                    <button type="button" onclick="cancelEditTitle()">X</button>
+                    <button type="submit">
+                        <i class="material-icons">save</i>    
+                    </button>
+                    <button type="button" onclick="cancelEditTitle()">
+                        <i class="material-icons">cancel</i>
+                    </button>
                 </form>
 
                 <h2 id="edit-btn" onclick="enableEditTitle()">{{ issue.subject }}</h2>
+                {% if issue.deadline %}
+                <i class="material-icons" title='{{ issue.deadline|date:"d/m/Y" }}'>schedule</i>
+                {% endif %}
             </div>
 
             <div class="creation-info">
@@ -36,6 +44,8 @@
                 </div>
                 <img src="{{issue.created_by.extra_data.picture}}"/> 
             </div>
+
+            <hr class="head-separator">
 
             <div class="issue-info">
                 <div id="editDesc-btn" onclick="enableEditDesc()">
@@ -49,8 +59,12 @@
                 <form id="description-form" method="POST" style="display: none;">
                     {% csrf_token %}
                     <input type="text" name="description" id="description-input" value="{{ issue.description }}">
-                    <button type="submit">Save</button>
-                    <button type="button" onclick="cancelEditDesc()">Cancel</button>
+                    <button type="submit">
+                        <i class="material-icons">save</i>
+                    </button>
+                    <button type="button" onclick="cancelEditDesc()">
+                        <i class="material-icons">cancel</i>
+                    </button>
                 </form>
 
                 <br>
@@ -59,27 +73,42 @@
                     <div class="attachments-header">
                         <h3> {{ attachments|length }} Attachments</h3>
                     </div>
-                    <ul>
-                        {% for attachment in attachments %}
-                        <li>
-                            <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.filename }}</a>
-                            ({{ attachment.formatted_filesize }})
-                            {% if attachment.description %} - {{ attachment.description }}{% endif %}
-                            <form method="POST" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
-                                <button type="submit" name="delete_attachment" value="true"
-                                    onclick="return confirm('¿Estás seguro que quieres eliminar este archivo?');">✖</button>
-                            </form>
-                        </li>
-                        {% empty %}
-                        <li>No attachments</li>
-                        {% endfor %}
-                    </ul>
+                    {% for attachment in attachments %}
+                        <div class="attachment-item">
+                            <a href="{{ attachment.file.url }}" target="_blank" class="attachment-url">
+                                <i class="material-icons">attachment</i> <p>{{ attachment.filename }}</p>
+                            </a>
+
+                            <div class="attachment-description">
+                                {% if attachment.description %} 
+                                {{ attachment.description }} 
+                                {% endif %}
+                            </div>
+
+                                <div class="attachment-filesize">
+                                    ({{ attachment.formatted_filesize }})
+                                </div>
+
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
+                                    <button type="submit" name="delete_attachment" value="true" onclick="return confirm('¿Estás seguro que quieres eliminar este archivo?');">
+                                        <i class="material-icons">delete</i>
+                                    </button>
+                                </form>
+
+                        </div>
+                    {% empty %}
+                    <li>No attachments</li>
+                    {% endfor %}
+
 
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <input type="file" name="new_attachments" multiple>
+                        <input type="file" name="new_attachments" id="file-upload" multiple>
+                            <!--<label for="file-upload">
+                                <i class="material-icons">upload_file</i>
+                            </label>-->
                         <input type="text" name="attachment_description" placeholder="Description (optional)">
                         <button type="submit" name="upload_attachment" value="true">Upload</button>
                     </form>
@@ -98,11 +127,17 @@
                     </form>
 
                     {% for comment in comments %}
-                    <p>{{ comment.comment }}
-                    <p>
-                    <p><img src="{{comment.user.extra_data.picture}}" width="25" height="25" />
-                        {{comment.user.extra_data.name}} -
-                        {{comment.created_at}} </p>
+                    <div class="comment-item">
+                        <img src="{{ comment.user.extra_data.picture }}" />
+                        <div class="comment-info">
+                            <span>
+                                <h1> {{comment.user.extra_data.name}} </h1> 
+                                <p>{{comment.created_at}} </p>
+                            </span>
+                            {{ comment.comment }}
+                        </div>
+                    </div>
+                    <hr class="separator">
                     {% endfor %}
 
                 </div>
@@ -136,6 +171,8 @@
                 </div>
             </form>
             
+            <hr class="separator">
+
             <div class="add-people">
                 <h3>Assigned</h3>
                 {% for assigned in assigneds %}
@@ -177,6 +214,8 @@
                 </form>
             </div>
 
+            <hr class="separator">
+
             <div class="add-people">
                 <h3>Watchers</h3>
                 {% for watcher in watchers %}
@@ -206,6 +245,7 @@
                 </div>
             </div>
 
+
             <div id="watchForm" style="display: none; margin-top: 1em;">
                 <form method="post">
                     {% csrf_token %}
@@ -218,22 +258,20 @@
                 </form>
             </div>
 
+            <hr class="separator">
+
             <form method="POST">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger" name="delete" value="true" onclick="return confirmDelete();">Eliminar</button>
+                <button type="submit" class="btn-sidebar" name="back" value="true">
+                    <i class="material-icons">arrow_back</i>
+                </button>
+                <button type="submit" class="btn-sidebar" name="delete" value="true" onclick="return confirmDelete();">
+                    <i class="material-icons a">delete</i>
+                </button>
+                <button type="button" class="btn-sidebar" onclick="enableEditDeadline()">
+                    <i class="material-icons">access_time_filled</i>
+                </button>
             </form>
-
-            <p>
-                <strong>Deadline:</strong>
-                <span id="deadline-display">
-                    {% if issue.deadline %}
-                    {{ issue.deadline|date:"d/m/Y" }}
-                    {% else %}
-                    No deadline set
-                    {% endif %}
-                </span>
-                <button type="button" onclick="enableEditDeadline()">✏️</button>
-            </p>
 
             <!-- Formulario para editar deadline -->
             <form id="deadline-form" method="POST" style="display: none;">
@@ -252,23 +290,23 @@
     <script>
         function enableEditTitle() {
             document.getElementById("edit-btn").style.display = "none";
-            document.getElementById("subject-form").style.display = "inline";
+            document.getElementById("subject-form").style.display = "flex";
             document.getElementById("subject-input").focus();
         }
 
         function cancelEditTitle() {
-            document.getElementById("edit-btn").style.display = "inline";
+            document.getElementById("edit-btn").style.display = "flex";
             document.getElementById("subject-form").style.display = "none";
         }
 
         function enableEditDesc() {
             document.getElementById("editDesc-btn").style.display = "none";
-            document.getElementById("description-form").style.display = "inline";
+            document.getElementById("description-form").style.display = "flex";
             document.getElementById("description-input").focus();
         }
 
         function cancelEditDesc() {
-            document.getElementById("editDesc-btn").style.display = "inline";
+            document.getElementById("editDesc-btn").style.display = "flex";
             document.getElementById("description-form").style.display = "none";
         }
 
@@ -277,13 +315,11 @@
         }
 
         function enableEditDeadline() {
-            document.getElementById("deadline-display").style.display = "none";
             document.getElementById("deadline-form").style.display = "inline";
             document.getElementById("deadline-input").focus();
         }
 
         function cancelEditDeadline() {
-            document.getElementById("deadline-display").style.display = "inline";
             document.getElementById("deadline-form").style.display = "none";
         }
         document.addEventListener("DOMContentLoaded", function () {

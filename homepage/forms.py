@@ -48,6 +48,7 @@ class CommentForm(forms.ModelForm):
                 'rows': 5, 
                 'cols': 40, 
                 'placeholder': 'Escribe tu comentario aquí...',  
+                'class': 'textarea-comment',
             }),
         }
 
