@@ -31,6 +31,22 @@
                     </button>
                 </form>
 
+                {% empty %}
+                <li>No watchers</li>
+                {% endfor %}
+            </ul>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="button" onclick="document.getElementById('watchForm').style.display = 'block';">+ Add
+                    Watcher</button>
+                {% if is_watching %}
+                <button type="submit" class="btn btn-danger" name="unsetWatcher" value="true">Unwatch</button>
+                {% else %}
+                <button type="submit" class="btn btn-danger" name="setWatcher" value="true">Watch</button>
+                {% endif %}
+            </form>
+    </div>
+
                 <h2 id="edit-btn" onclick="enableEditTitle()">{{ issue.subject }}</h2>
                 {% if issue.deadline %}
                 <i class="material-icons" title='{{ issue.deadline|date:"d/m/Y" }}'>schedule</i>
@@ -204,6 +220,15 @@
 
             <div id="assignForm" style="display: none; margin-top: 1em;">
                 <form method="post">
+    <div>
+        <h3>Attachments</h3>
+        <ul>
+            {% for attachment in attachments %}
+            <li>
+                <a href="{{ attachment.get_file_url }}" target="_blank">{{ attachment.filename }}</a>
+                ({{ attachment.formatted_filesize }})
+                {% if attachment.description %} - {{ attachment.description }}{% endif %}
+                <form method="POST" style="display:inline;">
                     {% csrf_token %}
                     <select name="assigned_user" required>
                         {% for user in users %}
