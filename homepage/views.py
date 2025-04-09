@@ -413,10 +413,10 @@ def statuses_settings(request):
 
             if "write a name for the new element" not in status_name.lower():
                 messages.success(request, f'Status "{status_name}" succesfully deleted')
-            return redirect('priorities')  # Redirecciona de vuelta a la misma página
+            return redirect('statuses')  # Redirecciona de vuelta a la misma página
 
         elif action == 'add_new':
-            max_position = priorities.aggregate(Max('position'))['position__max'] or 0
+            max_position = statuses.aggregate(Max('position'))['position__max'] or 0
             new_name = f"New Status {max_position + 1}"
 
             if not Status.objects.filter(name=new_name).exists():
@@ -426,7 +426,7 @@ def statuses_settings(request):
                     position=max_position + 1
                 )
 
-            return redirect('priorities')
+            return redirect('statuses')
 
         elif action == 'edit_name':
             original_name = request.POST.get('original_name')
