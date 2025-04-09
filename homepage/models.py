@@ -140,3 +140,25 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Profile of {self.user.username}"
+
+
+def get_avatar_upload_path(instance, filename):
+    """Generate upload path for avatar images"""
+    return f'avatars/{instance.user.id}/{filename}'
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    bio = models.TextField(null=True, blank=True)
+    avatar = models.ImageField(upload_to=get_avatar_upload_path, null=True, blank=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+    
+    def delete_avatar(self):
+        """Delete the avatar file and clear the field"""
+        if self.avatar:
+            # Delete the file from storage
+            if self.avatar.storage.exists(self.avatar.name):
+                self.avatar.delete()
+            self.avatar = None
+            self.save()
