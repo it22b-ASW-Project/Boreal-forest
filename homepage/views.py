@@ -274,24 +274,30 @@ def user_settings(request):
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
     profile, created = UserProfile.objects.get_or_create(user_id=id)
-    active_tab = request.GET.get('tab', 'assigned-issues')  # Tab activo por defecto
-    sort_by = request.GET.get('sort_by', '-modified')  # Por defecto, ordenar por 'modified'
-    edit_bio = request.GET.get('edit_bio', 'false') == 'true' 
+    active_tab = request.GET.get('tab', 'assigned-issues')
+    sort_by = request.GET.get('sort_by', '-modified')
+    edit_bio = request.GET.get('edit_bio', 'false') == 'true'
 
-    valid_sort_fields = ['type__name', 'severity__name', 'priority__name', 'status', 'modified_at']
-    if sort_by.lstrip('-') not in valid_sort_fields:
-        sort_by = '-modified_at'
-
-    order_by_field = f'issue__{sort_by.lstrip("-")}'
-    if sort_by.startswith('-'):
-        order_by_field = f'-{order_by_field}'
-    
     if request.method == 'POST':
+        # Handle avatar upload
+        if 'upload_avatar' in request.POST and request.FILES.get('avatar'):
+            if profile.avatar:
+                profile.delete_avatar()  # Delete old avatar if it exists
+            profile.avatar = request.FILES['avatar']
+            profile.save()
+            return redirect('user_profile', id=id)
+            
+        # Handle avatar deletion
+        elif 'delete_avatar' in request.POST:
+            profile.delete_avatar()
+            return redirect('user_profile', id=id)
+            
+        # Existing bio form handling
         form = EditBioForm(request.POST, instance=profile)
         if form.is_valid():
             profile.bio = form.cleaned_data['bio']
             form.save()
-            return redirect('user_profile', id=id)  # Redirige a la misma página después de guardar
+            return redirect('user_profile', id=id)
     else:
         form = EditBioForm(instance=profile)
 
@@ -310,6 +316,7 @@ def user_profile(request, id):
         'Numwatched_issues': len(watched_issues),
         'Numcomments': len(comments),
         'bio': profile.bio,
+        'profile': profile,
         'form': form,
         'active_tab': active_tab,
         'edit_bio': edit_bio,
