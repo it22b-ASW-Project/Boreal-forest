@@ -3,6 +3,19 @@
 {% block content %}
 <div class="container">
 
+    <!--Para mostrar mensajes informativos-->
+        {% if request.path == '/settings/priorities/' %}
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endif %}
+
     <div class="section-header">
         <div class="section-title">Priorities</div>
     </div>
@@ -21,11 +34,14 @@
             <div></div>
             <div>Color</div>
             <div>Name</div>
+            <div></div>
+            <div></div>
         </div>
 
         {% for p in priorities %}
         <div class="table-row" data-id="{{ p.name }}">
 
+        <!-- Flechas -->            
         <div class="move-buttons" >
             <form method="POST">
                 {% csrf_token %}
@@ -40,23 +56,80 @@
             </form>
         </div>     
 
+        <!-- Color -->
         <div>
-            <span class="color-circle" style="background-color: {{ p.color }}"></span>
+            {% if editing_name == p.name %}
+                <input 
+                    type="color" 
+                    name="new_color" 
+                    value="{{ p.color }}" 
+                    class="color-picker-input"
+                    title="Pick a new color"
+                >
+            {% else %}
+                <span class="color-circle" style="background-color: {{ p.color }}"></span>
+            {% endif %}
         </div>
-        {% if "New Priority" in p.name %}
+
+
+        <!--Name-->
+        {% if p.name == "Write a name for the new element" %}
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="original_name" value="{{ p.name }}">
             <input type="hidden" name="action" value="edit_name">
-            <input type="text" name="new_name" value="{{ p.name }}">
+            <input type="text" name="new_name" value="" placeholder="Write a name for the new element" autofocus style="width: 80%;">
         </form>
+        {% elif editing_name == p.name %}
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="original_name" value="{{ p.name }}">
+            <input type="hidden" name="action" value="edit_name">
+            <input type="text" 
+                name="new_name" 
+                value="{{ p.name }}" 
+                placeholder="Write a name for the new element" 
+                autofocus 
+                class="input-edit-name">
+            <button type="submit">
+                <i class="material-icons">check</i>
+            </button>
+           </form>
         {% else %}
-            <div>{{ p.name }}</div>
+            <div>{{ p.name }} - {{p.position}}</div>
         {% endif %}
+
+        <!--Edit-->
+        <div>
+            {% if editing_name != p.name %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="priority_id" value="{{ p.id }}">
+                <input type="hidden" name="action" value="start_editting">
+                <button type="submit">
+                    <i class="material-icons">edit</i> <!-- Botón de editar -->
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+
+        <!--Delete-->
+        <div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="priority_name" value="{{ p.name }}">
+                <input type="hidden" name="action" value="delete_priority">
+                <button type="submit">
+                    <i class="material-icons">delete</i>
+                </button>
+            </form>
+        </div>
+    
         
         </div>
     
-        {% endfor %}
+    {% endfor %}
 
     </div>
 

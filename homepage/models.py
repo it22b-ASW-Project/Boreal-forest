@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 
 class Priority(models.Model):
-    name = models.CharField(max_length=20, primary_key=True)  
+    name = models.CharField(max_length=20, unique=True)  
     color = models.CharField(max_length=7, default="#808080") 
     position = models.IntegerField(default = 0)
 

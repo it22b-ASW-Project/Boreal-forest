@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
     <link rel="stylesheet" href="{% static 'css/settings.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
-
     <ul class="sidebar">
         <li><a href="{% url 'statuses' %}" class="{% if request.resolver_match.url_name == 'statuses' %}active{% endif %}">STATUSES</a></li>
         <li><a href="{% url 'priorities' %}" class="{% if request.resolver_match.url_name == 'priorities' %}active{% endif %}">PRIORITIES</a></li>
