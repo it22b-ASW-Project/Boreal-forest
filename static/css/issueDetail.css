@@ -303,10 +303,6 @@ p {
     gap: 0.5rem;
 }
 
-/*#file-upload {
-    display: none;
-}*/
-
 .attachments form input[type="text"] {
     padding: 0.5rem;
     border: 1px solid #ccc;
