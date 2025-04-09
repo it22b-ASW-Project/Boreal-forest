@@ -533,7 +533,8 @@ def confirm_delete_priority(request):
     priority_name = request.GET.get('priority_name')
     priority_to_delete = get_object_or_404(Priority, name=priority_name)
     other_priorities = Priority.objects.exclude(name=priority_name).order_by('position')
-
+    print("HOLIIS")
+    
     if request.method == 'POST':
         new_priority_id = request.POST.get('new_priority_id')
         new_priority = get_object_or_404(Priority, name=new_priority_id)
@@ -571,8 +572,8 @@ def confirm_delete_status(request):
         messages.success(request, f'Status "{status_name}" deleted and issues changed to "{new_status.name}".')
         return redirect('statuses')
 
-    return render(request, 'confirm_delete_priority.html', {
-        'priority': priority_to_delete,
+    return render(request, 'confirm_delete_status.html', {
+        'status': priority_to_delete,
         'other_statuses': other_statuses,
     })
 
