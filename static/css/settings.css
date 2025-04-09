@@ -63,6 +63,36 @@ body {
     font-weight: bold;
 }
 
+
+/*MATERIAL ICONS*/
+.material-icons {
+    color: rgb(0, 138, 168);
+    flex-shrink: 0;
+    transition: 0.3s;
+    vertical-align: middle;
+}
+
+.material-icons:hover {
+    cursor: pointer;
+    color: #333;
+}
+
+form button {
+    background-color: transparent;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 10px 20px;
+    font-size: 12px;
+    transition: 0.3s;
+}
+
+form button:hover {
+    color: #2596be;
+}
+
+
 .add-button {
     padding: 6px 12px;
     background-color: #83eede;
@@ -80,11 +110,12 @@ body {
 
 .add-button:hover {
     background-color: #56a69a;
+    color: black; 
 }
 
 .table-columns {
     display: grid;
-    grid-template-columns: 60px 100px 1fr;
+    grid-template-columns: 60px 200px 1fr 40px 100px;
     column-gap: 30px;
     padding: 8px;
     font-weight: bold;
@@ -101,7 +132,7 @@ body {
 
 .table-row {
     display: grid;
-    grid-template-columns: 60px 100px 1fr;
+    grid-template-columns: 60px 200px 1fr 40px 100px;
     column-gap: 30px;
     align-items: center;
     padding: 10px;
@@ -147,5 +178,75 @@ body {
 
 .move-buttons form {
     margin: 0; 
+}
+
+ 
+/* Estilo para los mensajes de éxito */
+.messages {
+    margin-bottom: 15px;
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Estilo para el mensaje */
+.messages {
+    min-height: 60px; /* Ajusta este valor según el tamaño de los mensajes */
+    transition: height 0.3s ease; /* Para una animación suave al desaparecer */
+    overflow: hidden; /* Para que no se desborden */
+}
+
+.messages.empty {
+    display: none; 
+}
+
+.input-edit-name {
+    width: 80%;
+    font-family: Arial, sans-serif;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #797a7e;
+    box-sizing: border-box;
+}
+
+.color-picker-input {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    background-color: transparent;
+    display: inline-block;
+}
+
+/* Para navegadores WebKit (Chrome, Edge, Safari) */
+.color-picker-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border: none;
+}
+
+.color-picker-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+/* Para Firefox */
+.color-picker-input::-moz-color-swatch {
+    border: none;
+    border-radius: 50%;
 }
 

@@ -13,6 +13,8 @@ from django.utils import timezone
 
 from django.db.models import Max
 
+from django.contrib import messages
+
 def showAllIssues(request):
     bulkForm = BulkIssueForm()
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
@@ -305,16 +307,25 @@ def priorities_settings(request):
     priorities = Priority.objects.all().order_by('position')
     if request.method == "POST":
         action = request.POST.get('action')
-        print(request.POST)
-        if action == 'add_new':
+        if action not in( 'add_new', 'edit_name', 'start_editting'):
+            priority_name = request.POST.get('priority_name')
+            priority = Priority.objects.get(name=priority_name)
+
+        if action == 'delete_priority':
+            priority.delete()
+
+            if "write a name for the new element" not in priority_name.lower():
+                messages.success(request, f'Prioridad "{priority_name}" eliminada correctamente.')
+            return redirect('priorities')  # Redirecciona de vuelta a la misma página
+
+        elif action == 'add_new':
             max_position = priorities.aggregate(Max('position'))['position__max'] or 0
             new_name = f"New Priority {max_position + 1}"
 
-            # Solo crear si NO existe ya
             if not Priority.objects.filter(name=new_name).exists():
                 Priority.objects.create(
-                    name=new_name,
-                    color="#808080",
+                    name="Write a name for the new element",
+                    color="#808080", #gris por defecto
                     position=max_position + 1
                 )
 
@@ -324,17 +335,31 @@ def priorities_settings(request):
             original_name = request.POST.get('original_name')
             new_name = request.POST.get('new_name')
 
-            print(f"Editing: {original_name} -> {new_name}")  # Ver qué valores llegan
+            if new_name.strip():
+                priority = Priority.objects.get(name=original_name)
+                priority.name = new_name.strip()
+                priority.save()
 
-            priority = Priority.objects.get(name=original_name)
-            priority.name = new_name
-            priority.save()
+                Priority.objects.filter(name="Write a name for the new element").exclude(pk=priority.pk).delete()
+
+                messages.success(request, f'Prioridad "{new_name}" editada correctamente.')
 
             return redirect('priorities')
+        
+        elif action == 'start_editting':
+
+            prioID = request.POST.get('priority_id')
+
+            # Este contexto extra indica a la plantilla que estamos editando ese nombre
+            priority = Priority.objects.get(id=prioID)
+            return render(request, 'priorities.html', {
+            'priorities': Priority.objects.all().order_by('position'),
+            'editing_name': priority.name,
+            'messages': messages.get_messages(request),
+            })
 
         elif "moveUp" in request.POST:
-            priority_name = request.POST.get('priority_name')
-            priority = Priority.objects.get(name=priority_name)
+
             if priority.position > 1:  
                 previous_priority = Priority.objects.get(position=priority.position - 1)
                 priority.position -= 1
@@ -344,8 +369,7 @@ def priorities_settings(request):
             print("Moved up")
 
         elif "move_down" in request.POST:
-            priority_name = request.POST.get('priority_name')
-            priority = Priority.objects.get(name=priority_name)
+
             if priority.position < len(priorities):
                     next_priority = Priority.objects.get(position=priority.position + 1)
                     # Intercambiar las posiciones
