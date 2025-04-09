@@ -1,17 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-
     {% load socialaccount %}
-
+    {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <title>Welcome!</title>
 </head>
 <body>
-    <h1>Welcome to Boreal Forest!</h1>
+    <div class="container"></div>
+        {% if request.GET.next %}
+        <div class="alert alert-warning">
+            Debes iniciar sesión para acceder a esa página.
+        </div>
+        {% endif %}
 
-    <a href="{% provider_login_url 'google' %}">Login with Google account</a>
+        <div class="login-form">
+            <h1>Welcome to Boreal Forest!</h1>
+            <a href="{% provider_login_url 'google' %}">
+                <img src="{% static 'img/google.png' %}" alt="Google" class="google-icon"> Login with Google account
+            </a>
+        </div>
+    </div>
 
 </body>
 </html>

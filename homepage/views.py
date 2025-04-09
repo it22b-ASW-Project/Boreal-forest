@@ -1,8 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
+
 
 from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment, UserProfile
 from .forms import EditParamsForm, CommentForm, BulkIssueForm, EditBioForm
@@ -15,28 +17,31 @@ from django.db.models import Max
 
 from django.contrib import messages
 
+@login_required
 def showAllIssues(request):
     bulkForm = BulkIssueForm()
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
+
+    show_filters = request.GET.get('show_filters') == '1'
 
     if request.method == "POST":
         form = BulkIssueForm(request.POST)
         if form.is_valid():
             crearIssues(request, form)
-            return redirect("/")  # Cambia a tu vista/listado real
+            return redirect("/issues")  # Cambia a tu vista/listado real
     else:
         form = BulkIssueForm()
 
-    return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues, 'bulkForm': bulkForm})
+    return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues, 'bulkForm': bulkForm, 'show_filters': show_filters})
     
 def crearIssues(request, form):
     lines = form.cleaned_data["bulk_text"].splitlines()
-    issues = [Issue(subject=line.strip(), status=Status.objects.order_by('id').first(), type=Type.objects.order_by('id').first(),
-                    severity=Severity.objects.order_by('id').first(), priority=Priority.objects.order_by('id').first(), 
+    issues = [Issue(subject=line.strip(), status=Status.objects.order_by('name').first(), type=Type.objects.order_by('name').first(),
+                    severity=Severity.objects.order_by('name').first(), priority=Priority.objects.order_by('name').first(), 
                     created_by=SocialAccount.objects.filter(user=request.user, provider="google").first()) for line in lines if line.strip()]
     Issue.objects.bulk_create(issues)
 
-
+@login_required
 def createIssue(request):
     if request.method == 'POST':
         # Obtener valores del formulario
@@ -97,7 +102,7 @@ def createIssue(request):
         'status' : status
     })
     
-
+@login_required
 def issueDetail(request, id):
     issue = Issue.objects.get(id=id)
     watchers = list(Watch.objects.filter(issue=issue))
@@ -120,8 +125,11 @@ def issueDetail(request, id):
     })
 
     if request.method == "POST":
-        if 'close' in request.POST: 
+        if 'back' in request.POST:
+            return redirect('/issues')
+        elif 'edit_params' in request.POST:
             form = EditParamsForm(request.POST)
+            print(request.POST)
             if form.is_valid():
                 # Guardar los cambios en la base de datos
                 issue.priority = form.cleaned_data['priority']
@@ -130,7 +138,7 @@ def issueDetail(request, id):
                 issue.status = form.cleaned_data['status']
                 # No guardamos deadline aquí, se maneja por separado
                 issue.save()
-            return redirect('/issues')
+            return redirect(reverse("issueDetail", args=[issue.id]))
         
         elif 'subject' in request.POST:    
             issue.subject = request.POST.get("subject", issue.subject)
@@ -257,6 +265,24 @@ def issueDetail(request, id):
 def login(request):
     return render(request, "login.html")
 
+@login_required
+def settings(request):
+    return render(request, 'settings.html')
+
+@login_required
+def user_settings(request):
+    user = request.user
+    context = {
+        'username': user.username,
+        'email': user.email,
+        'full_name': f"{user.first_name} {user.last_name}",
+        'language': 'English (US)',
+        'theme': 'dark',
+        'bio': 'Computer Engineering student',
+    }
+    return render(request, 'user_settings.html', context)
+
+@login_required
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
     profile, created = UserProfile.objects.get_or_create(user_id=id)
