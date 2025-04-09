@@ -307,7 +307,8 @@ def priorities_settings(request):
     priorities = Priority.objects.all().order_by('position')
     if request.method == "POST":
         action = request.POST.get('action')
-        if action not in( 'add_new', 'edit_name', 'start_editting'):
+        print(f"Action: {action}")
+        if action not in( 'add_new', 'edit_name', 'start_editting', 'new_color'):
             priority_name = request.POST.get('priority_name')
             priority = Priority.objects.get(name=priority_name)
 
@@ -315,7 +316,7 @@ def priorities_settings(request):
             priority.delete()
 
             if "write a name for the new element" not in priority_name.lower():
-                messages.success(request, f'Prioridad "{priority_name}" eliminada correctamente.')
+                messages.success(request, f'Priority "{priority_name}" succesfully deleted')
             return redirect('priorities')  # Redirecciona de vuelta a la misma página
 
         elif action == 'add_new':
@@ -334,24 +335,38 @@ def priorities_settings(request):
         elif action == 'edit_name':
             original_name = request.POST.get('original_name')
             new_name = request.POST.get('new_name')
-
             if new_name.strip():
                 priority = Priority.objects.get(name=original_name)
                 priority.name = new_name.strip()
+
                 priority.save()
+                #logica per eliminar els elements editats antics, perque como es primary key no es pot editar
+                if  new_name.strip() != original_name:
+                    prioritytoDelete = Priority.objects.get(name=original_name)
+                    prioritytoDelete.delete()
 
                 Priority.objects.filter(name="Write a name for the new element").exclude(pk=priority.pk).delete()
 
-                messages.success(request, f'Prioridad "{new_name}" editada correctamente.')
+                messages.success(request, f'Priority "{new_name}" succesfully modified')
 
             return redirect('priorities')
+
+        elif action == 'new_color':
+            
+            original_name = request.POST.get('original_name')
+            new_color = request.POST.get('new_color')
         
+            priority = Priority.objects.get(name=original_name)
+            priority.color = new_color
+            priority.save()
+            return redirect('priorities')
+
         elif action == 'start_editting':
 
-            prioID = request.POST.get('priority_id')
+            prioName = request.POST.get('priority_name')
 
             # Este contexto extra indica a la plantilla que estamos editando ese nombre
-            priority = Priority.objects.get(id=prioID)
+            priority = Priority.objects.get(name=prioName)
             return render(request, 'priorities.html', {
             'priorities': Priority.objects.all().order_by('position'),
             'editing_name': priority.name,
@@ -383,9 +398,102 @@ def priorities_settings(request):
 
     return render(request, 'priorities.html', {'priorities': priorities})
 
+
 def statuses_settings(request):
-    statuses = Status.objects.all().order_by('position') 
-    return render(request, 'statuses.html',{'statuses': statuses})
+    statuses = Status.objects.all().order_by('position')
+    if request.method == "POST":
+        action = request.POST.get('action')
+        print(f"Action: {action}")
+        if action not in( 'add_new', 'edit_name', 'start_editting', 'new_color'):
+            status_name = request.POST.get('status_name')
+            status = Status.objects.get(name=status_name)
+
+        if action == 'delete_status':
+            status.delete()
+
+            if "write a name for the new element" not in status_name.lower():
+                messages.success(request, f'Status "{status_name}" succesfully deleted')
+            return redirect('priorities')  # Redirecciona de vuelta a la misma página
+
+        elif action == 'add_new':
+            max_position = priorities.aggregate(Max('position'))['position__max'] or 0
+            new_name = f"New Status {max_position + 1}"
+
+            if not Status.objects.filter(name=new_name).exists():
+                Status.objects.create(
+                    name="Write a name for the new element",
+                    color="#808080", #gris por defecto
+                    position=max_position + 1
+                )
+
+            return redirect('priorities')
+
+        elif action == 'edit_name':
+            original_name = request.POST.get('original_name')
+            new_name = request.POST.get('new_name')
+            if new_name.strip():
+                status = Status.objects.get(name=original_name)
+                status.name = new_name.strip()
+
+                status.save()
+                #logica per eliminar els elements editats antics, perque como es primary key no es pot editar
+                if  new_name.strip() != original_name:
+                    statustoDelete = Status.objects.get(name=original_name)
+                    statustoDelete.delete()
+
+                Status.objects.filter(name="Write a name for the new element").exclude(pk=status.pk).delete()
+
+                messages.success(request, f'Status "{new_name}" succesfully modified')
+
+            return redirect('statuses')
+
+        elif action == 'new_color':
+            
+            original_name = request.POST.get('original_name')
+            new_color = request.POST.get('new_color')
+        
+            status = Status.objects.get(name=original_name)
+            status.color = new_color
+            status.save()
+            return redirect('statuses')
+
+        elif action == 'start_editting':
+
+            statusName = request.POST.get('status_name')
+
+            # Este contexto extra indica a la plantilla que estamos editando ese nombre
+            status = Status.objects.get(name=statusName)
+            return render(request, 'statuses.html', {
+            'statuses': Status.objects.all().order_by('position'),
+            'editing_name': status.name,
+            'messages': messages.get_messages(request),
+            })
+
+        elif "moveUp" in request.POST:
+
+            if status.position > 1:  
+                previous_status = Status.objects.get(position=status.position - 1)
+                status.position -= 1
+                previous_status.position += 1
+                status.save()
+                previous_status.save()
+            print("Moved up")
+
+        elif "move_down" in request.POST:
+
+            if status.position < len(statuses):
+                    next_status = Status.objects.get(position=status.position + 1)
+                    # Intercambiar las posiciones
+                    status.position += 1
+                    next_status.position -= 1
+                    status.save()
+                    next_status.save()
+            print("Moved down")
+
+        return redirect("statuses")  # Redirigir después de la acción
+
+    return render(request, 'statuses.html', {'statuses': statuses})
+
 
 def types_settings(request):
     types = Type.objects.all().order_by('position') 
@@ -394,4 +502,51 @@ def types_settings(request):
 def severities_settings(request):
     severities = Severity.objects.all().order_by('position') 
     return render(request, 'severities.html',{'severities': severities} )
+
+def confirm_delete_priority(request):
+    priority_name = request.GET.get('priority_name')
+    priority_to_delete = get_object_or_404(Priority, name=priority_name)
+    other_priorities = Priority.objects.exclude(name=priority_name).order_by('position')
+
+    if request.method == 'POST':
+        new_priority_id = request.POST.get('new_priority_id')
+        new_priority = get_object_or_404(Priority, name=new_priority_id)
+
+        # Cambiar issues a la nueva prioridad
+        issues = Issue.objects.filter(priority=priority_to_delete)
+        issues.update(priority=new_priority)
+
+        # Eliminar la prioridad
+        priority_to_delete.delete()
+
+        messages.success(request, f'Priority "{priority_name}" deleted and issues changed to  "{new_priority.name}".')
+        return redirect('priorities')
+
+    return render(request, 'confirm_delete_priority.html', {
+        'priority': priority_to_delete,
+        'other_priorities': other_priorities,
+    })
+
+def confirm_delete_status(request):
+    status_name = request.GET.get('status_name')
+    priority_to_delete = get_object_or_404(Priority, name=status_name)
+    other_statuses = Priority.objects.exclude(name=status_name).order_by('position')
+
+    if request.method == 'POST':
+        new_status_id = request.POST.get('new_status_id')
+        new_status = get_object_or_404(Priority, name=new_status_id)
+
+        
+        issues = Issue.objects.filter(status=priority_to_delete)
+        issues.update(status=new_status)
+
+        priority_to_delete.delete()
+
+        messages.success(request, f'Status "{status_name}" deleted and issues changed to "{new_status.name}".')
+        return redirect('statuses')
+
+    return render(request, 'confirm_delete_priority.html', {
+        'priority': priority_to_delete,
+        'other_statuses': other_statuses,
+    })
 
