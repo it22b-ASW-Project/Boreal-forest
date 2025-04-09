@@ -18,21 +18,22 @@ def showAllIssues(request):
     bulkForm = BulkIssueForm()
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
 
+    show_filters = request.GET.get('show_filters') == '1'
+
     if request.method == "POST":
         form = BulkIssueForm(request.POST)
         if form.is_valid():
             crearIssues(request, form)
-            return redirect("/")  # Cambia a tu vista/listado real
+            return redirect("/issues")  # Cambia a tu vista/listado real
     else:
         form = BulkIssueForm()
 
-    return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues, 'bulkForm': bulkForm})
+    return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues, 'bulkForm': bulkForm, 'show_filters': show_filters})
     
-@login_required
 def crearIssues(request, form):
     lines = form.cleaned_data["bulk_text"].splitlines()
-    issues = [Issue(subject=line.strip(), status=Status.objects.order_by('id').first(), type=Type.objects.order_by('id').first(),
-                    severity=Severity.objects.order_by('id').first(), priority=Priority.objects.order_by('id').first(), 
+    issues = [Issue(subject=line.strip(), status=Status.objects.order_by('name').first(), type=Type.objects.order_by('name').first(),
+                    severity=Severity.objects.order_by('name').first(), priority=Priority.objects.order_by('name').first(), 
                     created_by=SocialAccount.objects.filter(user=request.user, provider="google").first()) for line in lines if line.strip()]
     Issue.objects.bulk_create(issues)
 
