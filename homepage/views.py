@@ -1,8 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from allauth.socialaccount.models import SocialAccount
+
 
 from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Comments, Attachment, UserProfile
 from .forms import EditParamsForm, CommentForm, BulkIssueForm, EditBioForm
@@ -11,6 +13,7 @@ from .filters import IssueFilter
 
 from django.utils import timezone
 
+@login_required
 def showAllIssues(request):
     bulkForm = BulkIssueForm()
     issues = IssueFilter(request.GET, queryset=Issue.objects.all().order_by('-id'))
@@ -25,6 +28,7 @@ def showAllIssues(request):
 
     return render(request, "showAllIssues.html", {'issues': issues.qs, 'filter': issues, 'bulkForm': bulkForm})
     
+@login_required
 def crearIssues(request, form):
     lines = form.cleaned_data["bulk_text"].splitlines()
     issues = [Issue(subject=line.strip(), status=Status.objects.order_by('id').first(), type=Type.objects.order_by('id').first(),
@@ -32,7 +36,7 @@ def crearIssues(request, form):
                     created_by=SocialAccount.objects.filter(user=request.user, provider="google").first()) for line in lines if line.strip()]
     Issue.objects.bulk_create(issues)
 
-
+@login_required
 def createIssue(request):
     if request.method == 'POST':
         # Obtener valores del formulario
@@ -93,7 +97,7 @@ def createIssue(request):
         'status' : status
     })
     
-
+@login_required
 def issueDetail(request, id):
     issue = Issue.objects.get(id=id)
     watchers = list(Watch.objects.filter(issue=issue))
@@ -256,9 +260,11 @@ def issueDetail(request, id):
 def login(request):
     return render(request, "login.html")
 
+@login_required
 def settings(request):
     return render(request, 'settings.html')
 
+@login_required
 def user_settings(request):
     user = request.user
     context = {
@@ -271,6 +277,7 @@ def user_settings(request):
     }
     return render(request, 'user_settings.html', context)
 
+@login_required
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
     profile, created = UserProfile.objects.get_or_create(user_id=id)

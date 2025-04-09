@@ -71,6 +71,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 LOGIN_REDIRECT_URL = '/issues'  # URL to redirect after login
 LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/'
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
