@@ -59,7 +59,6 @@ class IssueFilter(django_filters.FilterSet):
     
         self.filters['assigned'].extra['choices'] = [('0', 'Unassigned')] + [
             (account.user_id, f"{account.extra_data.get('name', 'Unknown')}")
-            #for account in SocialAccount.objects.filter(user_id__in=Assigned.objects.values_list('assigned', flat=True).distinct())
             for account in SocialAccount.objects.all().order_by('extra_data__name')
         
         ]

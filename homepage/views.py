@@ -311,7 +311,6 @@ def user_profile(request, id):
             profile.bio = form.cleaned_data['bio']
             form.save()
             return redirect('user_profile', id=id)
-            return redirect('user_profile', id=id)
     else:
         form = EditBioForm(instance=profile)
 
@@ -331,11 +330,9 @@ def user_profile(request, id):
         'Numcomments': len(comments),
         'bio': profile.bio,
         'profile': profile,
-        'profile': profile,
         'form': form,
         'active_tab': active_tab,
         'edit_bio': edit_bio,
-        'messages': messages.get_messages(request),
         'messages': messages.get_messages(request),
     }
     return render(request, 'user_profile.html', context)
@@ -812,48 +809,3 @@ def confirm_delete_type(request):
         'type': type_to_delete,
         'other_types': other_types,
     })
-# Añade esto al final de tu archivo views.py
-from django.http import JsonResponse
-
-def test_s3_connection(request):
-    """
-    Vista para probar la conexión con AWS S3.
-    Accede a /test-s3/ para ejecutar esta prueba.
-    """
-    from django.conf import settings
-    
-    # Verificar si S3 está configurado
-    if not getattr(settings, 'USE_S3', False):
-        return JsonResponse({
-            'status': 'warning',
-            'message': 'S3 no está configurado. Establece USE_S3=True en settings para usar S3'
-        })
-    
-    try:
-        import boto3
-        s3 = boto3.client(
-            's3',
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-            aws_session_token=settings.AWS_SESSION_TOKEN,
-            region_name=settings.AWS_S3_REGION_NAME
-        )
-        
-        # Listar buckets para verificar la conexión
-        response = s3.list_buckets()
-        
-        # Comprobar si nuestro bucket existe
-        bucket_exists = any(bucket['Name'] == settings.AWS_STORAGE_BUCKET_NAME 
-                         for bucket in response['Buckets'])
-        
-        return JsonResponse({
-            'status': 'success',
-            'message': 'Conexión exitosa a S3',
-            'bucket_exists': bucket_exists,
-            'bucket_name': settings.AWS_STORAGE_BUCKET_NAME
-        })
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Error al conectar con S3: {str(e)}'
-        }, status=500)
