@@ -1,0 +1,24 @@
+{% extends "settings.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Delete value: "{{ priority.name }}"</h2>
+    <p>All items with this value will be changed to</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="new_priority">New priority:</label>
+        <select name="new_priority_id" id="new_priority" required>
+            {% for p in other_priorities %}
+                <option value="{{ p.name }}">{{ p.name }}</option>
+            {% endfor %}
+        </select>
+        <div style="margin-top: 1em; display: flex; gap: 1em;">
+            <button type="submit" class="confirm-delete">Delete</button> 
+            </button>
+            <a href="{% url 'priorities' %}" class="cancel-button">Cancel 
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -31,10 +31,12 @@
                     </button>
                 </form>
 
-                <h2 id="edit-btn" onclick="enableEditTitle()">{{ issue.subject }}</h2>
-                {% if issue.deadline %}
-                <i class="material-icons" title='{{ issue.deadline|date:"d/m/Y" }}'>schedule</i>
-                {% endif %}
+                <h2 id="edit-btn" onclick="enableEditTitle()">
+                    {{ issue.subject }}
+                    {% if issue.deadline %}
+                    <i class="material-icons" title='{{ issue.deadline|date:"d/m/Y" }}'>schedule</i>
+                    {% endif %}
+                </h2>
             </div>
 
             <div class="creation-info">

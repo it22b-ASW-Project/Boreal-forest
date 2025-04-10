@@ -1,28 +1,26 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
     <link rel="stylesheet" href="{% static 'css/settings.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
-    <div class="settings-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <ul>
-                <li data-page="user-settings">USER SETTINGS</li>
-            </ul>
-        </div>
+    <ul class="sidebar">
+        <li><a href="{% url 'statuses' %}" class="{% if request.resolver_match.url_name == 'statuses' %}active{% endif %}">STATUSES</a></li>
+        <li><a href="{% url 'priorities' %}" class="{% if request.resolver_match.url_name == 'priorities' %}active{% endif %}">PRIORITIES</a></li>
+        <li><a href="{% url 'severities' %}" class="{% if request.resolver_match.url_name == 'severities' %}active{% endif %}">SEVERITIES</a></li>
+        <li><a href="{% url 'types' %}" class="{% if request.resolver_match.url_name == 'types' %}active{% endif %}">TYPES</a></li>
+    </ul>
 
-        <!-- Main Content -->
-        <div class="main-content" id="main-content">
-            <!-- Aquí se cargará el contenido dinámico -->
-            <h1>Welcome to Settings</h1>
-            <p>Selecciona una opción de la barra lateral para ver más detalles.</p>
-        </div>
+    <div class="content">
+        <a href="/issues" class="back-button">&lt;</a>
+        {% block content %}
+        {% endblock %}
     </div>
-    <script src="{% static 'js/settings.js' %}"></script>
+
 </body>
 </html>

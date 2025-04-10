@@ -57,8 +57,8 @@ class BulkIssueForm(forms.Form):
         label='',
         widget=forms.Textarea(attrs={
             'placeholder': 'Escribe cada issue en una línea diferente...',
-            'rows': 6,
-            'cols': 40,
+            'rows': 10,
+            'cols': 60,
         })
     )
 class EditBioForm(forms.ModelForm):
