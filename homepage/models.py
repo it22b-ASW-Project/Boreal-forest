@@ -47,16 +47,16 @@ class Issue(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def get_priority_color(self):
-            return self.priority.color if self.priority else "#808080"  # Gris por defecto
+            return self.priority.color if self.priority else "#808080"  
     
     def get_status_color(self):
-            return self.status.color if self.status else "#808080"  # Gris por defecto
+            return self.status.color if self.status else "#808080"  
     
     def get_type_color(self):
-            return self.type.color if self.type else "#808080"  # Gris por defecto
+            return self.type.color if self.type else "#808080" 
     
     def get_severity_color(self):
-            return self.severity.color if self.severity else "#808080"  # Gris por defecto
+            return self.severity.color if self.severity else "#808080"  
     def save(self, *args, **kwargs):
         if not self.pk:
              self.modified_at = created_at = now()
@@ -104,7 +104,7 @@ class Comments(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    bio = models.TextField(null=True, blank=True)  # Campo adicional para la biografía
+    bio = models.TextField(null=True, blank=True)  
 
     def __str__(self):
         return f"Profile of {self.user.username}"
