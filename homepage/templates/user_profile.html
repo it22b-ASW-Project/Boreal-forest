@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link rel="stylesheet" href="{% static 'css/user.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
+
 
 <body>
 
+
     <div class="container">
-        <a href="/issues" class="back-button">&lt;</a>
+        <a href="/issues" class="back-button">
+            <i class="material-icons">arrow_back</i>
+        </a>
         <!-- Sidebar -->
         <div class="profile-sidebar">
             {% if profile.avatar %}
@@ -39,9 +45,11 @@
             <h2>{{ full_name }}</h2>
             <p>@{{ username }}</p>
 
+
             <div class="stats">
                 <div>
                     <p class="num"><strong>{{Numassigned_issues}}</strong></p>
+                    <p>Open Assigned Issues</p>
                     <p>Open Assigned Issues</p>
                 </div>
                 <div>
@@ -54,7 +62,10 @@
                 </div>
             </div>
 
+
             {% if not edit_bio %}
+            <p class="break-word">{{ bio }}</p>
+            <a href="?edit_bio=true&tab={{active_tab}}" id="editBioButton" class="edit-bio">Edit Bio</a>
             <p class="break-word">{{ bio }}</p>
             <a href="?edit_bio=true&tab={{active_tab}}" id="editBioButton" class="edit-bio">Edit Bio</a>
             {% endif %}
@@ -74,6 +85,13 @@
         <!-- Main Content -->
         <div class="profile-content">
             <div class="tabs">
+                <a href="?tab=assigned-issues"
+                    class="tab-button {% if active_tab == 'assigned-issues' %}active{% endif %}">Open Assigned
+                    Issues</a>
+                <a href="?tab=watched-issues"
+                    class="tab-button {% if active_tab == 'watched-issues' %}active{% endif %}">Watched Issues</a>
+                <a href="?tab=comments"
+                    class="tab-button {% if active_tab == 'comments' %}active{% endif %}">Comments</a>
                 <a href="?tab=assigned-issues"
                     class="tab-button {% if active_tab == 'assigned-issues' %}active{% endif %}">Open Assigned
                     Issues</a>
@@ -123,17 +141,23 @@
                             <td>
                                 <span class="colorDot"
                                     style="background-color: {{ issue.issue.type.color|default:'#ccc' }}">
-                                </span>
+                                    <span class="colorDot"
+                                        style="background-color: {{ issue.issue.type.color|default:'#ccc' }}">
+                                    </span>
                             </td>
                             <td>
                                 <span class="colorDot"
                                     style="background-color: {{ issue.issue.severity.color|default:'#ccc' }}">
-                                </span>
+                                    <span class="colorDot"
+                                        style="background-color: {{ issue.issue.severity.color|default:'#ccc' }}">
+                                    </span>
                             </td>
                             <td>
                                 <span class="colorDot"
                                     style="background-color: {{ issue.issue.priority.color|default:'#ccc' }}">
-                                </span>
+                                    <span class="colorDot"
+                                        style="background-color: {{ issue.issue.priority.color|default:'#ccc' }}">
+                                    </span>
                             </td>
                             <td>#{{ issue.issue.id }} {{ issue.issue.subject }}</td>
                             <td>{{ issue.issue.status }}</td>
@@ -181,17 +205,23 @@
                             <td>
                                 <span class="colorDot"
                                     style="background-color: {{ issue.issue.type.color|default:'#ccc' }}">
-                                </span>
+                                    <span class="colorDot"
+                                        style="background-color: {{ issue.issue.type.color|default:'#ccc' }}">
+                                    </span>
                             </td>
                             <td>
                                 <span class="colorDot"
                                     style="background-color: {{ issue.issue.severity.color|default:'#ccc' }}">
-                                </span>
+                                    <span class="colorDot"
+                                        style="background-color: {{ issue.issue.severity.color|default:'#ccc' }}">
+                                    </span>
                             </td>
                             <td>
                                 <span class="colorDot"
                                     style="background-color: {{ issue.issue.priority.color|default:'#ccc' }}">
-                                </span>
+                                    <span class="colorDot"
+                                        style="background-color: {{ issue.issue.priority.color|default:'#ccc' }}">
+                                    </span>
                             </td>
                             <td>#{{ issue.issue.id }} {{ issue.issue.subject }}</td>
                             <td>{{ issue.issue.status }}</td>
@@ -222,6 +252,26 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('avatar-input').addEventListener('change', function () {
+            if (this.files.length > 0) {
+                // Create a hidden input with name="upload_avatar" and add it to the form
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'upload_avatar';
+                hiddenInput.value = 'true';
+                document.getElementById('avatar-form').appendChild(hiddenInput);
+
+                // Update label text to show uploading status
+                document.querySelector('label[for="avatar-input"]').textContent = 'Uploading...';
+                document.querySelector('label[for="avatar-input"]').style.backgroundColor = '#7dcdc1';
+
+                // Submit the form
+                document.getElementById('avatar-form').submit();
+            }
+        });
+    </script>
 </body>
+
 
 </html>
