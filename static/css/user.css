@@ -20,6 +20,39 @@ body {
     overflow: hidden;
 }
 
+.material-icons {
+    color: #2596be;
+    flex-shrink: 0;
+    transition: 0.3s;
+    vertical-align: middle;
+}
+
+.material-icons:hover {
+    cursor: pointer;
+    color: #333;
+}
+
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    color: #0099cc;
+    border: none;
+    background-color: #ddd;
+    padding: 8px 8px;
+    transition: 0.3s;
+    margin-right: 10px;
+}
+
+.back-button:hover {
+    background-color: #ccc;
+}
+
 .profile-sidebar {
     width: 30%;
     height: 100%;
@@ -28,27 +61,6 @@ body {
     border-right: 1px solid #ddd;
     box-sizing: border-box;
     float: left;
-}
-
-.back-button {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    padding: 10px 15px;
-    background-color: #f0f0f0;
-    color: grey;
-    text-decoration: none;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 10;
-}
-
-.back-button:hover {
-    background-color: #ddd;
-    color: #000;
 }
 
 .profile-sidebar img {
@@ -107,7 +119,7 @@ body {
     width: auto;
     display: inline-block;
     padding: 10px 20px;
-    background-color: #98ede1;
+    background-color: #2596be;
     color: white;
     border: none;
     border-radius: 4px;
@@ -117,7 +129,7 @@ body {
 }
 
 .profile-sidebar .edit-bio:hover {
-    background-color: #98ede1;
+    background-color: #7cd6c9;
 }
 
 .profile-content {
@@ -251,7 +263,7 @@ body {
     width: 100px;
     display: inline-block;
     padding: 10px 20px;
-    background-color: #98ede1;
+    background-color: #2596be;
     color: white;
     border: none;
     border-radius: 4px;
@@ -286,7 +298,7 @@ body {
 .avatar-controls button[class="upload_avatar"] {
     display: inline-block;
     padding: 8px 15px;
-    background-color: #98ede1;
+    background-color: #2596be;
     color: white;
     border: none;
     border-radius: 4px;
@@ -316,7 +328,7 @@ body {
 .avatar-controls label[for="avatar-input"] {
     display: inline-block;
     padding: 8px 15px;
-    background-color: #98ede1;
+    background-color: #2596be;
     color: white;
     border-radius: 4px;
     cursor: pointer;
@@ -326,13 +338,13 @@ body {
 }
 
 .avatar-controls label[for="avatar-input"]:hover {
-    background-color: #7dcdc1;
+    background-color: #7cd6c9;
 }
 
 .avatar-upload-button {
     display: inline-block;
     padding: 8px 15px;
-    background-color: #98ede1;
+    background-color: #2596be;
     color: white;
     border: none;
     border-radius: 4px;
@@ -343,5 +355,24 @@ body {
 }
 
 .avatar-upload-button:hover {
+    background-color: #7dcdc1;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+    transition: 0.3s
+}
+
+a:hover {
+    color: #2596be;
+}
+
+#SaveBioButton {
+    background-color: #2596be;
+    transition: 0.3s;
+}
+
+#SaveBioButton:hover {
     background-color: #7dcdc1;
 }

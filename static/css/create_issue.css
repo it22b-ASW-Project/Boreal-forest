@@ -1,9 +1,10 @@
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9; 
+    background-color: #f4f4f9;
     color: #333;
 }
 
@@ -24,6 +25,7 @@ body {
     display: relative;
     grid-gap: 20px;
 }
+
 .colorDot {
     display: inline-block;
     width: 25px;
@@ -32,7 +34,7 @@ body {
 }
 
 h1 {
-    grid-column: 1 / -1; 
+    grid-column: 1 / -1;
     font-size: 24px;
     color: #153859;
     text-align: center;
@@ -54,7 +56,7 @@ h1 {
 .left-column {
     flex: 2;
     display: flex;
-    position:relative;
+    position: relative;
     flex-direction: column;
     gap: 20px;
 }
@@ -62,14 +64,16 @@ h1 {
 .right-column {
     flex: 1;
     display: flex;
-    position:relative;
+    position: relative;
     flex-direction: column;
     gap: 20px;
 }
-.Options{
+
+.Options {
     display: flex;
     gap: 20px;
 }
+
 .form-section {
     display: flex;
     flex-direction: column;
@@ -97,7 +101,9 @@ label {
     color: #333;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -111,7 +117,9 @@ textarea {
     height: 100px;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
     border-color: #98ede1;
     outline: none;
     box-shadow: 0 0 5px rgba(152, 237, 225, 0.5);
@@ -136,6 +144,7 @@ button {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 button:hover {
@@ -144,7 +153,7 @@ button:hover {
 
 .create-button {
     grid-column: 1 / -1;
-    grid-row: 3; 
+    grid-row: 3;
     text-align: center;
     margin-top: 20px;
 }
@@ -164,4 +173,8 @@ button:hover {
     padding: 8px 8px;
     transition: 0.3s;
     margin-right: 10px;
+}
+
+.back-button:hover {
+    background-color: #ccc;
 }
