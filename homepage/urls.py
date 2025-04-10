@@ -24,7 +24,6 @@ urlpatterns = [
     path('', views.login), 
     path('issues/new/', views.createIssue),
     path('issue/<int:id>/', views.issueDetail, name='issueDetail'),
-    path('test-s3/', views.test_s3_connection, name='test_s3')
 ]
 
 if settings.DEBUG:

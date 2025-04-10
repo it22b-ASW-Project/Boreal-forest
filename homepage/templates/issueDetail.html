@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<title>{{issue.subject}} - Issue #{{issue.id}}</title>
 
 <head>
     {% load static %}
@@ -12,14 +11,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
-
 <body>
     <div class="container">
         <div class="main-content">
             <div class="issue-header">
                 <h1>#{{ issue.id }}</h1>
-
-                <!-- Formulario oculto por defecto -->
                 <form id="subject-form" method="POST" style="display: none;">
                     {% csrf_token %}
                     <input type="text" name="subject" id="subject-input" value="{{ issue.subject }}">
@@ -30,7 +26,6 @@
                         <i class="material-icons">cancel</i>
                     </button>
                 </form>
-
                 <h2 id="edit-btn" onclick="enableEditTitle()">
                     {{ issue.subject }}
                     {% if issue.deadline %}
@@ -42,8 +37,7 @@
             <div class="creation-info">
                 <div class="creation-info-text">
                     <h1>Created by {{ issue.created_by.extra_data.name }}</h1>
-                    <p>{{issue.created_at}}
-                    <p>
+                    <p>{{issue.created_at}}</p>
                 </div>
                 {% if issue.created_by.user.profile.avatar %}
                 <img src="{{ issue.created_by.user.profile.avatar.url }}" />
@@ -82,21 +76,18 @@
                     </div>
                     {% for attachment in attachments %}
                     <div class="attachment-item">
-                        <a href="{{ attachment.file.url }}" target="_blank" class="attachment-url">
+                        <a href="{{ attachment.get_file_url }}" target="_blank" class="attachment-url">
                             <i class="material-icons">attachment</i>
                             <p>{{ attachment.filename }}</p>
                         </a>
-
                         <div class="attachment-description">
                             {% if attachment.description %}
                             {{ attachment.description }}
                             {% endif %}
                         </div>
-
                         <div class="attachment-filesize">
                             ({{ attachment.formatted_filesize }})
                         </div>
-
                         <form method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
@@ -105,12 +96,10 @@
                                 <i class="material-icons">delete</i>
                             </button>
                         </form>
-
                     </div>
                     {% empty %}
                     <li>No attachments</li>
                     {% endfor %}
-
 
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
@@ -119,7 +108,6 @@
                         <button type="submit" name="upload_attachment" value="true">Upload</button>
                     </form>
                 </div>
-
 
                 <div class="comments-section">
                     <div class="comments-header">
@@ -131,7 +119,6 @@
                         <br>
                         <button type="submit" name="add_comment" class="add_comment">Save</button>
                     </form>
-
                     {% for comment in comments %}
                     <div class="comment-item">
                         {% if comment.user.user.profile.avatar %}
@@ -141,23 +128,22 @@
                         {% endif %}
                         <div class="comment-info">
                             <span>
-                                <h1> {{comment.user.extra_data.name}} </h1>
-                                <p>{{comment.created_at}} </p>
+                                <h1>{{comment.user.extra_data.name}}</h1>
+                                <p>{{comment.created_at}}</p>
                             </span>
                             {{ comment.comment }}
                         </div>
                     </div>
                     <hr class="separator">
                     {% endfor %}
-
                 </div>
             </div>
         </div>
 
         <div class="extra-info">
             <form method="POST">
-                <input type="hidden" name="edit_params" value="true">
                 {% csrf_token %}
+                <input type="hidden" name="edit_params" value="true">
                 <div class="param-status">
                     <label for="status">Status</label>
                     <div class="param-st-value">
@@ -211,23 +197,23 @@
                         {% if is_assigned %}
                         <button type="submit" class="btn btn-danger" name="unsetAssigned" value="true">Unassign</button>
                         {% else %}
-                        <button type="submit" class="btn btn-danger" name="setAssigned" value="true">Assigne to
+                        <button type="submit" class="btn btn-danger" name="setAssigned" value="true">Assign to
                             me</button>
                         {% endif %}
                     </form>
                 </div>
-            </div>
 
-            <div id="assignForm" style="display: none; margin-top: 1em;">
-                <form method="post">
-                    {% csrf_token %}
-                    <select name="assigned_user" required>
-                        {% for user in users %}
-                        <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" name="addAssigned" value="true">Assigne</button>
-                </form>
+                <div id="assignForm" style="display: none; margin-top: 1em;">
+                    <form method="post">
+                        {% csrf_token %}
+                        <select name="assigned_user" required>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" name="addAssigned" value="true">Assign</button>
+                    </form>
+                </div>
             </div>
 
             <hr class="separator">
@@ -249,9 +235,8 @@
                     </form>
                 </div>
                 {% empty %}
-                <p>No watchers
-                <p>
-                    {% endfor %}
+                <p>No watchers</p>
+                {% endfor %}
 
                 <div class="add-usr-btn">
                     <form method="POST">
@@ -265,19 +250,18 @@
                         {% endif %}
                     </form>
                 </div>
-            </div>
 
-
-            <div id="watchForm" style="display: none; margin-top: 1em;">
-                <form method="post">
-                    {% csrf_token %}
-                    <select name="watcher_user" required>
-                        {% for user in users %}
-                        <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" name="addWatcher" value="true">Watch</button>
-                </form>
+                <div id="watchForm" style="display: none; margin-top: 1em;">
+                    <form method="post">
+                        {% csrf_token %}
+                        <select name="watcher_user" required>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.extra_data.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" name="addWatcher" value="true">Watch</button>
+                    </form>
+                </div>
             </div>
 
             <hr class="separator">
@@ -295,7 +279,6 @@
                 </button>
             </form>
 
-            <!-- Formulario para editar deadline -->
             <form id="deadline-form" method="POST" style="display: none;">
                 {% csrf_token %}
                 <input type="date" name="deadline" id="deadline-input"
@@ -304,10 +287,8 @@
                 <button type="button" onclick="cancelEditDeadline()">Cancel</button>
                 <br>
             </form>
-
         </div>
     </div>
-
 
     <script>
         function enableEditTitle() {
@@ -344,28 +325,7 @@
         function cancelEditDeadline() {
             document.getElementById("deadline-form").style.display = "none";
         }
-        document.addEventListener("DOMContentLoaded", function () {
-            const deadlineDisplay = document.getElementById("deadline-display");
-            const deadlineText = deadlineDisplay.innerText.trim();
-
-            if (deadlineText !== "No deadline set") {
-                const parts = deadlineText.split("/"); // Asumiendo formato dd/mm/yyyy
-                const deadlineDate = new Date(parts[2], parts[1] - 1, parts[0]);
-                const today = new Date();
-                const diffTime = deadlineDate - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                if (diffDays < 0) {
-                    deadlineDisplay.style.color = "red"; // Pasado
-                } else if (diffDays <= 2) {
-                    deadlineDisplay.style.color = "orange"; // Próximos 2 días
-                } else {
-                    deadlineDisplay.style.color = "green"; // A futuro
-                }
-            }
-        });
     </script>
-
 </body>
 
 </html>
