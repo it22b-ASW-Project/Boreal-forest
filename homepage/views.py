@@ -278,50 +278,14 @@ def login(request):
 def settings(request):
     return render(request, 'settings.html')
 
-@login_required
-def user_settings(request):
-    user = request.user
-    profile, created = UserProfile.objects.get_or_create(user=user)
-    messages = []  # For user feedback
-    
-    if request.method == 'POST':
-        # Handle avatar upload
-        if request.FILES.get('avatar'):
-            try:
-                if profile.avatar:
-                    profile.delete_avatar()
-                
-                profile.avatar = request.FILES['avatar']
-                profile.save()
-                messages.append('Avatar uploaded successfully!')
-                
-            except Exception as e:
-                messages.append(f'Error uploading avatar: {str(e)}')
-                
-            # Use reverse to ensure correct URL generation
-            return redirect(reverse('user_settings'))
-            
-        # Handle other form submissions...
-    
-    context = {
-        'username': user.username,
-        'email': user.email,
-        'full_name': f"{user.first_name} {user.last_name}",
-        'language': 'English (US)',
-        'theme': 'dark',
-        'bio': profile.bio,
-        'profile': profile,
-        'messages': messages,
-    }
-    return render(request, 'user_settings.html', context)
 
 @login_required
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
-    profile, created = UserProfile.objects.get_or_create(user_id=id)
-    active_tab = request.GET.get('tab', 'assigned-issues')  # Tab activo por defecto
-    sort_by = request.GET.get('sort_by', '-modified_at')  # Por defecto, ordenar por 'modified'
-    edit_bio = request.GET.get('edit_bio', 'false') == 'true' 
+    profile, created = UserProfile.objects.get_or_create(user=user.user)
+    active_tab = request.GET.get('tab', 'assigned-issues') 
+    sort_by = request.GET.get('sort_by', '-modified_at') 
+    edit_bio = request.GET.get('edit_bio', 'false') == 'true'
 
     valid_sort_fields = ['type__position', 'severity__position', 'priority__position', 'status__position', 'modified_at']
     if sort_by.lstrip('-') not in valid_sort_fields:
@@ -334,18 +298,23 @@ def user_profile(request, id):
     if request.method == 'POST':
         # Handle avatar upload
         if 'upload_avatar' in request.POST and request.FILES.get('avatar'):
-            if profile.avatar:
-                profile.delete_avatar()  # Delete old avatar if it exists
-            profile.avatar = request.FILES['avatar']
-            profile.save()
+            try:
+                if profile.avatar:
+                    profile.delete_avatar()  # Delete old avatar if it exists
+                profile.avatar = request.FILES['avatar']
+                profile.save()
+                messages.success(request, 'Avatar uploaded successfully!')
+            except Exception as e:
+                messages.error(request, f'Error uploading avatar: {str(e)}')
             return redirect('user_profile', id=id)
             
         # Handle avatar deletion
         elif 'delete_avatar' in request.POST:
             profile.delete_avatar()
+            messages.success(request, 'Avatar removed')
             return redirect('user_profile', id=id)
             
-        # Existing bio form handling
+        # Handle bio form
         form = EditBioForm(request.POST, instance=profile)
         if form.is_valid():
             profile.bio = form.cleaned_data['bio']
@@ -373,6 +342,7 @@ def user_profile(request, id):
         'form': form,
         'active_tab': active_tab,
         'edit_bio': edit_bio,
+        'messages': messages.get_messages(request),
     }
     return render(request, 'user_profile.html', context)
 
