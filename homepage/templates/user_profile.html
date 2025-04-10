@@ -7,15 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link rel="stylesheet" href="{% static 'css/user.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 <body>
 
     <div class="container">
-        <a href="/issues" class="back-button">
-            <i class="material-icons">arrow_back</i>
-        </a>
+        <a href="/issues" class="back-button">&lt;</a>
         <!-- Sidebar -->
         <div class="profile-sidebar">
             {% if profile.avatar %}
@@ -28,6 +25,8 @@
                     {% csrf_token %}
                     <input type="file" name="avatar" id="avatar-input" accept="image/*">
                     <label for="avatar-input">Choose Photo</label>
+                    <input type="hidden" name="upload_avatar" value="true">
+                    <button type="submit" class="avatar-upload-button">Upload</button>
                 </form>
 
                 {% if profile.avatar %}
@@ -207,7 +206,8 @@
                     {% for comment in comments %}
                     <div class="comment-container">
                         <h3 class="comment-title">
-                            <a href="/issue/{{ comment.issue.id }}">#{{ comment.issue.id }} {{ comment.issue.subject}}</a>
+                            <a href="/issue/{{ comment.issue.id }}">#{{ comment.issue.id }} {{ comment.issue.subject
+                                }}</a>
                             <span class="comment-date">{{ comment.created_at|date:"d M Y H:i" }}</span>
                         </h3>
                         <p class="comment-text">{{ comment.comment }}</p>
@@ -222,25 +222,6 @@
             </div>
         </div>
     </div>
-    <script>
-        document.getElementById('avatar-input').addEventListener('change', function () {
-            if (this.files.length > 0) {
-                // Create a hidden input with name="upload_avatar" and add it to the form
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'upload_avatar';
-                hiddenInput.value = 'true';
-                document.getElementById('avatar-form').appendChild(hiddenInput);
-
-                // Update label text to show uploading status
-                document.querySelector('label[for="avatar-input"]').textContent = 'Uploading...';
-                document.querySelector('label[for="avatar-input"]').style.backgroundColor = '#7dcdc1';
-
-                // Submit the form
-                document.getElementById('avatar-form').submit();
-            }
-        });
-    </script>
 </body>
 
 </html>

@@ -10,11 +10,8 @@ from .models import Issue, Type, Severity, Status, Priority, Watch, Assigned, Co
 from .forms import EditParamsForm, CommentForm, BulkIssueForm, EditBioForm
 
 from .filters import IssueFilter
-
 from django.utils import timezone
-
 from django.db.models import Max
-
 from django.contrib import messages
 
 @login_required
@@ -130,7 +127,6 @@ def issueDetail(request, id):
         "type": issue.type.name,
         "severity": issue.severity.name,
         "status": issue.status.name,
-        # Quitamos la deadline de aquí para evitar edición duplicada
     })
 
     if request.method == "POST":
@@ -140,12 +136,10 @@ def issueDetail(request, id):
             form = EditParamsForm(request.POST)
             print(request.POST)
             if form.is_valid():
-                # Guardar los cambios en la base de datos
                 issue.priority = form.cleaned_data['priority']
                 issue.type = form.cleaned_data['type']
                 issue.severity = form.cleaned_data['severity']
                 issue.status = form.cleaned_data['status']
-                # No guardamos deadline aquí, se maneja por separado
                 issue.save()
             return redirect(reverse("issueDetail", args=[issue.id]))
         
@@ -295,11 +289,10 @@ def user_profile(request, id):
         order_by_field = f'-{order_by_field}'
 
     if request.method == 'POST':
-        # Handle avatar upload
         if 'upload_avatar' in request.POST and request.FILES.get('avatar'):
             try:
                 if profile.avatar:
-                    profile.delete_avatar()  # Delete old avatar if it exists
+                    profile.delete_avatar()
                 profile.avatar = request.FILES['avatar']
                 profile.save()
                 messages.success(request, 'Avatar uploaded successfully!')
@@ -307,7 +300,6 @@ def user_profile(request, id):
                 messages.error(request, f'Error uploading avatar: {str(e)}')
             return redirect('user_profile', id=id)
             
-        # Handle avatar deletion
         elif 'delete_avatar' in request.POST:
             profile.delete_avatar()
             messages.success(request, 'Avatar removed')
@@ -817,48 +809,3 @@ def confirm_delete_type(request):
         'type': type_to_delete,
         'other_types': other_types,
     })
-# Añade esto al final de tu archivo views.py
-from django.http import JsonResponse
-
-def test_s3_connection(request):
-    """
-    Vista para probar la conexión con AWS S3.
-    Accede a /test-s3/ para ejecutar esta prueba.
-    """
-    from django.conf import settings
-    
-    # Verificar si S3 está configurado
-    if not getattr(settings, 'USE_S3', False):
-        return JsonResponse({
-            'status': 'warning',
-            'message': 'S3 no está configurado. Establece USE_S3=True en settings para usar S3'
-        })
-    
-    try:
-        import boto3
-        s3 = boto3.client(
-            's3',
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-            aws_session_token=settings.AWS_SESSION_TOKEN,
-            region_name=settings.AWS_S3_REGION_NAME
-        )
-        
-        # Listar buckets para verificar la conexión
-        response = s3.list_buckets()
-        
-        # Comprobar si nuestro bucket existe
-        bucket_exists = any(bucket['Name'] == settings.AWS_STORAGE_BUCKET_NAME 
-                         for bucket in response['Buckets'])
-        
-        return JsonResponse({
-            'status': 'success',
-            'message': 'Conexión exitosa a S3',
-            'bucket_exists': bucket_exists,
-            'bucket_name': settings.AWS_STORAGE_BUCKET_NAME
-        })
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Error al conectar con S3: {str(e)}'
-        }, status=500)

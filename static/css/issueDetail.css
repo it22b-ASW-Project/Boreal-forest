@@ -40,7 +40,7 @@ form button:hover {
 .separator {
     display: block;
     border: none;
-    border-top: 1px solid #ddd; 
+    border-top: 1px solid #ddd;
     margin: 20px 0;
     height: 0;
     opacity: 1;

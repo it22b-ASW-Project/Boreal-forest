@@ -20,18 +20,6 @@ body {
     overflow: hidden;
 }
 
-.material-icons {
-    color: #2596be;
-    flex-shrink: 0;
-    transition: 0.3s;
-    vertical-align: middle;
-}
-
-.material-icons:hover {
-    cursor: pointer;
-    color: #333;
-}
-
 .profile-sidebar {
     width: 30%;
     height: 100%;
@@ -46,17 +34,16 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
+    padding: 10px 15px;
+    background-color: #f0f0f0;
+    color: grey;
     text-decoration: none;
+    border: 1px solid #ddd;
     border-radius: 5px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
-    color: #0099cc;
-    border: none;
-    background-color: #ddd;
-    padding: 8px 8px;
-    transition: 0.3s;
-    margin-right: 10px;
 }
 
 .back-button:hover {
@@ -65,11 +52,13 @@ body {
 }
 
 .profile-sidebar img {
-    width: 70%;
-    height: 40%;
-    border-radius: 0;
+    width: 55%;
+    height: 30%;
+    border-radius: 100%;
     margin-bottom: 20px;
     background-color: grey;
+    margin-top: 80px;
+
 }
 
 .profile-sidebar h2 {
@@ -86,17 +75,17 @@ body {
 
 .profile-sidebar .stats div p,
 .profile-sidebar .stats div span {
-    margin-top: 10px;
-    font-size: 20px;
-    color: black; 
-    white-space: pre-line; 
+    margin-top: 20px;
+    font-size: 10px;
+    color: black;
+    white-space: pre-line;
     display: block;
     line-height: 1;
-    text-align: center; 
+    text-align: center;
 }
 
 .profile-sidebar .stats div .num {
-    font-size: 50px;
+    font-size: 35px;
 }
 
 .profile-sidebar .stats {
@@ -118,18 +107,17 @@ body {
     width: auto;
     display: inline-block;
     padding: 10px 20px;
-    background-color: #2596be;
+    background-color: #98ede1;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
     font-size: 20px;
-    transition: 0.3s
 }
 
 .profile-sidebar .edit-bio:hover {
-    background-color: #65eedc;
+    background-color: #98ede1;
 }
 
 .profile-content {
@@ -278,7 +266,6 @@ body {
     white-space: normal;
 }
 
-/* Avatar controls styling */
 .avatar-controls {
     display: flex;
     flex-direction: column;
@@ -287,7 +274,6 @@ body {
     gap: 8px;
 }
 
-/* Style file input */
 .avatar-controls input[type="file"] {
     width: 0.1px;
     height: 0.1px;
@@ -297,8 +283,7 @@ body {
     z-index: -1;
 }
 
-/* Style the main upload button */
-.avatar-controls button[name="upload_avatar"] {
+.avatar-controls button[class="upload_avatar"] {
     display: inline-block;
     padding: 8px 15px;
     background-color: #98ede1;
@@ -314,7 +299,6 @@ body {
     background-color: #7dcdc1;
 }
 
-/* Style the text button (Use default image) */
 .avatar-controls .text-button {
     background-color: transparent;
     border: none;
@@ -329,7 +313,6 @@ body {
     color: #143645;
 }
 
-/* Add custom label for file input for better UX */
 .avatar-controls label[for="avatar-input"] {
     display: inline-block;
     padding: 8px 15px;
@@ -343,5 +326,22 @@ body {
 }
 
 .avatar-controls label[for="avatar-input"]:hover {
+    background-color: #7dcdc1;
+}
+
+.avatar-upload-button {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #98ede1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 5px;
+    transition: all 0.2s ease;
+}
+
+.avatar-upload-button:hover {
     background-color: #7dcdc1;
 }

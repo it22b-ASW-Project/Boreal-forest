@@ -18,15 +18,15 @@
     <div class="main-content">
       <div class="header">
         <h1>~ Boreal forest ~</h1>
-          <div class="header-buttons">
-            <button onclick="location.href='{% url 'user_profile' user.id %}'">
-              <i class="material-icons">account_circle</i>
+        <div class="header-buttons">
+          <button onclick="location.href='{% url 'user_profile' user.id %}'">
+            <i class="material-icons">account_circle</i>
+          </button>
+          <form action="/settings/" method="get">
+            <button type="submit">
+              <i class="material-icons">settings</i>
             </button>
-            <form action="/settings/" method="get">
-              <button type="submit">
-                <i class="material-icons">settings</i>
-              </button>
-            </form>
+          </form>
         </div>
       </div>
 
@@ -79,7 +79,7 @@
           </div>
         </form>
 
-        <div class="issue-buttons"> 
+        <div class="issue-buttons">
           <form action="new/" method="get">
             <button type="submit">
               <i class="material-icons">add</i>
@@ -96,8 +96,8 @@
               <p>Bulk Insert Issues</p>
               {% csrf_token %}
               {{ bulkForm }}
-              <button type="submit">Crear Issues</button> 
-              <button onclick="document.getElementById('bulkForm').style.display = 'none';">Cerrar</button> 
+              <button type="submit">Crear Issues</button>
+              <button onclick="document.getElementById('bulkForm').style.display = 'none';">Cerrar</button>
             </form>
           </div>
         </div>
@@ -106,66 +106,66 @@
       <div class="profile-content">
         <table>
           <thead>
-              <tr>
-                  <th>
-                      <span>Type</span>
-                      <a href="?sort_by=type__position&tab=issues">↑</a>
-                      <a href="?sort_by=-type__position&tab=issues">↓</a>
-                  </th>
-                  <th>
-                      <span>Severity</span>
-                      <a href="?sort_by=severity__position&tab=assigned-issues">↑</a>
-                      <a href="?sort_by=-severity__position&tab=assigned-issues">↓</a>
-                  </th>
-                  <th>
-                      <span>Priority</span>
-                      <a href="?sort_by=priority__position&tab=assigned-issues">↑</a>
-                      <a href="?sort_by=-priority__position&tab=assigned-issues">↓</a>
-                  </th>
-                  <th>Issue</th>
-                  <th>
-                      <span>Status</span>
-                      <a href="?sort_by=status__position&tab=assigned-issues">↑</a>
-                      <a href="?sort_by=-status__position&tab=assigned-issues">↓</a>
-                  </th>
-                  <th>
-                      <span>Modified</span>
-                      <a href="?sort_by=modified_at&tab=assigned-issues">↑</a>
-                      <a href="?sort_by=-modified_at&tab=assigned-issues">↓</a>
-                  </th>
-              </tr>
+            <tr>
+              <th>
+                <span>Type</span>
+                <a href="?sort_by=type__position&tab=issues">↑</a>
+                <a href="?sort_by=-type__position&tab=issues">↓</a>
+              </th>
+              <th>
+                <span>Severity</span>
+                <a href="?sort_by=severity__position&tab=assigned-issues">↑</a>
+                <a href="?sort_by=-severity__position&tab=assigned-issues">↓</a>
+              </th>
+              <th>
+                <span>Priority</span>
+                <a href="?sort_by=priority__position&tab=assigned-issues">↑</a>
+                <a href="?sort_by=-priority__position&tab=assigned-issues">↓</a>
+              </th>
+              <th>Issue</th>
+              <th>
+                <span>Status</span>
+                <a href="?sort_by=status__position&tab=assigned-issues">↑</a>
+                <a href="?sort_by=-status__position&tab=assigned-issues">↓</a>
+              </th>
+              <th>
+                <span>Modified</span>
+                <a href="?sort_by=modified_at&tab=assigned-issues">↑</a>
+                <a href="?sort_by=-modified_at&tab=assigned-issues">↓</a>
+              </th>
+            </tr>
           </thead>
           <tbody>
-              {% for issue in issues %}
-              <tr>
-                  <td>
-                      <span class="colorDot" style="background-color: {{ issue.type.color|default:'#ccc' }}">
-                      </span>
-                  </td>
-                  <td>
-                      <span class="colorDot" style="background-color: {{ issue.severity.color|default:'#ccc' }}">
-                      </span>
-                  </td>
-                  <td>
-                      <span class="colorDot" style="background-color: {{ issue.priority.color|default:'#ccc' }}">
-                      </span>
-                  </td>
-                  <td>  <a href="/issue/{{issue.id}}">#{{ issue.id }} {{ issue.subject }} </a></td>
-                  <td>{{ issue.status }}</td>
-                  <td>{{ issue.modified_at }}</td>
-              </tr>
-              {% endfor %}
+            {% for issue in issues %}
+            <tr>
+              <td>
+                <span class="colorDot" style="background-color: {{ issue.type.color|default:'#ccc' }}">
+                </span>
+              </td>
+              <td>
+                <span class="colorDot" style="background-color: {{ issue.severity.color|default:'#ccc' }}">
+                </span>
+              </td>
+              <td>
+                <span class="colorDot" style="background-color: {{ issue.priority.color|default:'#ccc' }}">
+                </span>
+              </td>
+              <td> <a href="/issue/{{issue.id}}">#{{ issue.id }} {{ issue.subject }} </a></td>
+              <td>{{ issue.status }}</td>
+              <td>{{ issue.modified_at }}</td>
+            </tr>
+            {% endfor %}
           </tbody>
-      </table>
+        </table>
+      </div>
     </div>
-  </div>
 
-<script>
-   function ChangeFilterVisibility() {
-    const form = document.getElementById("filterForm");
-    form.style.display = form.style.display === "none" ? "block" : "none";
-  }
-</script>
+    <script>
+      function ChangeFilterVisibility() {
+        const form = document.getElementById("filterForm");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+      }
+    </script>
 
 </body>
 
