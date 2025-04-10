@@ -372,8 +372,10 @@ def priorities_settings(request):
                     prioritytoDelete.delete()
 
                 Priority.objects.filter(name="Write a name for the new element").exclude(pk=priority.pk).delete()
-
-                messages.success(request, f'Priority "{new_name}" succesfully modified')
+                if original_name == "Write a name for the new element": 
+                    messages.success(request, f'Priority "{new_name}" succesfully created')
+                else: 
+                    messages.success(request, f'Priority "{new_name}" succesfully modified')
 
             return redirect('priorities')
 
