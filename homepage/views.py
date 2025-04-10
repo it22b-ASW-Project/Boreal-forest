@@ -278,26 +278,14 @@ def login(request):
 def settings(request):
     return render(request, 'settings.html')
 
-@login_required
-def user_settings(request):
-    user = request.user
-    context = {
-        'username': user.username,
-        'email': user.email,
-        'full_name': f"{user.first_name} {user.last_name}",
-        'language': 'English (US)',
-        'theme': 'dark',
-        'bio': 'Computer Engineering student',
-    }
-    return render(request, 'user_settings.html', context)
 
 @login_required
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
-    profile, created = UserProfile.objects.get_or_create(user_id=id)
-    active_tab = request.GET.get('tab', 'assigned-issues')  # Tab activo por defecto
-    sort_by = request.GET.get('sort_by', '-modified_at')  # Por defecto, ordenar por 'modified'
-    edit_bio = request.GET.get('edit_bio', 'false') == 'true' 
+    profile, created = UserProfile.objects.get_or_create(user=user.user)
+    active_tab = request.GET.get('tab', 'assigned-issues') 
+    sort_by = request.GET.get('sort_by', '-modified_at') 
+    edit_bio = request.GET.get('edit_bio', 'false') == 'true'
 
     valid_sort_fields = ['type__position', 'severity__position', 'priority__position', 'status__position', 'modified_at']
     if sort_by.lstrip('-') not in valid_sort_fields:
@@ -306,13 +294,32 @@ def user_profile(request, id):
     order_by_field = f'issue__{sort_by.lstrip("-")}'
     if sort_by.startswith('-'):
         order_by_field = f'-{order_by_field}'
-    
+
     if request.method == 'POST':
+        # Handle avatar upload
+        if 'upload_avatar' in request.POST and request.FILES.get('avatar'):
+            try:
+                if profile.avatar:
+                    profile.delete_avatar()  # Delete old avatar if it exists
+                profile.avatar = request.FILES['avatar']
+                profile.save()
+                messages.success(request, 'Avatar uploaded successfully!')
+            except Exception as e:
+                messages.error(request, f'Error uploading avatar: {str(e)}')
+            return redirect('user_profile', id=id)
+            
+        # Handle avatar deletion
+        elif 'delete_avatar' in request.POST:
+            profile.delete_avatar()
+            messages.success(request, 'Avatar removed')
+            return redirect('user_profile', id=id)
+            
+        # Handle bio form
         form = EditBioForm(request.POST, instance=profile)
         if form.is_valid():
             profile.bio = form.cleaned_data['bio']
             form.save()
-            return redirect('user_profile', id=id)  # Redirige a la misma página después de guardar
+            return redirect('user_profile', id=id)
     else:
         form = EditBioForm(instance=profile)
 
@@ -331,9 +338,11 @@ def user_profile(request, id):
         'Numwatched_issues': len(watched_issues),
         'Numcomments': len(comments),
         'bio': profile.bio,
+        'profile': profile,
         'form': form,
         'active_tab': active_tab,
         'edit_bio': edit_bio,
+        'messages': messages.get_messages(request),
     }
     return render(request, 'user_profile.html', context)
 
@@ -381,8 +390,10 @@ def priorities_settings(request):
                     prioritytoDelete.delete()
 
                 Priority.objects.filter(name="Write a name for the new element").exclude(pk=priority.pk).delete()
-
-                messages.success(request, f'Priority "{new_name}" succesfully modified')
+                if original_name == "Write a name for the new element": 
+                    messages.success(request, f'Priority "{new_name}" succesfully created')
+                else: 
+                    messages.success(request, f'Priority "{new_name}" succesfully modified')
 
             return redirect('priorities')
 
@@ -582,7 +593,7 @@ def severities_settings(request):
             original_name = request.POST.get('original_name')
             new_color = request.POST.get('new_color')
         
-            severity = Status.objects.get(name=original_name)
+            severity = Severity.objects.get(name=original_name)
             severity.color = new_color
             severity.save()
             return redirect('severities')
@@ -592,9 +603,9 @@ def severities_settings(request):
             severityName = request.POST.get('severity_name')
 
             # Este contexto extra indica a la plantilla que estamos editando ese nombre
-            severity = Status.objects.get(name=severityName)
+            severity = Severity.objects.get(name=severityName)
             return render(request, 'severities.html', {
-            'severities': Status.objects.all().order_by('position'),
+            'severities': Severity.objects.all().order_by('position'),
             'editing_name': severity.name,
             'messages': messages.get_messages(request),
             })
@@ -602,7 +613,7 @@ def severities_settings(request):
         elif "moveUp" in request.POST:
 
             if severity.position > 1:  
-                previous_severity = Status.objects.get(position=severity.position - 1)
+                previous_severity = Severity.objects.get(position=severity.position - 1)
                 severity.position -= 1
                 previous_severity.position += 1
                 severity.save()
@@ -811,3 +822,48 @@ def confirm_delete_type(request):
         'type': type_to_delete,
         'other_types': other_types,
     })
+# Añade esto al final de tu archivo views.py
+from django.http import JsonResponse
+
+def test_s3_connection(request):
+    """
+    Vista para probar la conexión con AWS S3.
+    Accede a /test-s3/ para ejecutar esta prueba.
+    """
+    from django.conf import settings
+    
+    # Verificar si S3 está configurado
+    if not getattr(settings, 'USE_S3', False):
+        return JsonResponse({
+            'status': 'warning',
+            'message': 'S3 no está configurado. Establece USE_S3=True en settings para usar S3'
+        })
+    
+    try:
+        import boto3
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            aws_session_token=settings.AWS_SESSION_TOKEN,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+        
+        # Listar buckets para verificar la conexión
+        response = s3.list_buckets()
+        
+        # Comprobar si nuestro bucket existe
+        bucket_exists = any(bucket['Name'] == settings.AWS_STORAGE_BUCKET_NAME 
+                         for bucket in response['Buckets'])
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Conexión exitosa a S3',
+            'bucket_exists': bucket_exists,
+            'bucket_name': settings.AWS_STORAGE_BUCKET_NAME
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Error al conectar con S3: {str(e)}'
+        }, status=500)
