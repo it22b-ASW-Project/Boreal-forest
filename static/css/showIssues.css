@@ -153,7 +153,6 @@ a {
 }
 
 a:hover {
-    text-decoration: underline;
     color: #2596be;
 }
 
@@ -167,7 +166,7 @@ a:hover {
 
 #filterForm {
     display: flex;
-    flex-wrap: wrap; /* O usa nowrap si no quieres que se bajen */
+    flex-wrap: wrap; 
     gap: 10px;
     align-items: center;
     justify-content: flex-start;
@@ -193,8 +192,8 @@ a:hover {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
-    display: none; /* Oculto por defecto */
+    background: rgba(0, 0, 0, 0.5); 
+    display: none; 
     justify-content: center;
     align-items: center;
     z-index: 9999;

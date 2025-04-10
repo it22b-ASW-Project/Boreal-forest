@@ -1,7 +1,3 @@
-/* {
-    outline: orangered solid 1px;
-}*/
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -44,8 +40,7 @@ form button:hover {
 .separator {
     display: block;
     border: none;
-    border-top: 1px solid #ddd;
-    /* Usa un color fuerte para pruebas */
+    border-top: 1px solid #ddd; 
     margin: 20px 0;
     height: 0;
     opacity: 1;
