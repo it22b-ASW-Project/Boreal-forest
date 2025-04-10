@@ -17,6 +17,7 @@ body {
     border-radius: 0;
     box-shadow: none;
     overflow: hidden;
+    margin-bottom: 20px;
 }
 
 .material-icons {
@@ -87,8 +88,8 @@ button:hover {
 }
 
 .colorDot {
-    width: 12px;
-    height: 12px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     display: inline-block;
 }
@@ -103,7 +104,7 @@ button:hover {
 .profile-content {
     flex: 1;
     box-sizing: border-box;
-    max-height: 80vh; 
+    max-height: 75vh; 
     overflow-y: auto;
     margin-bottom: 20px;
 }
@@ -118,7 +119,6 @@ button:hover {
 .profile-content table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 0; 
 }
 
 .profile-content table td {
@@ -140,6 +140,10 @@ button:hover {
 
 .profile-content tr {
     border-bottom: 1px solid #ddd;
+}
+.profile-content table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 a {
