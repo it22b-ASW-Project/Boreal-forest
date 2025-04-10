@@ -8,9 +8,11 @@
     {% if messages %}
         <div class="messages">
             {% for message in messages %}
+            {% if 'Successfully signed in as' not in message.message %}
                 <div class="message {{ message.tags }}">
                     {{ message }}
                 </div>
+            {% endif %}
             {% endfor %}
         </div>
     {% endif %}
