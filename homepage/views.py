@@ -282,7 +282,7 @@ def settings(request):
 @login_required
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
-    profile, created = UserProfile.objects.get_or_create(user=user.user)
+    profile, created = UserProfile.objects.get_or_create(user_id=id)
     active_tab = request.GET.get('tab', 'assigned-issues') 
     sort_by = request.GET.get('sort_by', '-modified_at') 
     edit_bio = request.GET.get('edit_bio', 'false') == 'true'
@@ -325,7 +325,7 @@ def user_profile(request, id):
 
     assigned_issues = Assigned.objects.filter(assigned=user, issue__status__name__in=['New', 'In progress', 'Ready for test', 'Needs info', 'Rejected', 'Postponed']).select_related('issue').order_by(order_by_field)
     watched_issues = Watch.objects.filter(watcher=user).select_related('issue').order_by(order_by_field)
-    comments = Comments.objects.filter(user=user).select_related('issue').order_by(f'-created_at')
+    comments = Comments.objects.filter(user_id=id).select_related('issue').order_by(f'-created_at')
 
     context = {
         'username': user.user.username,
