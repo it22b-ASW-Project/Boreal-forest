@@ -1,6 +1,6 @@
 /* {
     outline: orangered solid 1px;
-}*/ 
+}*/
 
 body {
     font-family: Arial, sans-serif;
@@ -44,7 +44,8 @@ form button:hover {
 .separator {
     display: block;
     border: none;
-    border-top: 1px solid #ddd; /* Usa un color fuerte para pruebas */
+    border-top: 1px solid #ddd;
+    /* Usa un color fuerte para pruebas */
     margin: 20px 0;
     height: 0;
     opacity: 1;
@@ -53,9 +54,9 @@ form button:hover {
 
 .head-separator {
     width: 100%;
-    height: 10px; 
-    background-color: #e5e7eb; 
-    margin: 1rem 0; 
+    height: 10px;
+    background-color: #e5e7eb;
+    margin: 1rem 0;
     border: none;
 }
 
@@ -89,7 +90,7 @@ form button:hover {
     cursor: pointer;
 }
 
-.issue-header form{
+.issue-header form {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -132,7 +133,7 @@ h1 {
     margin: 0;
 }
 
-p {  
+p {
     font-size: 14px;
     color: #888;
     margin: 0;
@@ -143,8 +144,6 @@ p {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
 }
 
 .issue-info {
@@ -307,7 +306,7 @@ p {
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 6px;
-    flex: 1; 
+    flex: 1;
     min-width: 200px;
 }
 
@@ -326,7 +325,7 @@ p {
 
 .comment-info {
     display: block;
-    align-items:normal;
+    align-items: normal;
     gap: 10px;
     font-size: 14px;
     width: 100%;
@@ -355,7 +354,7 @@ p {
     gap: 10px;
     width: 100%;
 }
-  
+
 .param-field label {
     display: block;
     font-size: 11px;
@@ -408,7 +407,7 @@ p {
 
 .add-people h3 {
     font-size: 10px;
-    color: #333;    
+    color: #333;
     margin-bottom: 0;
     text-transform: uppercase;
     font-weight: bold;
@@ -432,19 +431,20 @@ p {
 
 .added-user form:hover {
     background-color: #f7f7f7;
-    border-radius: 5px;;
+    border-radius: 5px;
+    ;
     color: #2596be;
 }
 
 .added-user button {
     margin-left: auto;
     border: none;
-    background-color: transparent; 
+    background-color: transparent;
 }
 
 .added-user button:hover {
     cursor: pointer;
-    color:chocolate;
+    color: chocolate;
 }
 
 .add-usr-btn {
@@ -491,4 +491,3 @@ p {
     background-color: #ccc;
     color: #333;
 }
-
