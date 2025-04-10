@@ -108,9 +108,6 @@
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         <input type="file" name="new_attachments" id="file-upload" multiple>
-                            <!--<label for="file-upload">
-                                <i class="material-icons">upload_file</i>
-                            </label>-->
                         <input type="text" name="attachment_description" placeholder="Description (optional)">
                         <button type="submit" name="upload_attachment" value="true">Upload</button>
                     </form>

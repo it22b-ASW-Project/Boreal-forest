@@ -20,6 +20,18 @@ body {
     overflow: hidden;
 }
 
+.material-icons {
+    color: #2596be;
+    flex-shrink: 0;
+    transition: 0.3s;
+    vertical-align: middle;
+}
+
+.material-icons:hover {
+    cursor: pointer;
+    color: #333;
+}
+
 .profile-sidebar {
     width: 30%;
     height: 100%;
@@ -34,16 +46,17 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
-    padding: 10px 15px;
-    background-color: #f0f0f0;
-    color: grey;
     text-decoration: none;
-    border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
+    color: #0099cc;
+    border: none;
+    background-color: #ddd;
+    padding: 8px 8px;
+    transition: 0.3s;
+    margin-right: 10px;
 }
 
 .back-button:hover {
@@ -73,12 +86,12 @@ body {
 .profile-sidebar .stats div p,
 .profile-sidebar .stats div span {
     margin-top: 10px;
-    font-size: 20px; /* Tamaño de la fuente */
-    color: black; /* Color del texto */
-    white-space: pre-line; /* Permitir saltos de línea */
-    display: block; /* Asegurar que cada palabra ocupe su propia línea */
-    line-height: 1; /* Espaciado entre líneas */
-    text-align: center; /* Alinear el texto al centro */
+    font-size: 20px;
+    color: black; 
+    white-space: pre-line; 
+    display: block;
+    line-height: 1;
+    text-align: center; 
 }
 .profile-sidebar .stats div .num{
     font-size: 50px;
@@ -102,17 +115,18 @@ body {
     width: auto;
     display: inline-block;
     padding: 10px 20px;
-    background-color: #98ede1;
+    background-color: #2596be;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
     font-size: 20px;
+    transition: 0.3s
 }
 
 .profile-sidebar .edit-bio:hover {
-    background-color: #98ede1;
+    background-color: #65eedc;
 }
 
 .profile-content {

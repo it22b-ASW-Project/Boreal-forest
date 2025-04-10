@@ -37,7 +37,7 @@ def showAllIssues(request):
         form = BulkIssueForm(request.POST)
         if form.is_valid():
             crearIssues(request, form)
-            return redirect("/issues")  # Cambia a tu vista/listado real
+            return redirect("/issues")  
     else:
         form = BulkIssueForm()
 
@@ -78,7 +78,7 @@ def createIssue(request):
             severity=severity,
             status=status,
             deadline=deadline or None,
-            created_by= SocialAccount.objects.filter(user=request.user, provider="google").first()  # Asignar el usuario que crea el issue
+            created_by= SocialAccount.objects.filter(user=request.user, provider="google").first() 
         )
         new_issue.save()
 
@@ -95,7 +95,7 @@ def createIssue(request):
             )
             attachment.save()
 
-        return redirect('/issues')  # Redirige a la página principal
+        return redirect('/issues')  
 
     # Obtener datos para los selectores
     priorities = Priority.objects.all()
@@ -152,7 +152,7 @@ def issueDetail(request, id):
         elif 'subject' in request.POST:    
             issue.subject = request.POST.get("subject", issue.subject)
             issue.save()
-            return redirect(reverse("issueDetail", args=[issue.id])) # Redirige a la misma página
+            return redirect(reverse("issueDetail", args=[issue.id])) 
         
         elif 'description' in request.POST:
             issue.description = request.POST.get("description", issue.description)
@@ -161,7 +161,6 @@ def issueDetail(request, id):
 
         elif 'deadline' in request.POST:
             deadline = request.POST.get("deadline", "")
-            # Si se deja en blanco, establecemos a None
             issue.deadline = deadline if deadline else None
             issue.save()
             return redirect(reverse("issueDetail", args=[issue.id]))
@@ -295,8 +294,8 @@ def user_settings(request):
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
     profile, created = UserProfile.objects.get_or_create(user_id=id)
-    active_tab = request.GET.get('tab', 'assigned-issues')  # Tab activo por defecto
-    sort_by = request.GET.get('sort_by', '-modified_at')  # Por defecto, ordenar por 'modified'
+    active_tab = request.GET.get('tab', 'assigned-issues')  
+    sort_by = request.GET.get('sort_by', '-modified_at') 
     edit_bio = request.GET.get('edit_bio', 'false') == 'true' 
 
     valid_sort_fields = ['type__position', 'severity__position', 'priority__position', 'status__position', 'modified_at']
@@ -312,7 +311,7 @@ def user_profile(request, id):
         if form.is_valid():
             profile.bio = form.cleaned_data['bio']
             form.save()
-            return redirect('user_profile', id=id)  # Redirige a la misma página después de guardar
+            return redirect('user_profile', id=id)  
     else:
         form = EditBioForm(instance=profile)
 
@@ -352,7 +351,7 @@ def priorities_settings(request):
 
             if "write a name for the new element" not in priority_name.lower():
                 messages.success(request, f'Priority "{priority_name}" succesfully deleted')
-            return redirect('priorities')  # Redirecciona de vuelta a la misma página
+            return redirect('priorities')  
 
         elif action == 'add_new':
             max_position = priorities.aggregate(Max('position'))['position__max'] or 0
@@ -361,7 +360,7 @@ def priorities_settings(request):
             if not Priority.objects.filter(name=new_name).exists():
                 Priority.objects.create(
                     name="Write a name for the new element",
-                    color="#808080", #gris por defecto
+                    color="#808080", 
                     position=max_position + 1
                 )
 
@@ -429,7 +428,7 @@ def priorities_settings(request):
                     next_priority.save()
             print("Moved down")
 
-        return redirect("priorities")  # Redirigir después de la acción
+        return redirect("priorities")  
 
     return render(request, 'priorities.html', {'priorities': priorities})
 
@@ -448,7 +447,7 @@ def statuses_settings(request):
 
             if "write a name for the new element" not in status_name.lower():
                 messages.success(request, f'Status "{status_name}" succesfully deleted')
-            return redirect('statuses')  # Redirecciona de vuelta a la misma página
+            return redirect('statuses')  
 
         elif action == 'add_new':
             max_position = statuses.aggregate(Max('position'))['position__max'] or 0
@@ -457,7 +456,7 @@ def statuses_settings(request):
             if not Status.objects.filter(name=new_name).exists():
                 Status.objects.create(
                     name="Write a name for the new element",
-                    color="#808080", #gris por defecto
+                    color="#808080", 
                     position=max_position + 1
                 )
 
@@ -525,7 +524,7 @@ def statuses_settings(request):
                     next_status.save()
             print("Moved down")
 
-        return redirect("statuses")  # Redirigir después de la acción
+        return redirect("statuses")  
 
     return render(request, 'statuses.html', {'statuses': statuses})
 
@@ -543,7 +542,7 @@ def severities_settings(request):
 
             if "write a name for the new element" not in severity_name.lower():
                 messages.success(request, f'Status "{severity_name}" succesfully deleted')
-            return redirect('severities')  # Redirecciona de vuelta a la misma página
+            return redirect('severities')  
 
         elif action == 'add_new':
             max_position = severities.aggregate(Max('position'))['position__max'] or 0
@@ -552,7 +551,7 @@ def severities_settings(request):
             if not Severity.objects.filter(name=new_name).exists():
                 Severity.objects.create(
                     name="Write a name for the new element",
-                    color="#808080", #gris por defecto
+                    color="#808080", 
                     position=max_position + 1
                 )
 
@@ -620,7 +619,7 @@ def severities_settings(request):
                     next_severity.save()
             print("Moved down")
 
-        return redirect("severities")  # Redirigir después de la acción
+        return redirect("severities")  
 
     return render(request, 'severities.html', {'severities': severities})
 
@@ -638,7 +637,7 @@ def types_settings(request):
 
             if "write a name for the new element" not in type_name.lower():
                 messages.success(request, f'Type "{type_name}" succesfully deleted')
-            return redirect('types')  # Redirecciona de vuelta a la misma página
+            return redirect('types')  
 
         elif action == 'add_new':
             max_position = types.aggregate(Max('position'))['position__max'] or 0
@@ -647,7 +646,7 @@ def types_settings(request):
             if not Type.objects.filter(name=new_name).exists():
                 Type.objects.create(
                     name="Write a name for the new element",
-                    color="#808080", #gris por defecto
+                    color="#808080", 
                     position=max_position + 1
                 )
 
@@ -715,7 +714,7 @@ def types_settings(request):
                     next_type.save()
             print("Moved down")
 
-        return redirect("types")  # Redirigir después de la acción
+        return redirect("types") 
 
     return render(request, 'types.html', {'types': types})
 
@@ -796,12 +795,8 @@ def confirm_delete_type(request):
     if request.method == 'POST':
         new_type_id = request.POST.get('new_type_id')
         new_type = get_object_or_404(Type, name=new_type_id)
-
-        # Cambiar issues a la nueva prioridad
         issues = Issue.objects.filter(type=type_to_delete)
         issues.update(type=new_type)
-
-        # Eliminar la prioridad
         type_to_delete.delete()
 
         messages.success(request, f'Type "{type_name}" deleted and issues changed to  "{new_type.name}".')

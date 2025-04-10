@@ -90,17 +90,17 @@
             <i class="material-icons">playlist_add</i>
           </button>
 
-            <div id="bulkForm" style="display:none;">
-              <br>
-              <form method="POST">
-                <p>Bulk Insert Issues</p>
-                {% csrf_token %}
-                {{ bulkForm }}
-                <button type="submit">Crear Issues</button> 
-                <button onclick="document.getElementById('bulkForm').style.display = 'none';">Cerrar</button> 
-              </form>
-            </div>
+          <div id="bulkForm" style="display:none;">
+            <br>
+            <form method="POST">
+              <p>Bulk Insert Issues</p>
+              {% csrf_token %}
+              {{ bulkForm }}
+              <button type="submit">Crear Issues</button> 
+              <button onclick="document.getElementById('bulkForm').style.display = 'none';">Cerrar</button> 
+            </form>
           </div>
+        </div>
       </div>
 
       <div class="profile-content">
