@@ -593,7 +593,7 @@ def severities_settings(request):
             original_name = request.POST.get('original_name')
             new_color = request.POST.get('new_color')
         
-            severity = Status.objects.get(name=original_name)
+            severity = Severity.objects.get(name=original_name)
             severity.color = new_color
             severity.save()
             return redirect('severities')
@@ -603,9 +603,9 @@ def severities_settings(request):
             severityName = request.POST.get('severity_name')
 
             # Este contexto extra indica a la plantilla que estamos editando ese nombre
-            severity = Status.objects.get(name=severityName)
+            severity = Severity.objects.get(name=severityName)
             return render(request, 'severities.html', {
-            'severities': Status.objects.all().order_by('position'),
+            'severities': Severity.objects.all().order_by('position'),
             'editing_name': severity.name,
             'messages': messages.get_messages(request),
             })
@@ -613,7 +613,7 @@ def severities_settings(request):
         elif "moveUp" in request.POST:
 
             if severity.position > 1:  
-                previous_severity = Status.objects.get(position=severity.position - 1)
+                previous_severity = Severity.objects.get(position=severity.position - 1)
                 severity.position -= 1
                 previous_severity.position += 1
                 severity.save()

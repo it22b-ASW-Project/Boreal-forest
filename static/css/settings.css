@@ -14,6 +14,17 @@ body {
     width: 200px;
     background-color: #f4f4f4;
     flex-shrink: 0;
+    overflow-y: auto;
+    display: table-cell;
+    height: 100vh; 
+    position: sticky; 
+    top: 0; 
+}
+
+.layout {
+    display: flex;
+    align-items: stretch;
+    min-height: 100vh;
 }
 
 .sidebar li {
@@ -191,8 +202,8 @@ form button:hover {
 /* Estilo para los botones */
 .move-buttons {
     display: flex;
-    justify-content: flex-start; /* Alinea los botones a la izquierda */
-    gap: 2px; /* Espacio entre los botones */
+    justify-content: flex-start; 
+    gap: 2px; 
 }
 
 .move-buttons button {
@@ -207,12 +218,12 @@ form button:hover {
 }
 
 .move-buttons button:hover {
-    background-color: #d1d0cc;  /* Cambio de color en hover */
-    transform: scale(1.05);     /* Ligera ampliación al pasar el mouse */
+    background-color: #d1d0cc;  
+    transform: scale(1.05);    
 }
 
 .move-buttons button:active {
-    transform: scale(0.95);     /* Pequeña animación al hacer clic */
+    transform: scale(0.95);    
 }
 
 .move-buttons form {
@@ -239,9 +250,9 @@ form button:hover {
 
 /* Estilo para el mensaje */
 .messages {
-    min-height: 60px; /* Ajusta este valor según el tamaño de los mensajes */
-    transition: height 0.3s ease; /* Para una animación suave al desaparecer */
-    overflow: hidden; /* Para que no se desborden */
+    min-height: 60px; 
+    transition: height 0.3s ease; 
+    overflow: hidden; 
 }
 
 .messages.empty {
@@ -273,7 +284,7 @@ form button:hover {
     display: inline-block;
 }
 
-/* Para navegadores WebKit (Chrome, Edge, Safari) */
+
 .color-picker-input::-webkit-color-swatch-wrapper {
     padding: 0;
     border: none;
@@ -284,7 +295,6 @@ form button:hover {
     border-radius: 50%;
 }
 
-/* Para Firefox */
 .color-picker-input::-moz-color-swatch {
     border: none;
     border-radius: 50%;
