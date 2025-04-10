@@ -2,130 +2,98 @@
 <html lang="en">
 
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <title>New Issue</title>
-    <style>
-        .colorDot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
-            vertical-align: middle;
-        }
-
-        .option-with-color {
-            display: flex;
-            align-items: center;
-        }
-
-        select option {
-            padding-left: 20px;
-            position: relative;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/create_issue.css' %}">
 </head>
 
 <body>
-    <div>
+    <div class="container">
+        <a href="/issues" class="back-button">&lt;</a>
         <h1>New Issue</h1>
+        <form action="" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+        <div class="Options">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Subject -->
+                <div class="form-section">
+                    <label for="Subject">Subject:</label>
+                    <input type="text" id="Subject" name="Subject" value="{{ form.Subject.value }}" required>
+                </div>
+
+                <!-- Description -->
+                <div class="form-section">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" required>{{ form.description.value }}</textarea>
+                </div>
+
+                <!-- Attachments -->
+                <div class="form-section">
+                    <label for="attachments">Attachments:</label>
+                    <input type="file" id="attachments" name="attachments" multiple onchange="updateFileName(this)">
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Status -->
+                <div class="form-section">
+                    <label for="status">Status:
+                    </label>
+                    <select id="status" name="status" required>
+                        {% for s in status %}
+                        <option value="{{ s.name }}" {% if form.status.value == s.name %}selected{% endif %}>
+                            {{ s.name }} 
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Type -->
+                <div class="form-section">
+                    <label for="type">Type:</label>
+                    <select id="type" name="type" required>
+                        {% for type in types %}
+                        <option value="{{ type.name }}" {% if form.type.value == type.name %}selected{% endif %}>
+                            {{ type.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Severity -->
+                <div class="form-section">
+                    <label for="severity">Severity:</label>
+                    <select id="severity" name="severity" required>
+                        {% for severity in severities %}
+                        <option value="{{ severity.name }}" {% if form.severity.value == severity.name %}selected{% endif %}>
+                            {{ severity.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Priority -->
+                <div class="form-section">
+                    <label for="priority">Priority:</label>
+                    <select id="priority" name="priority" required>
+                        {% for priority in priorities %}
+                        <option value="{{ priority.name }}" {% if form.priority.value == priority.name %}selected{% endif %}>
+                            {{ priority.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+            <!-- Submit Button -->
+            <div class="create-button">
+                <button type="submit">Create</button>
+            </div>
+        </form>
     </div>
-    <form action="" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for="Subject">Subject:</label>
-        <input type="text" id="Subject" name="Subject" required>
-
-        <br><br>
-
-        <label for="description">Description:</label>
-        <input type="text" id="description" name="description" required>
-
-        <br><br>
-
-        <label for="type">Type: </label>
-        <select id="type" name="type" required>
-            {% for type in types %}
-            <option value="{{ type.name }}" data-color="{{ type.color }}">
-                <span class="colorDot" style="background-color: {{ type.color }}"></span>
-                {{ type.name }}
-            </option>
-            {% endfor %}
-        </select>
-        <span class="colorDot" id="typeDot" style="background-color: {{ types.0.color }}"></span>
-
-        <br><br>
-
-        <label for="severity">Severity: </label>
-        <select id="severity" name="severity" required>
-            {% for severity in severities %}
-            <option value="{{ severity.name }}" data-color="{{ severity.color }}">{{ severity.name }}</option>
-            {% endfor %}
-        </select>
-        <span class="colorDot" id="severityDot" style="background-color: {{ severities.0.color }}"></span>
-
-        <br><br>
-
-        <label for="priority">Priority: </label>
-        <select id="priority" name="priority" required>
-            {% for priority in priorities %}
-            <option value="{{ priority.name }}" data-color="{{ priority.color }}">{{ priority.name }}</option>
-            {% endfor %}
-        </select>
-        <span class="colorDot" id="priorityDot" style="background-color: {{ priorities.0.color }}"></span>
-
-        <br><br>
-
-        <label for="status">Status: </label>
-        <select id="status" name="status" required>
-            {% for s in status %}
-            <option value="{{ s.name }}" data-color="{{ s.color }}">{{ s.name }}</option>
-            {% endfor %}
-        </select>
-        <span class="colorDot" id="statusDot" style="background-color: {{ status.0.color }}"></span>
-
-        <br><br>
-
-        <label for="attachments">Attachments (you can select multiple files): </label>
-        <input type="file" id="attachments" name="attachments" multiple>
-
-        <br><br>
-
-        <label for="attachments_description">Description (optional): </label>
-        <input type="text" id="attachments_description" name="attachments_description">
-
-        <br><br>
-
-        <label for="deadline">Deadline: </label>
-        <input type="date" id="deadline" name="deadline">
-
-
-        <br><br>
-
-        <button type="submit">Create</button>
-    </form>
-
-    <script>
-        // Actualizar el color de los dots cuando cambia la selección
-        document.getElementById('type').addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            document.getElementById('typeDot').style.backgroundColor = selectedOption.getAttribute('data-color');
-        });
-
-        document.getElementById('severity').addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            document.getElementById('severityDot').style.backgroundColor = selectedOption.getAttribute('data-color');
-        });
-
-        document.getElementById('priority').addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            document.getElementById('priorityDot').style.backgroundColor = selectedOption.getAttribute('data-color');
-        });
-
-        document.getElementById('status').addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            document.getElementById('statusDot').style.backgroundColor = selectedOption.getAttribute('data-color');
-        });
-    </script>
 </body>
 
 </html>
