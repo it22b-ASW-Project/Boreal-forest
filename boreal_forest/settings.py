@@ -47,6 +47,27 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': '791844404146-o431l77f7iqeplifush65c07vc42jp6g.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        }
+    }
+}
+
+LOGIN_REDIRECT_URL = '/issues'  # URL to redirect after login
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/'
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
     'allauth.account.middleware.AccountMiddleware',
 ]
 

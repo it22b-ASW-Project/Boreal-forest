@@ -1,0 +1,140 @@
+{% extends "settings.html" %}
+
+{% block content %}
+<div class="container">
+
+    <!--Para mostrar mensajes informativos-->
+    {% if request.path == '/settings/severities/' %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endif %}
+
+    <div class="section-header">
+        <div class="section-title">Severities</div>
+    </div>
+
+    <div class="table-title">
+        <p>Specify the severities your issues will have</p>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_new">
+            <button type="submit" class="add-button">ADD NEW SEVERITY</button>
+        </form>
+    </div>
+
+    <div class="table">
+        <div class="table-columns">
+            <div></div>
+            <div>Color</div>
+            <div>Name</div>
+            <div></div>
+            <div></div>
+        </div>
+
+        {% for p in severities %}
+        <div class="table-row" data-id="{{ p.name }}">
+
+            <!-- Flechas -->
+            <div class="move-buttons">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="severity_name" value="{{ p.name }}">
+                    <button type="submit" class="move-up" name="moveUp" value="up">↑</button>
+                </form>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="severity_name" value="{{ p.name }}">
+                    <button type="submit" name="move_down" value="down">↓</button>
+                </form>
+            </div>
+
+            <!-- Color -->
+            <div>
+                {% if editing_name == p.name %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="original_name" value="{{ p.name }}">
+                    <input type="hidden" name="action" value="new_color">
+                    <input 
+                        type="color" 
+                        name="new_color" 
+                        value="{{ p.color }}" 
+                        class="color-picker-input"
+                        title="Pick a new color"
+                    >
+                    <button type="submit">
+                        <i class="material-icons">check</i>
+                    </button>
+                </form>
+                {% else %}
+                <span class="color-circle" style="background-color: {{ p.color }}"></span>
+                {% endif %}
+            </div>
+
+            <!-- Name -->
+            <div>
+                {% if p.name == "Write a name for the new element" %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="original_name" value="{{ p.name }}">
+                    <input type="hidden" name="action" value="edit_name">
+                    <input type="text" name="new_name" value="" placeholder="Write a name for the new element" autofocus class="input-edit-name" style="width: 80%;">
+                </form>
+                {% elif editing_name == p.name %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="original_name" value="{{ p.name }}">
+                    <input type="hidden" name="action" value="edit_name">
+                    <input type="text" 
+                        name="new_name" 
+                        value="{{ p.name }}" 
+                        autofocus 
+                        class="input-edit-name">
+                    <button type="submit">
+                        <i class="material-icons">check</i>
+                    </button>
+                </form>
+                {% else %}
+                <div>{{ p.name }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Edit -->
+            <div>
+                {% if editing_name != p.name %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="severity_name" value="{{ p.name }}">
+                    <input type="hidden" name="action" value="start_editting">
+                    <button type="submit">
+                        <i class="material-icons">edit</i> <!-- Botón de editar -->
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- Delete -->
+            <div>
+                <form method="GET" action="{% url 'confirm_delete_severity' %}">
+                    <input type="hidden" name="severity_name" value="{{ p.name }}">
+                    <button type="submit">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}
