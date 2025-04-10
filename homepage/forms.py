@@ -4,7 +4,7 @@ from .models import Priority, Type, Severity, Status, Comments, UserProfile
 
 class EditParamsForm(forms.Form):
     priority = forms.ModelChoiceField(
-        queryset=Priority.objects.all(),  # Debe ser un queryset de objetos
+        queryset=Priority.objects.all(),  
         required=True,
         empty_label=None,
         widget=forms.Select(attrs={"onchange": "this.form.submit();", "class": "form-style"})
