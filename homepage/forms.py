@@ -1,27 +1,31 @@
 from django import forms
-
 from .models import Priority, Type, Severity, Status, Comments, UserProfile
+
 
 class EditParamsForm(forms.Form):
     priority = forms.ModelChoiceField(
         queryset=Priority.objects.all(),  # Debe ser un queryset de objetos
         required=True,
-        empty_label=None
+        empty_label=None,
+        widget=forms.Select(attrs={"onchange": "this.form.submit();", "class": "form-style"})
     )
     type = forms.ModelChoiceField(
         queryset=Type.objects.all(),
         required=True,
-        empty_label=None
+        empty_label=None,
+        widget=forms.Select(attrs={"onchange": "this.form.submit();" , "class": "form-style"})
     )
     severity = forms.ModelChoiceField(
         queryset=Severity.objects.all(),
         required=True,
-        empty_label=None
+        empty_label=None,
+        widget=forms.Select(attrs={"onchange": "this.form.submit();" , "class": "form-style"})
     )
     status = forms.ModelChoiceField(
         queryset=Status.objects.all(),
         required=True,
-        empty_label=None
+        empty_label=None,
+        widget=forms.Select(attrs={"onchange": "this.form.submit();"})
     )
     deadline = forms.DateField(
         required=False,
@@ -44,6 +48,7 @@ class CommentForm(forms.ModelForm):
                 'rows': 5, 
                 'cols': 40, 
                 'placeholder': 'Escribe tu comentario aquí...',  
+                'class': 'textarea-comment',
             }),
         }
 
@@ -52,8 +57,8 @@ class BulkIssueForm(forms.Form):
         label='',
         widget=forms.Textarea(attrs={
             'placeholder': 'Escribe cada issue en una línea diferente...',
-            'rows': 6,
-            'cols': 40,
+            'rows': 10,
+            'cols': 60,
         })
     )
 class EditBioForm(forms.ModelForm):

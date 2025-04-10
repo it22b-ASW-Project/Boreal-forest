@@ -71,6 +71,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 LOGIN_REDIRECT_URL = '/issues'  # URL to redirect after login
 LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/'
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
@@ -164,3 +165,5 @@ import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
