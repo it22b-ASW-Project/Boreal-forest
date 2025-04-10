@@ -23,7 +23,7 @@ def showAllIssues(request):
     
     sort_by = request.GET.get('sort_by', '-modified') 
     show_filters = request.GET.get('show_filters') == '1'
-    valid_sort_fields = ['type__name', 'severity__name', 'priority__name', 'status', 'modified_at']
+    valid_sort_fields = ['type__position', 'severity__position', 'priority__position', 'status__position', 'modified_at']
     if sort_by.lstrip('-') not in valid_sort_fields:
         sort_by = '-modified_at'
 
@@ -296,10 +296,10 @@ def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
     profile, created = UserProfile.objects.get_or_create(user_id=id)
     active_tab = request.GET.get('tab', 'assigned-issues')  # Tab activo por defecto
-    sort_by = request.GET.get('sort_by', '-modified')  # Por defecto, ordenar por 'modified'
+    sort_by = request.GET.get('sort_by', '-modified_at')  # Por defecto, ordenar por 'modified'
     edit_bio = request.GET.get('edit_bio', 'false') == 'true' 
 
-    valid_sort_fields = ['type__name', 'severity__name', 'priority__name', 'status', 'modified_at']
+    valid_sort_fields = ['type__position', 'severity__position', 'priority__position', 'status__position', 'modified_at']
     if sort_by.lstrip('-') not in valid_sort_fields:
         sort_by = '-modified_at'
 
