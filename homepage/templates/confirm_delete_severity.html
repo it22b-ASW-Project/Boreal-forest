@@ -1,0 +1,24 @@
+{% extends "settings.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Delete value: "{{ severity.name }}"</h2>
+    <p>All items with this value will be changed to</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="severity">New severity:</label>
+        <select name="new_severity_id" id="new_severity" required>
+            {% for p in other_serverities %}
+                <option value="{{ p.name }}">{{ p.name }}</option>
+            {% endfor %}
+        </select>
+        <div style="margin-top: 1em; display: flex; gap: 1em;">
+            <button type="submit" class="confirm-delete">Delete</button> 
+            </button>
+            <a href="{% url 'severities' %}" class="cancel-button">Cancel 
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -13,7 +13,7 @@ class IssueFilter(django_filters.FilterSet):
         label="Buscar", 
         widget=forms.TextInput(attrs={
             "placeholder": "Subject or description", 
-            "onchange": "this.form.submit();"
+            "onchange": "this.form.submit();",
             })
     )
 
