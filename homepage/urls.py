@@ -8,12 +8,17 @@ from . import views
 urlpatterns = [
     
     path('settings/', RedirectView.as_view(pattern_name='statuses', permanent=False)),
+    
     path('settings/priorities/delete/', views.confirm_delete_priority, name='confirm_delete_priority'),
     path('settings/statuses/delete/', views.confirm_delete_status, name='confirm_delete_status'),
+    path('settings/severities/delete/', views.confirm_delete_severity, name='confirm_delete_severity'),
+    path('settings/types/delete/', views.confirm_delete_type, name='confirm_delete_type'),
+    
     path('settings/priorities/', views.priorities_settings, name='priorities'),
     path('settings/statuses/', views.statuses_settings, name='statuses'),
     path('settings/severities/', views.severities_settings, name='severities'),
     path('settings/types/', views.types_settings, name='types'),
+    
     path('user-profile/<int:id>/', views.user_profile, name='user_profile'),
     path('issues/', views.showAllIssues),
     path('', views.login), 

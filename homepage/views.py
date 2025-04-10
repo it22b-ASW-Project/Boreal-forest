@@ -520,21 +520,201 @@ def statuses_settings(request):
 
     return render(request, 'statuses.html', {'statuses': statuses})
 
+def severities_settings(request):
+    severities = Severity.objects.all().order_by('position')
+    if request.method == "POST":
+        action = request.POST.get('action')
+        print(f"Action: {action}")
+        if action not in( 'add_new', 'edit_name', 'start_editting', 'new_color'):
+            severity_name = request.POST.get('severity_name')
+            severity = Status.objects.get(name=severity_name)
+
+        if action == 'delete_severity':
+            severity.delete()
+
+            if "write a name for the new element" not in severity_name.lower():
+                messages.success(request, f'Status "{severity_name}" succesfully deleted')
+            return redirect('severities')  # Redirecciona de vuelta a la misma página
+
+        elif action == 'add_new':
+            max_position = severities.aggregate(Max('position'))['position__max'] or 0
+            new_name = f"New Status {max_position + 1}"
+
+            if not Severity.objects.filter(name=new_name).exists():
+                Severity.objects.create(
+                    name="Write a name for the new element",
+                    color="#808080", #gris por defecto
+                    position=max_position + 1
+                )
+
+            return redirect('severities')
+
+        elif action == 'edit_name':
+            original_name = request.POST.get('original_name')
+            new_name = request.POST.get('new_name')
+            if new_name.strip():
+                severity = Severity.objects.get(name=original_name)
+                severity.name = new_name.strip()
+
+                severity.save()
+                #logica per eliminar els elements editats antics, perque como es primary key no es pot editar
+                if  new_name.strip() != original_name:
+                    severitytoDelete = Severity.objects.get(name=original_name)
+                    severitytoDelete.delete()
+
+                Severity.objects.filter(name="Write a name for the new element").exclude(pk=severity.pk).delete()
+
+                messages.success(request, f'Severity "{new_name}" succesfully modified')
+
+            return redirect('severities')
+
+        elif action == 'new_color':
+            
+            original_name = request.POST.get('original_name')
+            new_color = request.POST.get('new_color')
+        
+            severity = Status.objects.get(name=original_name)
+            severity.color = new_color
+            severity.save()
+            return redirect('severities')
+
+        elif action == 'start_editting':
+
+            severityName = request.POST.get('severity_name')
+
+            # Este contexto extra indica a la plantilla que estamos editando ese nombre
+            severity = Status.objects.get(name=severityName)
+            return render(request, 'severities.html', {
+            'severities': Status.objects.all().order_by('position'),
+            'editing_name': severity.name,
+            'messages': messages.get_messages(request),
+            })
+
+        elif "moveUp" in request.POST:
+
+            if severity.position > 1:  
+                previous_severity = Status.objects.get(position=severity.position - 1)
+                severity.position -= 1
+                previous_severity.position += 1
+                severity.save()
+                previous_severity.save()
+            print("Moved up")
+
+        elif "move_down" in request.POST:
+
+            if severity.position < len(severities):
+                    next_severity = Status.objects.get(position=severity.position + 1)
+                    # Intercambiar las posiciones
+                    severity.position += 1
+                    next_severity.position -= 1
+                    severity.save()
+                    next_severity.save()
+            print("Moved down")
+
+        return redirect("severities")  # Redirigir después de la acción
+
+    return render(request, 'severities.html', {'severities': severities})
 
 def types_settings(request):
-    types = Type.objects.all().order_by('position') 
-    return render(request, 'types.html',{'types':types})
+    types = Type.objects.all().order_by('position')
+    if request.method == "POST":
+        action = request.POST.get('action')
+        print(f"Action: {action}")
+        if action not in( 'add_new', 'edit_name', 'start_editting', 'new_color'):
+            type_name = request.POST.get('type_name')
+            type = Type.objects.get(name=type_name)
 
-def severities_settings(request):
-    severities = Severity.objects.all().order_by('position') 
-    return render(request, 'severities.html',{'severities': severities} )
+        if action == 'delete_type':
+            type.delete()
+
+            if "write a name for the new element" not in type_name.lower():
+                messages.success(request, f'Type "{type_name}" succesfully deleted')
+            return redirect('types')  # Redirecciona de vuelta a la misma página
+
+        elif action == 'add_new':
+            max_position = types.aggregate(Max('position'))['position__max'] or 0
+            new_name = f"New Type {max_position + 1}"
+
+            if not Type.objects.filter(name=new_name).exists():
+                Type.objects.create(
+                    name="Write a name for the new element",
+                    color="#808080", #gris por defecto
+                    position=max_position + 1
+                )
+
+            return redirect('types')
+
+        elif action == 'edit_name':
+            original_name = request.POST.get('original_name')
+            new_name = request.POST.get('new_name')
+            if new_name.strip():
+                type = Type.objects.get(name=original_name)
+                type.name = new_name.strip()
+
+                type.save()
+                #logica per eliminar els elements editats antics, perque como es primary key no es pot editar
+                if  new_name.strip() != original_name:
+                    typetoDelete = Type.objects.get(name=original_name)
+                    typetoDelete.delete()
+
+                Type.objects.filter(name="Write a name for the new element").exclude(pk=type.pk).delete()
+
+                messages.success(request, f'Type "{new_name}" succesfully modified')
+
+            return redirect('types')
+
+        elif action == 'new_color':
+            
+            original_name = request.POST.get('original_name')
+            new_color = request.POST.get('new_color')
+        
+            type = Type.objects.get(name=original_name)
+            type.color = new_color
+            type.save()
+            return redirect('types')
+
+        elif action == 'start_editting':
+
+            prioName = request.POST.get('type_name')
+
+            # Este contexto extra indica a la plantilla que estamos editando ese nombre
+            type = Type.objects.get(name=prioName)
+            return render(request, 'types.html', {
+            'types': Type.objects.all().order_by('position'),
+            'editing_name': type.name,
+            'messages': messages.get_messages(request),
+            })
+
+        elif "moveUp" in request.POST:
+
+            if type.position > 1:  
+                previous_type = Type.objects.get(position=type.position - 1)
+                type.position -= 1
+                previous_type.position += 1
+                type.save()
+                previous_type.save()
+            print("Moved up")
+
+        elif "move_down" in request.POST:
+
+            if type.position < len(types):
+                    next_type = Type.objects.get(position=type.position + 1)
+                    # Intercambiar las posiciones
+                    type.position += 1
+                    next_type.position -= 1
+                    type.save()
+                    next_type.save()
+            print("Moved down")
+
+        return redirect("types")  # Redirigir después de la acción
+
+    return render(request, 'types.html', {'types': types})
 
 def confirm_delete_priority(request):
     priority_name = request.GET.get('priority_name')
     priority_to_delete = get_object_or_404(Priority, name=priority_name)
     other_priorities = Priority.objects.exclude(name=priority_name).order_by('position')
-    print("HOLIIS")
-    
+
     if request.method == 'POST':
         new_priority_id = request.POST.get('new_priority_id')
         new_priority = get_object_or_404(Priority, name=new_priority_id)
@@ -556,24 +736,69 @@ def confirm_delete_priority(request):
 
 def confirm_delete_status(request):
     status_name = request.GET.get('status_name')
-    priority_to_delete = get_object_or_404(Priority, name=status_name)
-    other_statuses = Priority.objects.exclude(name=status_name).order_by('position')
+    status_to_delete = get_object_or_404(Status, name=status_name)
+    other_statuses = Status.objects.exclude(name=status_name).order_by('position')
 
     if request.method == 'POST':
         new_status_id = request.POST.get('new_status_id')
-        new_status = get_object_or_404(Priority, name=new_status_id)
+        new_status = get_object_or_404(Status, name=new_status_id)
 
-        
-        issues = Issue.objects.filter(status=priority_to_delete)
+        issues = Issue.objects.filter(status=status_to_delete)
         issues.update(status=new_status)
 
-        priority_to_delete.delete()
+        status_to_delete.delete()
 
         messages.success(request, f'Status "{status_name}" deleted and issues changed to "{new_status.name}".')
         return redirect('statuses')
 
     return render(request, 'confirm_delete_status.html', {
-        'status': priority_to_delete,
+        'status': status_to_delete,
         'other_statuses': other_statuses,
     })
 
+def confirm_delete_severity(request):
+    severity_name = request.GET.get('severity_name')
+    severity_to_delete = get_object_or_404(Severity, name=severity_name)
+    other_severities = Severity.objects.exclude(name=severity_name).order_by('position')
+    
+    if request.method == 'POST':
+        new_severity_id = request.POST.get('new_severity_id')
+        new_severity = get_object_or_404(Severity, name=new_severity_id)
+
+        issues = Issue.objects.filter(severity=severity_to_delete)
+        issues.update(severity=new_severity)
+
+        severity_to_delete.delete()
+
+        messages.success(request, f'Severity "{severity_name}" deleted and issues changed to "{new_severity.name}".')
+        return redirect('severities')
+
+    return render(request, 'confirm_delete_severity.html', {
+        'severity': severity_to_delete,
+        'other_severities': other_severities,
+    })
+
+def confirm_delete_type(request):
+    type_name = request.GET.get('type_name')
+    type_to_delete = get_object_or_404(Type, name=type_name)
+    other_types = Type.objects.exclude(name=type_name).order_by('position')
+   
+   
+    if request.method == 'POST':
+        new_type_id = request.POST.get('new_type_id')
+        new_type = get_object_or_404(Type, name=new_type_id)
+
+        # Cambiar issues a la nueva prioridad
+        issues = Issue.objects.filter(type=type_to_delete)
+        issues.update(type=new_type)
+
+        # Eliminar la prioridad
+        type_to_delete.delete()
+
+        messages.success(request, f'Type "{type_name}" deleted and issues changed to  "{new_type.name}".')
+        return redirect('types')
+
+    return render(request, 'confirm_delete_type.html', {
+        'type': type_to_delete,
+        'other_types': other_types,
+    })
