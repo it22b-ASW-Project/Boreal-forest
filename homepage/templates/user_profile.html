@@ -207,8 +207,7 @@
                     {% for comment in comments %}
                     <div class="comment-container">
                         <h3 class="comment-title">
-                            <a href="/issue/{{ comment.issue.id }}">#{{ comment.issue.id }} {{ comment.issue.subject
-                                }}</a>
+                            <a href="/issue/{{ comment.issue.id }}">#{{ comment.issue.id }} {{ comment.issue.subject}}</a>
                             <span class="comment-date">{{ comment.created_at|date:"d M Y H:i" }}</span>
                         </h3>
                         <p class="comment-text">{{ comment.comment }}</p>

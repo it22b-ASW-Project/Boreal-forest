@@ -25,6 +25,18 @@ body {
     margin: 0;
     width: 200px;
     background-color: #f4f4f4;
+    flex-shrink: 0;
+    overflow-y: auto;
+    display: table-cell;
+    height: 100vh; 
+    position: sticky; 
+    top: 0; 
+}
+
+.layout {
+    display: flex;
+    align-items: stretch;
+    min-height: 100vh;
 }
 
 .sidebar li {
@@ -203,8 +215,8 @@ form button:hover {
 /* Estilo para los botones */
 .move-buttons {
     display: flex;
-    justify-content: flex-start; 
-    gap: 2px; 
+    justify-content: flex-start; /* Alinea los botones a la izquierda */
+    gap: 2px; /* Espacio entre los botones */
 }
 
 .move-buttons button {
@@ -247,6 +259,7 @@ form button:hover {
 
 /* Estilo para el mensaje */
 .messages {
+    min-height: 60px; 
     transition: height 0.3s ease; 
     overflow: hidden; 
 }
@@ -290,7 +303,6 @@ form button:hover {
     border-radius: 50%;
 }
 
-/* Para Firefox */
 .color-picker-input::-moz-color-swatch {
     border: none;
     border-radius: 50%;

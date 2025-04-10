@@ -63,7 +63,7 @@
 
             <!-- Color -->
             <div>
-                {% if editing_name == p.name %}
+                {% if editing_name == p.name or p.name == "Write a name for the new element"%}
                 <form method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="original_name" value="{{ p.name }}">
@@ -92,6 +92,9 @@
                     <input type="hidden" name="original_name" value="{{ p.name }}">
                     <input type="hidden" name="action" value="edit_name">
                     <input type="text" name="new_name" value="" placeholder="Write a name for the new element" autofocus class="input-edit-name" style="width: 80%;">
+                    <button type="submit">
+                        <i class="material-icons">check</i>
+                    </button>
                 </form>
                 {% elif editing_name == p.name %}
                 <form method="POST">
@@ -114,7 +117,7 @@
 
             <!-- Edit -->
             <div>
-                {% if editing_name != p.name %}
+                {% if editing_name != p.name and p.name != "Write a name for the new element"%}
                 <form method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="status_name" value="{{ p.name }}">
@@ -128,12 +131,14 @@
 
             <!-- Delete -->
             <div>
+                {% if editing_name != p.name and  p.name != "Write a name for the new element" %}
                 <form method="GET" action="{% url 'confirm_delete_status' %}">
                     <input type="hidden" name="status_name" value="{{ p.name }}">
                     <button type="submit">
                         <i class="material-icons">delete</i>
                     </button>
                 </form>
+                {% endif %}
             </div>
 
         </div>

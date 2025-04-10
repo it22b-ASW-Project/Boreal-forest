@@ -281,7 +281,7 @@ def settings(request):
 @login_required
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
-    profile, created = UserProfile.objects.get_or_create(user=user.user)
+    profile, created = UserProfile.objects.get_or_create(user_id=id)
     active_tab = request.GET.get('tab', 'assigned-issues') 
     sort_by = request.GET.get('sort_by', '-modified_at') 
     edit_bio = request.GET.get('edit_bio', 'false') == 'true'
@@ -324,7 +324,7 @@ def user_profile(request, id):
 
     assigned_issues = Assigned.objects.filter(assigned=user, issue__status__name__in=['New', 'In progress', 'Ready for test', 'Needs info', 'Rejected', 'Postponed']).select_related('issue').order_by(order_by_field)
     watched_issues = Watch.objects.filter(watcher=user).select_related('issue').order_by(order_by_field)
-    comments = Comments.objects.filter(user=user).select_related('issue').order_by(f'-created_at')
+    comments = Comments.objects.filter(user_id=id).select_related('issue').order_by(f'-created_at')
 
     context = {
         'username': user.user.username,
@@ -389,8 +389,10 @@ def priorities_settings(request):
                     prioritytoDelete.delete()
 
                 Priority.objects.filter(name="Write a name for the new element").exclude(pk=priority.pk).delete()
-
-                messages.success(request, f'Priority "{new_name}" succesfully modified')
+                if original_name == "Write a name for the new element": 
+                    messages.success(request, f'Priority "{new_name}" succesfully created')
+                else: 
+                    messages.success(request, f'Priority "{new_name}" succesfully modified')
 
             return redirect('priorities')
 
@@ -590,7 +592,7 @@ def severities_settings(request):
             original_name = request.POST.get('original_name')
             new_color = request.POST.get('new_color')
         
-            severity = Status.objects.get(name=original_name)
+            severity = Severity.objects.get(name=original_name)
             severity.color = new_color
             severity.save()
             return redirect('severities')
@@ -600,9 +602,9 @@ def severities_settings(request):
             severityName = request.POST.get('severity_name')
 
             # Este contexto extra indica a la plantilla que estamos editando ese nombre
-            severity = Status.objects.get(name=severityName)
+            severity = Severity.objects.get(name=severityName)
             return render(request, 'severities.html', {
-            'severities': Status.objects.all().order_by('position'),
+            'severities': Severity.objects.all().order_by('position'),
             'editing_name': severity.name,
             'messages': messages.get_messages(request),
             })
@@ -610,7 +612,7 @@ def severities_settings(request):
         elif "moveUp" in request.POST:
 
             if severity.position > 1:  
-                previous_severity = Status.objects.get(position=severity.position - 1)
+                previous_severity = Severity.objects.get(position=severity.position - 1)
                 severity.position -= 1
                 previous_severity.position += 1
                 severity.save()
