@@ -9,7 +9,7 @@ body {
 }
 
 .container {
-    display: relative;  
+    display: relative;
     width: 100%;
     height: 100vh;
     margin: 0 auto;
@@ -83,6 +83,7 @@ body {
     color: black;
     margin-bottom: 20px;
 }
+
 .profile-sidebar .stats div p,
 .profile-sidebar .stats div span {
     margin-top: 10px;
@@ -93,9 +94,11 @@ body {
     line-height: 1;
     text-align: center; 
 }
-.profile-sidebar .stats div .num{
+
+.profile-sidebar .stats div .num {
     font-size: 50px;
 }
+
 .profile-sidebar .stats {
     padding: 10px;
     border: 1px solid #ddd;
@@ -148,6 +151,7 @@ body {
     border-collapse: collapse;
     margin-bottom: 20px;
 }
+
 .profile-content .comment-container {
     margin-left: 0px;
     width: auto;
@@ -155,10 +159,11 @@ body {
     margin-bottom: 1px;
 }
 
-.profile-content thead{
+.profile-content thead {
     background-color: #f4f4f9;
     height: 50px;
 }
+
 .profile-content table th,
 
 .profile-content table td {
@@ -202,12 +207,14 @@ body {
 .tab-content.active {
     display: block;
 }
+
 .colorDot {
     display: inline-block;
     width: 25px;
     height: 25px;
     border-radius: 50%;
 }
+
 .comment-title {
     margin: 0;
     font-size: 1.1em;
@@ -226,6 +233,7 @@ body {
 .comment-text {
     margin: 5px 0;
 }
+
 #editBioForm {
     display: Block;
     margin-top: auto;
@@ -235,6 +243,7 @@ body {
     border: 1px solid #ddd;
     border-radius: 4px;
 }
+
 #editBioForm textarea {
     width: 90%;
     height: 100px;
@@ -246,6 +255,7 @@ body {
     word-wrap: break-word;
     word-break: break-word;
 }
+
 #SaveBioButton {
     margin-top: auto;
     margin-bottom: auto;
@@ -261,8 +271,77 @@ body {
     text-decoration: none;
     font-size: 20px;
 }
+
 .break-word {
     word-wrap: break-word;
     word-break: break-word;
     white-space: normal;
+}
+
+/* Avatar controls styling */
+.avatar-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px 0 20px;
+    gap: 8px;
+}
+
+/* Style file input */
+.avatar-controls input[type="file"] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+/* Style the main upload button */
+.avatar-controls button[name="upload_avatar"] {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #98ede1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.avatar-controls button[name="upload_avatar"]:hover {
+    background-color: #7dcdc1;
+}
+
+/* Style the text button (Use default image) */
+.avatar-controls .text-button {
+    background-color: transparent;
+    border: none;
+    color: #2596be;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.avatar-controls .text-button:hover {
+    color: #143645;
+}
+
+/* Add custom label for file input for better UX */
+.avatar-controls label[for="avatar-input"] {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #98ede1;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 5px;
+    transition: all 0.2s ease;
+}
+
+.avatar-controls label[for="avatar-input"]:hover {
+    background-color: #7dcdc1;
 }

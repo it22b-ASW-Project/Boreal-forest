@@ -24,7 +24,7 @@
                     {% csrf_token %}
                     <input type="text" name="subject" id="subject-input" value="{{ issue.subject }}">
                     <button type="submit">
-                        <i class="material-icons">save</i>    
+                        <i class="material-icons">save</i>
                     </button>
                     <button type="button" onclick="cancelEditTitle()">
                         <i class="material-icons">cancel</i>
@@ -42,9 +42,14 @@
             <div class="creation-info">
                 <div class="creation-info-text">
                     <h1>Created by {{ issue.created_by.extra_data.name }}</h1>
-                    <p>{{issue.created_at}}<p>
+                    <p>{{issue.created_at}}
+                    <p>
                 </div>
-                <img src="{{issue.created_by.extra_data.picture}}"/> 
+                {% if issue.created_by.user.profile.avatar %}
+                <img src="{{ issue.created_by.user.profile.avatar.url }}" />
+                {% else %}
+                <img src="{{issue.created_by.extra_data.picture}}" />
+                {% endif %}
             </div>
 
             <hr class="head-separator">
@@ -76,30 +81,32 @@
                         <h3> {{ attachments|length }} Attachments</h3>
                     </div>
                     {% for attachment in attachments %}
-                        <div class="attachment-item">
-                            <a href="{{ attachment.file.url }}" target="_blank" class="attachment-url">
-                                <i class="material-icons">attachment</i> <p>{{ attachment.filename }}</p>
-                            </a>
+                    <div class="attachment-item">
+                        <a href="{{ attachment.file.url }}" target="_blank" class="attachment-url">
+                            <i class="material-icons">attachment</i>
+                            <p>{{ attachment.filename }}</p>
+                        </a>
 
-                            <div class="attachment-description">
-                                {% if attachment.description %} 
-                                {{ attachment.description }} 
-                                {% endif %}
-                            </div>
-
-                                <div class="attachment-filesize">
-                                    ({{ attachment.formatted_filesize }})
-                                </div>
-
-                                <form method="POST">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
-                                    <button type="submit" name="delete_attachment" value="true" onclick="return confirm('¿Estás seguro que quieres eliminar este archivo?');">
-                                        <i class="material-icons">delete</i>
-                                    </button>
-                                </form>
-
+                        <div class="attachment-description">
+                            {% if attachment.description %}
+                            {{ attachment.description }}
+                            {% endif %}
                         </div>
+
+                        <div class="attachment-filesize">
+                            ({{ attachment.formatted_filesize }})
+                        </div>
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="attachment_id" value="{{ attachment.id }}">
+                            <button type="submit" name="delete_attachment" value="true"
+                                onclick="return confirm('¿Estás seguro que quieres eliminar este archivo?');">
+                                <i class="material-icons">delete</i>
+                            </button>
+                        </form>
+
+                    </div>
                     {% empty %}
                     <li>No attachments</li>
                     {% endfor %}
@@ -127,10 +134,14 @@
 
                     {% for comment in comments %}
                     <div class="comment-item">
+                        {% if comment.user.user.profile.avatar %}
+                        <img src="{{ comment.user.user.profile.avatar.url }}" />
+                        {% else %}
                         <img src="{{ comment.user.extra_data.picture }}" />
+                        {% endif %}
                         <div class="comment-info">
                             <span>
-                                <h1> {{comment.user.extra_data.name}} </h1> 
+                                <h1> {{comment.user.extra_data.name}} </h1>
                                 <p>{{comment.created_at}} </p>
                             </span>
                             {{ comment.comment }}
@@ -145,10 +156,10 @@
 
         <div class="extra-info">
             <form method="POST">
-            <input type="hidden" name="edit_params" value="true">
+                <input type="hidden" name="edit_params" value="true">
                 {% csrf_token %}
                 <div class="param-status">
-                    <label for="status">Status</label> 
+                    <label for="status">Status</label>
                     <div class="param-st-value">
                         {{ paramform.status }}
                     </div>
@@ -169,7 +180,7 @@
                     <span class="colorDot" style="background-color: {{ issue.severity.color }}"></span>
                 </div>
             </form>
-            
+
             <hr class="separator">
 
             <div class="add-people">
@@ -178,10 +189,14 @@
                 <div class="added-user">
                     <form method="POST">
                         {% csrf_token %}
-                            <img src="{{ assigned.assigned.extra_data.picture }}" width="45" height="45" />
-                            <input type="hidden" name="delete_assigned_id" value="{{ assigned.id }}">
-                            {{ assigned.assigned.extra_data.name }}
-                            <button type="submit" name="deleteAssigned">✕</button>
+                        {% if assigned.assigned.user.profile.avatar %}
+                        <img src="{{ assigned.assigned.user.profile.avatar.url }}" width="45" height="45" />
+                        {% else %}
+                        <img src="{{ assigned.assigned.extra_data.picture }}" width="45" height="45" />
+                        {% endif %}
+                        <input type="hidden" name="delete_assigned_id" value="{{ assigned.id }}">
+                        {{ assigned.assigned.extra_data.name }}
+                        <button type="submit" name="deleteAssigned">✕</button>
                     </form>
                 </div>
                 {% empty %}
@@ -191,11 +206,13 @@
                 <div class="add-usr-btn">
                     <form method="POST">
                         {% csrf_token %}
-                        <button type="button" onclick="document.getElementById('assignForm').style.display = 'block';">+ Add Assigned</button>
+                        <button type="button" onclick="document.getElementById('assignForm').style.display = 'block';">+
+                            Add Assigned</button>
                         {% if is_assigned %}
                         <button type="submit" class="btn btn-danger" name="unsetAssigned" value="true">Unassign</button>
                         {% else %}
-                        <button type="submit" class="btn btn-danger" name="setAssigned" value="true">Assigne to me</button>
+                        <button type="submit" class="btn btn-danger" name="setAssigned" value="true">Assigne to
+                            me</button>
                         {% endif %}
                     </form>
                 </div>
@@ -221,20 +238,26 @@
                 <div class="added-user">
                     <form method="POST">
                         {% csrf_token %}
+                        {% if watcher.watcher.user.profile.avatar %}
+                        <img src="{{ watcher.watcher.user.profile.avatar.url }}" width="45" height="45" />
+                        {% else %}
                         <img src="{{ watcher.watcher.extra_data.picture }}" width="45" height="45" />
+                        {% endif %}
                         <input type="hidden" name="delete_watcher_id" value="{{ watcher.id }}">
                         {{ watcher.watcher.extra_data.name }}
                         <button type="submit" name="deleteWatcher">✕</button>
                     </form>
                 </div>
                 {% empty %}
-                <p>No watchers<p>
-                {% endfor %}
-                
+                <p>No watchers
+                <p>
+                    {% endfor %}
+
                 <div class="add-usr-btn">
                     <form method="POST">
                         {% csrf_token %}
-                        <button type="button" onclick="document.getElementById('watchForm').style.display = 'block';">+ Add Watcher</button>
+                        <button type="button" onclick="document.getElementById('watchForm').style.display = 'block';">+
+                            Add Watcher</button>
                         {% if is_watching %}
                         <button type="submit" class="btn btn-danger" name="unsetWatcher" value="true">Unwatch</button>
                         {% else %}
@@ -284,7 +307,7 @@
 
         </div>
     </div>
-        
+
 
     <script>
         function enableEditTitle() {
