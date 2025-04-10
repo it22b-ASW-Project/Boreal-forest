@@ -23,8 +23,7 @@ urlpatterns = [
     path('issues/', views.showAllIssues),
     path('', views.login), 
     path('issues/new/', views.createIssue),
-    path('issue/<int:id>/', views.issueDetail, name='issueDetail'),
-    path('test-s3/', views.test_s3_connection, name='test_s3')
+    path('issue/<int:id>/', views.issueDetail, name='issueDetail')
 ]
 
 if settings.DEBUG:

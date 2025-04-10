@@ -75,17 +75,11 @@ body {
 .profile-sidebar .stats div span {
     margin-top: 10px;
     font-size: 20px;
-    /* Tamaño de la fuente */
     color: black;
-    /* Color del texto */
     white-space: pre-line;
-    /* Permitir saltos de línea */
     display: block;
-    /* Asegurar que cada palabra ocupe su propia línea */
     line-height: 1;
-    /* Espaciado entre líneas */
     text-align: center;
-    /* Alinear el texto al centro */
 }
 
 .profile-sidebar .stats div .num {
@@ -270,7 +264,6 @@ body {
     white-space: normal;
 }
 
-/* Avatar controls styling */
 .avatar-controls {
     display: flex;
     flex-direction: column;
@@ -279,7 +272,6 @@ body {
     gap: 8px;
 }
 
-/* Style file input */
 .avatar-controls input[type="file"] {
     width: 0.1px;
     height: 0.1px;
@@ -289,7 +281,6 @@ body {
     z-index: -1;
 }
 
-/* Style the main upload button */
 .avatar-controls button[name="upload_avatar"] {
     display: inline-block;
     padding: 8px 15px;
@@ -306,7 +297,6 @@ body {
     background-color: #7dcdc1;
 }
 
-/* Style the text button (Use default image) */
 .avatar-controls .text-button {
     background-color: transparent;
     border: none;
@@ -321,7 +311,6 @@ body {
     color: #143645;
 }
 
-/* Add custom label for file input for better UX */
 .avatar-controls label[for="avatar-input"] {
     display: inline-block;
     padding: 8px 15px;

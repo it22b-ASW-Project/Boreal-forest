@@ -7,14 +7,14 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# === Seguridad ===
+# Seguridad
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "changeme-insecure")
 
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
-# === Aplicaciones ===
+# Aplicaciones
 INSTALLED_APPS = [
     # Django core
     'django.contrib.admin',
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'homepage',
 ]
 
-# === Middleware ===
+# Middleware
 MIDDLEWARE = [
 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -52,9 +52,6 @@ MIDDLEWARE = [
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        # For each OAuth based provider, either add a ``SocialApp``
-        # (``socialaccount`` app) containing the required client
-        # credentials, or list them here:
         'APP': {
             'client_id': '791844404146-o431l77f7iqeplifush65c07vc42jp6g.apps.googleusercontent.com',
             'secret': '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',
@@ -89,7 +86,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'boreal_forest.wsgi.application'
 
-# === Base de datos ===
+# Base de datos
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -97,7 +94,7 @@ DATABASES = {
     }
 }
 
-# === Validación de contraseñas ===
+# Validación de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -105,7 +102,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# === Autenticación ===
+# Autenticación
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
@@ -126,14 +123,14 @@ LOGIN_REDIRECT_URL = '/issues'
 LOGOUT_REDIRECT_URL = '/'
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-# === Internacionalización ===
+# Internacionalización
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 USE_L10N = True
 
-# === Archivos estáticos y media ===
+# Archivos estáticos y media
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -144,7 +141,7 @@ os.makedirs(MEDIA_ROOT, exist_ok=True)
 # WhiteNoise para servir archivos estáticos en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# === AWS S3 Storage (si está activado) ===
+# AWS S3 Storage
 USE_S3 = True
 
 if USE_S3:
@@ -173,5 +170,5 @@ else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
     MEDIA_URL = '/media/'
 
-# === Otros ===
+# Otros ajustes
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
