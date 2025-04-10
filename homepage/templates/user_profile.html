@@ -20,6 +20,20 @@
             {% else %}
             <img src="{% static 'img/default-profile.png' %}" alt="Profile Photo">
             {% endif %}
+            <div class="avatar-controls">
+                <form method="post" enctype="multipart/form-data" id="avatar-form">
+                    {% csrf_token %}
+                    <input type="file" name="avatar" id="avatar-input" accept="image/*">
+                    <button type="submit" name="upload_avatar">Upload Photo</button>
+                </form>
+
+                {% if profile.avatar %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" name="delete_avatar" class="text-button">Use default image</button>
+                </form>
+                {% endif %}
+            </div>
             <h2>{{ full_name }}</h2>
             <p>@{{ username }}</p>
 
@@ -206,6 +220,25 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('avatar-input').addEventListener('change', function () {
+            if (this.files.length > 0) {
+                // Create a hidden input with name="upload_avatar" and add it to the form
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'upload_avatar';
+                hiddenInput.value = 'true';
+                document.getElementById('avatar-form').appendChild(hiddenInput);
+
+                // Update button text and disable it
+                document.querySelector('#avatar-form button').textContent = 'Uploading...';
+                document.querySelector('#avatar-form button').disabled = true;
+
+                // Submit the form
+                document.getElementById('avatar-form').submit();
+            }
+        });
+    </script>
 </body>
 
 </html>

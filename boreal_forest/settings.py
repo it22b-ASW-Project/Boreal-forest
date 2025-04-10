@@ -47,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -67,9 +68,6 @@ LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/'
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
-
-    'allauth.account.middleware.AccountMiddleware',
-]
 
 ROOT_URLCONF = 'boreal_forest.urls'
 

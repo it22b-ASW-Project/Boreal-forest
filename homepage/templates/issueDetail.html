@@ -45,7 +45,11 @@
                     <p>{{issue.created_at}}
                     <p>
                 </div>
+                {% if issue.created_by.user.profile.avatar %}
+                <img src="{{ issue.created_by.user.profile.avatar.url }}" />
+                {% else %}
                 <img src="{{issue.created_by.extra_data.picture}}" />
+                {% endif %}
             </div>
 
             <hr class="head-separator">
@@ -133,7 +137,11 @@
 
                     {% for comment in comments %}
                     <div class="comment-item">
+                        {% if comment.user.user.profile.avatar %}
+                        <img src="{{ comment.user.user.profile.avatar.url }}" />
+                        {% else %}
                         <img src="{{ comment.user.extra_data.picture }}" />
+                        {% endif %}
                         <div class="comment-info">
                             <span>
                                 <h1> {{comment.user.extra_data.name}} </h1>
@@ -184,7 +192,11 @@
                 <div class="added-user">
                     <form method="POST">
                         {% csrf_token %}
+                        {% if assigned.assigned.user.profile.avatar %}
+                        <img src="{{ assigned.assigned.user.profile.avatar.url }}" width="45" height="45" />
+                        {% else %}
                         <img src="{{ assigned.assigned.extra_data.picture }}" width="45" height="45" />
+                        {% endif %}
                         <input type="hidden" name="delete_assigned_id" value="{{ assigned.id }}">
                         {{ assigned.assigned.extra_data.name }}
                         <button type="submit" name="deleteAssigned">✕</button>
@@ -229,7 +241,11 @@
                 <div class="added-user">
                     <form method="POST">
                         {% csrf_token %}
+                        {% if watcher.watcher.user.profile.avatar %}
+                        <img src="{{ watcher.watcher.user.profile.avatar.url }}" width="45" height="45" />
+                        {% else %}
                         <img src="{{ watcher.watcher.extra_data.picture }}" width="45" height="45" />
+                        {% endif %}
                         <input type="hidden" name="delete_watcher_id" value="{{ watcher.id }}">
                         {{ watcher.watcher.extra_data.name }}
                         <button type="submit" name="deleteWatcher">✕</button>
