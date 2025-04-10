@@ -141,6 +141,12 @@ body {
     margin-bottom: 1px;
 }
 
+.profile-content thead{
+    background-color: #f4f4f9;
+    height: 50px;
+}
+.profile-content table th,
+
 .profile-content table td {
     padding: 10px;
     text-align: left;
