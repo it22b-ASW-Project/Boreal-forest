@@ -7,12 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link rel="stylesheet" href="{% static 'css/user.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 <body>
 
     <div class="container">
-        <a href="/issues" class="back-button">&lt;</a>
+        <a href="/issues" class="back-button">
+            <i class="material-icons">arrow_back</i>
+        </a>
         <!-- Sidebar -->
         <div class="profile-sidebar">
             {% if profile.avatar %}
@@ -90,17 +93,17 @@
                     <thead>
                         <tr>
                             <th>
-                                <span>T</span>
+                                <span>Type</span>
                                 <a href="?sort_by=type__position&tab=assigned-issues">↑</a>
                                 <a href="?sort_by=-type__position&tab=assigned-issues">↓</a>
                             </th>
                             <th>
-                                <span>S</span>
+                                <span>Severity</span>
                                 <a href="?sort_by=severity__position&tab=assigned-issues">↑</a>
                                 <a href="?sort_by=-severity__position&tab=assigned-issues">↓</a>
                             </th>
                             <th>
-                                <span>P</span>
+                                <span>Priority</span>
                                 <a href="?sort_by=priority__position&tab=assigned-issues">↑</a>
                                 <a href="?sort_by=-priority__position&tab=assigned-issues">↓</a>
                             </th>

@@ -345,7 +345,7 @@ def user_profile(request, id):
     }
     return render(request, 'user_profile.html', context)
 
-
+@login_required
 def priorities_settings(request):
     priorities = Priority.objects.all().order_by('position')
     if request.method == "POST":
@@ -443,7 +443,7 @@ def priorities_settings(request):
 
     return render(request, 'priorities.html', {'priorities': priorities})
 
-
+@login_required
 def statuses_settings(request):
     statuses = Status.objects.all().order_by('position')
     if request.method == "POST":
@@ -539,6 +539,7 @@ def statuses_settings(request):
 
     return render(request, 'statuses.html', {'statuses': statuses})
 
+@login_required
 def severities_settings(request):
     severities = Severity.objects.all().order_by('position')
     if request.method == "POST":
@@ -634,6 +635,7 @@ def severities_settings(request):
 
     return render(request, 'severities.html', {'severities': severities})
 
+@login_required
 def types_settings(request):
     types = Type.objects.all().order_by('position')
     if request.method == "POST":
@@ -729,6 +731,7 @@ def types_settings(request):
 
     return render(request, 'types.html', {'types': types})
 
+@login_required
 def confirm_delete_priority(request):
     priority_name = request.GET.get('priority_name')
     priority_to_delete = get_object_or_404(Priority, name=priority_name)
@@ -753,6 +756,7 @@ def confirm_delete_priority(request):
         'other_priorities': other_priorities,
     })
 
+@login_required
 def confirm_delete_status(request):
     status_name = request.GET.get('status_name')
     status_to_delete = get_object_or_404(Status, name=status_name)
@@ -775,6 +779,7 @@ def confirm_delete_status(request):
         'other_statuses': other_statuses,
     })
 
+@login_required
 def confirm_delete_severity(request):
     severity_name = request.GET.get('severity_name')
     severity_to_delete = get_object_or_404(Severity, name=severity_name)
@@ -797,6 +802,7 @@ def confirm_delete_severity(request):
         'other_severities': other_severities,
     })
 
+@login_required
 def confirm_delete_type(request):
     type_name = request.GET.get('type_name')
     type_to_delete = get_object_or_404(Type, name=type_name)

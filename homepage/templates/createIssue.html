@@ -83,8 +83,7 @@
                         <label for="priority">Priority:</label>
                         <select id="priority" name="priority" required>
                             {% for priority in priorities %}
-                            <option value="{{ priority.name }}" {% if form.priority.value == priority.name %}selected{%
-                                endif %}>
+                            <option value="{{ priority.name }}" {% if form.priority.value == priority.name %}selected{% endif %}>
                                 {{ priority.name }}
                             </option>
                             {% endfor %}
