@@ -2,21 +2,21 @@
 
 {% block content %}
 <div class="container">
-    <h2>Delete value: "{{ status.name }}"</h2>
+    <h2>Delete value: "{{ type.name }}"</h2>
     <p>All items with this value will be changed to</p>
 
     <form method="POST">
         {% csrf_token %}
-        <label for="new_status">New status:</label>
-        <select name="new_status_id" id="new_status" required>
-            {% for p in other_statuses %}
+        <label for="new_type">New type:</label>
+        <select name="new_type_id" id="new_type" required>
+            {% for p in other_types %}
                 <option value="{{ p.name }}">{{ p.name }}</option>
             {% endfor %}
         </select>
         <div style="margin-top: 1em; display: flex; gap: 1em;">
             <button type="submit" class="confirm-delete">Delete</button> 
             </button>
-            <a href="{% url 'statuses' %}" class="cancel-button">Cancel 
+            <a href="{% url 'types' %}" class="cancel-button">Cancel 
             </a>
         </div>
     </form>
