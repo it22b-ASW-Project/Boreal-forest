@@ -20,9 +20,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['boreal-forest.onrender.com']
 
-
-# Application definition
-
 # Aplicaciones
 INSTALLED_APPS = [
     # Django core
