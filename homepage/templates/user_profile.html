@@ -25,6 +25,8 @@
                     {% csrf_token %}
                     <input type="file" name="avatar" id="avatar-input" accept="image/*">
                     <label for="avatar-input">Choose Photo</label>
+                    <input type="hidden" name="upload_avatar" value="true">
+                    <button type="submit" class="avatar-upload-button">Upload</button>
                 </form>
 
                 {% if profile.avatar %}
@@ -220,25 +222,6 @@
             </div>
         </div>
     </div>
-    <script>
-        document.getElementById('avatar-input').addEventListener('change', function () {
-            if (this.files.length > 0) {
-                // Create a hidden input with name="upload_avatar" and add it to the form
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'upload_avatar';
-                hiddenInput.value = 'true';
-                document.getElementById('avatar-form').appendChild(hiddenInput);
-
-                // Update label text to show uploading status
-                document.querySelector('label[for="avatar-input"]').textContent = 'Uploading...';
-                document.querySelector('label[for="avatar-input"]').style.backgroundColor = '#7dcdc1';
-
-                // Submit the form
-                document.getElementById('avatar-form').submit();
-            }
-        });
-    </script>
 </body>
 
 </html>
