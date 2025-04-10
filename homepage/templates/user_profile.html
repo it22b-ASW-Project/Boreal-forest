@@ -24,7 +24,7 @@
                 <form method="post" enctype="multipart/form-data" id="avatar-form">
                     {% csrf_token %}
                     <input type="file" name="avatar" id="avatar-input" accept="image/*">
-                    <button type="submit" name="upload_avatar">Upload Photo</button>
+                    <label for="avatar-input">Choose Photo</label>
                 </form>
 
                 {% if profile.avatar %}
@@ -230,9 +230,9 @@
                 hiddenInput.value = 'true';
                 document.getElementById('avatar-form').appendChild(hiddenInput);
 
-                // Update button text and disable it
-                document.querySelector('#avatar-form button').textContent = 'Uploading...';
-                document.querySelector('#avatar-form button').disabled = true;
+                // Update label text to show uploading status
+                document.querySelector('label[for="avatar-input"]').textContent = 'Uploading...';
+                document.querySelector('label[for="avatar-input"]').style.backgroundColor = '#7dcdc1';
 
                 // Submit the form
                 document.getElementById('avatar-form').submit();
