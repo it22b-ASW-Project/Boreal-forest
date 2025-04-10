@@ -6,11 +6,14 @@
     <meta charset="UTF-8">
     <title>New Issue</title>
     <link rel="stylesheet" href="{% static 'css/create_issue.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 <body>
     <div class="container">
-        <a href="/issues" class="back-button">&lt;</a>
+        <a href="/issues" class="back-button">
+            <i class="material-icons">arrow_back</i>
+        </a>
         <h1>New Issue</h1>
         <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}

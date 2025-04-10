@@ -66,16 +66,13 @@ class IssueFilter(django_filters.FilterSet):
 
     def filter_assigned(self, queryset, name, value):
         if value == '0':
-            # Filtra los problemas que no tienen ninguna relación en la tabla `Assigned`
             return queryset.exclude(
-                id__in=Assigned.objects.values('issue')  # Excluye problemas que están asignados
+                id__in=Assigned.objects.values('issue')  
             )
         if value:
-            # Filtra los problemas asignados a un usuario específico basado en `user_id`
             return queryset.filter(
-                assigned__assigned__user_id=value  # Busca los problemas asignados a ese `user_id`
+                assigned__assigned__user_id=value 
             )
-        # Si no se selecciona nada, devolver el queryset sin filtrar
         return queryset
 
     def filter_search(self, queryset, name, value):
