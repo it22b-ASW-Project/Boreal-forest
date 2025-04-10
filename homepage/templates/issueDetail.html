@@ -82,7 +82,7 @@
                     </div>
                     {% for attachment in attachments %}
                     <div class="attachment-item">
-                        <a href="{{ attachment.file.url }}" target="_blank" class="attachment-url">
+                        <a href="{{ attachment.get_file_url }}" target="_blank" class="attachment-url">
                             <i class="material-icons">attachment</i>
                             <p>{{ attachment.filename }}</p>
                         </a>
