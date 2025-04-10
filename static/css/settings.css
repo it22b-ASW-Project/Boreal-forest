@@ -6,6 +6,18 @@ body {
     font-family: Arial, sans-serif;
 }
 
+.material-icons {
+    color: #2596be;
+    flex-shrink: 0;
+    transition: 0.3s;
+    vertical-align: middle;
+}
+
+.material-icons:hover {
+    cursor: pointer;
+    color: #333;
+}
+
 /* Sidebar */
 .sidebar {
     list-style: none;
@@ -91,6 +103,7 @@ body {
     cursor: pointer;
     color: #143645;
 }
+
 form button {
     background-color: transparent;
     color: black;
@@ -202,8 +215,8 @@ form button:hover {
 /* Estilo para los botones */
 .move-buttons {
     display: flex;
-    justify-content: flex-start; 
-    gap: 2px; 
+    justify-content: flex-start; /* Alinea los botones a la izquierda */
+    gap: 2px; /* Espacio entre los botones */
 }
 
 .move-buttons button {
@@ -218,7 +231,7 @@ form button:hover {
 }
 
 .move-buttons button:hover {
-    background-color: #d1d0cc;  
+    background-color: #d1d0cc;
     transform: scale(1.05);    
 }
 
@@ -230,16 +243,12 @@ form button:hover {
     margin: 0; 
 }
 
- 
-/* Estilo para los mensajes de éxito */
-.messages {
-    margin-bottom: 15px;
-}
-
 .message {
     padding: 10px 15px;
     border-radius: 4px;
+    flex-grow: 1;
     font-weight: bold;
+    margin-right: 20px;
 }
 
 .message.success {
@@ -284,7 +293,6 @@ form button:hover {
     display: inline-block;
 }
 
-
 .color-picker-input::-webkit-color-swatch-wrapper {
     padding: 0;
     border: none;
@@ -310,32 +318,65 @@ input[type="color"] {
 }
 
 .back-button {
-    position: absolute;
-    top: 900px;
-    left: 20px;
-    padding: 10px 15px;
-    background-color: #f0f0f0;
-    color: grey;
+    display: flex;
     text-decoration: none;
-    border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
     cursor: pointer;
-    z-index: 10;
+    color: #0099cc;
+    border: none;
+    background-color: #ddd;
+    padding: 8px 8px;
+    transition: 0.3s;
+    margin-right: 20px;
 }
-.back-button {
-    position: absolute;
-    top: 20px;
-    left: 95%;
-    padding: 10px 15px;
-    background-color: #f0f0f0;
-    color: grey;
-    text-decoration: none;
-    border: 1px solid #ddd;
+
+.top-page {
+    display: flex;    
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.delete-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); 
+    display: none; 
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.delete-popup form {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+.delete-popup form button {
+    margin-top: 10px;
+    padding: 0.5rem 1rem;
+    background-color: #2596be;
+    color: white;
+    border: none;
     border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
     cursor: pointer;
-    z-index: 10;
+    transition: 0.3s;
+}
+
+.delete-popup form button:hover {
+    background-color: #1a7a9c;
+}
+
+.delete-popup form p {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 1rem;
 }

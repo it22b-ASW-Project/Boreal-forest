@@ -47,16 +47,16 @@ class Issue(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def get_priority_color(self):
-            return self.priority.color if self.priority else "#808080"  # Gris por defecto
+            return self.priority.color if self.priority else "#808080"  
     
     def get_status_color(self):
-            return self.status.color if self.status else "#808080"  # Gris por defecto
+            return self.status.color if self.status else "#808080"  
     
     def get_type_color(self):
-            return self.type.color if self.type else "#808080"  # Gris por defecto
+            return self.type.color if self.type else "#808080" 
     
     def get_severity_color(self):
-            return self.severity.color if self.severity else "#808080"  # Gris por defecto
+            return self.severity.color if self.severity else "#808080"  
     def save(self, *args, **kwargs):
         if not self.pk:
              self.modified_at = created_at = now()
