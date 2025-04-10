@@ -261,15 +261,40 @@ def settings(request):
 
 def user_settings(request):
     user = request.user
+    profile, created = UserProfile.objects.get_or_create(user=user)
+    messages = []  # For user feedback
+    
+    if request.method == 'POST':
+        # Handle avatar upload
+        if request.FILES.get('avatar'):
+            try:
+                if profile.avatar:
+                    profile.delete_avatar()
+                
+                profile.avatar = request.FILES['avatar']
+                profile.save()
+                messages.append('Avatar uploaded successfully!')
+                
+            except Exception as e:
+                messages.append(f'Error uploading avatar: {str(e)}')
+                
+            # Use reverse to ensure correct URL generation
+            return redirect(reverse('user_settings'))
+            
+        # Handle other form submissions...
+    
     context = {
         'username': user.username,
         'email': user.email,
         'full_name': f"{user.first_name} {user.last_name}",
         'language': 'English (US)',
         'theme': 'dark',
-        'bio': 'Computer Engineering student',
+        'bio': profile.bio,
+        'profile': profile,
+        'messages': messages,
     }
     return render(request, 'user_settings.html', context)
+
 
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
@@ -277,6 +302,14 @@ def user_profile(request, id):
     active_tab = request.GET.get('tab', 'assigned-issues')
     sort_by = request.GET.get('sort_by', '-modified')
     edit_bio = request.GET.get('edit_bio', 'false') == 'true'
+
+    valid_sort_fields = ['type__name', 'severity__name', 'priority__name', 'status', 'modified_at']
+    if sort_by.lstrip('-') not in valid_sort_fields:
+        sort_by = '-modified_at'
+
+    order_by_field = f'issue__{sort_by.lstrip("-")}'
+    if sort_by.startswith('-'):
+        order_by_field = f'-{order_by_field}'
 
     if request.method == 'POST':
         # Handle avatar upload
