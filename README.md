@@ -22,5 +22,9 @@ $ py .\manage.py migrate
 
 *Para consultar el archivo boreal_forest.sqlite3 (nuestra BD), os podeis descargar la aplicación en "sqlitebrowser.org/dl/".
 
+- PARA TRAER LOS ARCHIVOS ESTÁTICOS A LOCAL
+
+$ py .\manage.py collectstatic
+
 
 
