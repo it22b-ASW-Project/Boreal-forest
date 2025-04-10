@@ -9,7 +9,7 @@
         {% csrf_token %}
         <label for="severity">New severity:</label>
         <select name="new_severity_id" id="new_severity" required>
-            {% for p in other_serverities %}
+            {% for p in other_severities %}
                 <option value="{{ p.name }}">{{ p.name }}</option>
             {% endfor %}
         </select>
