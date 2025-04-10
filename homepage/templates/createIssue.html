@@ -47,7 +47,7 @@
                         </label>
                         <select id="status" name="status" required>
                             {% for s in status %}
-                            <option value="{{ s.name }}" {% if form.status.value==s.name %}selected{% endif %}>
+                            <option value="{{ s.name }}" {% if form.status.value == s.name %}selected{% endif %}>
                                 {{ s.name }}
                             </option>
                             {% endfor %}
@@ -59,7 +59,7 @@
                         <label for="type">Type:</label>
                         <select id="type" name="type" required>
                             {% for type in types %}
-                            <option value="{{ type.name }}" {% if form.type.value==type.name %}selected{% endif %}>
+                            <option value="{{ type.name }}" {% if form.type.value == type.name %}selected{% endif %}>
                                 {{ type.name }}
                             </option>
                             {% endfor %}
@@ -71,8 +71,7 @@
                         <label for="severity">Severity:</label>
                         <select id="severity" name="severity" required>
                             {% for severity in severities %}
-                            <option value="{{ severity.name }}" {% if form.severity.value==severity.name %}selected{%
-                                endif %}>
+                            <option value="{{ severity.name }}" {% if form.severity.value == severity.name %}selected{% endif %}>
                                 {{ severity.name }}
                             </option>
                             {% endfor %}
@@ -84,8 +83,7 @@
                         <label for="priority">Priority:</label>
                         <select id="priority" name="priority" required>
                             {% for priority in priorities %}
-                            <option value="{{ priority.name }}" {% if form.priority.value==priority.name %}selected{%
-                                endif %}>
+                            <option value="{{ priority.name }}" {% if form.priority.value == priority.name %}selected{% endif %}>
                                 {{ priority.name }}
                             </option>
                             {% endfor %}
