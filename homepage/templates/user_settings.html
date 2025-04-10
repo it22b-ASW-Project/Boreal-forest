@@ -15,16 +15,15 @@
         <div class="profile-section">
             <div class="profile-photo">
                 {% if profile.avatar %}
-                <img src="{{ profile.avatar.url }}" alt="Profile Photo">
+                <img src="{{ profile.avatar.url }}" alt="Profile">
                 {% else %}
-                <img src="{% static 'img/default-profile.png' %}" alt="Profile Photo">
+                <img src="{% static 'img/default-profile.png' %}" alt="Profile">
                 {% endif %}
 
-                <form method="post" enctype="multipart/form-data" id="avatar-form">
+                <form method="post" action="{% url 'user_settings' %}" enctype="multipart/form-data" id="avatar-form">
                     {% csrf_token %}
-                    <input type="file" name="avatar" id="avatar-input" style="display: none;" accept="image/*">
-                    <button type="button" onclick="document.getElementById('avatar-input').click()">CHANGE
-                        PHOTO</button>
+                    <input type="file" name="avatar" id="avatar-input" accept="image/*">
+                    <button type="submit">Upload Photo</button>
                 </form>
 
                 {% if profile.avatar %}
@@ -71,6 +70,10 @@
             if (this.files.length > 0) {
                 document.getElementById('avatar-form').submit();
             }
+        });
+        document.getElementById('avatar-form').addEventListener('submit', function () {
+            document.querySelector('#avatar-form button').textContent = 'Uploading...';
+            document.querySelector('#avatar-form button').disabled = true;
         });
     </script>
 </body>

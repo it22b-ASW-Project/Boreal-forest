@@ -120,11 +120,13 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+
 # WhiteNoise para servir archivos estáticos en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # === AWS S3 Storage (si está activado) ===
-USE_S3 = os.getenv("USE_S3", "True") == "True"
+USE_S3 = False #os.getenv("USE_S3", "True") == "True"
 
 if USE_S3:
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -143,6 +145,7 @@ if USE_S3:
     MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_URL = '/media/'
 
 # === Otros ===
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

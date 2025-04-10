@@ -22,20 +22,7 @@
             {% endif %}
             <h2>{{ full_name }}</h2>
             <p>@{{ username }}</p>
-            <div class="avatar-controls">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="file" name="avatar" accept="image/*">
-                    <button type="submit" name="upload_avatar">Upload Photo</button>
-                </form>
 
-                {% if profile.avatar %}
-                <form method="post">
-                    {% csrf_token %}
-                    <button type="submit" name="delete_avatar">Remove Photo</button>
-                </form>
-                {% endif %}
-            </div>
             <div class="stats">
                 <div>
                     <p class="num"><strong>{{Numassigned_issues}}</strong></p>

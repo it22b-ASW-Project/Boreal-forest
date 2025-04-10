@@ -134,14 +134,6 @@ class Comments(models.Model):
         created_at = models.DateTimeField(auto_now_add=True)
 
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    bio = models.TextField(null=True, blank=True)  # Campo adicional para la biografía
-
-    def __str__(self):
-        return f"Profile of {self.user.username}"
-
-
 def get_avatar_upload_path(instance, filename):
     """Generate upload path for avatar images"""
     return f'avatars/{instance.user.id}/{filename}'
