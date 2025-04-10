@@ -5,3 +5,4 @@ __pycache__/
 venv/*
 /staticfiles/
 boreal_forest.sqlite3
+/media/*
