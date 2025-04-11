@@ -12,7 +12,16 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "changeme-insecure")
 
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-4e26pic+us_pb*c-6iy6!y*5gaa-4xqn@2e$(5hqxzt(px5a*-'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = ['boreal-forest.onrender.com']
+
+
+# Application definition
 
 # Aplicaciones
 INSTALLED_APPS = [
