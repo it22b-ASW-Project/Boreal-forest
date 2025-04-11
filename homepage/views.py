@@ -45,8 +45,8 @@ def showAllIssues(request):
     
 def crearIssues(request, form):
     lines = form.cleaned_data["bulk_text"].splitlines()
-    issues = [Issue(subject=line.strip(), status=Status.objects.order_by('name').first(), type=Type.objects.order_by('name').first(),
-                    severity=Severity.objects.order_by('name').first(), priority=Priority.objects.order_by('name').first(), 
+    issues = [Issue(subject=line.strip(), status=Status.objects.order_by('positon').first(), type=Type.objects.order_by('positon').first(),
+                    severity=Severity.objects.order_by('positon').first(), priority=Priority.objects.order_by('positon').first(), 
                     created_by=SocialAccount.objects.filter(user=request.user, provider="google").first()) for line in lines if line.strip()]
     Issue.objects.bulk_create(issues)
 
