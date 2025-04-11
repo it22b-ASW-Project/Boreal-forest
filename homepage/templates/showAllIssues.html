@@ -1,28 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% load static %}
+
 <head>
   <meta charset="UTF-8">
   <title>Boreal Forest</title>
+  <link rel="stylesheet" href="{% static 'css/showIssues.css' %}">
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 <body>
-  <div>
-    <h1>Boreal forest</h1>
-  </div>
-  <form action="new/" method="get">
-    <button type="submit">+ NEW ISSUE</button>
-  </form>
-  {% for issue in issues %}
-  <div>
-    <p><b> Issue numero {{issue.id}}: </b></p>
-    <p>{{issue.subject}} - {{issue.description}}</p>
-    <p>{{issue.status}} , {{issue.type}} , {{issue.severity}}, {{issue.priority}}</p>
-    <br>
-  </div>
-  {% empty %}
-  <p>No hay issues registrados.</p>
-  {% endfor %}
+
+  <div class="container">
+
+    <div class="main-content">
+      <div class="header">
+        <h1>~ Boreal forest ~</h1>
+        <div class="header-buttons">
+          <button onclick="location.href='{% url 'user_profile' user.id %}'">
+            <i class="material-icons">account_circle</i>
+          </button>
+          <form action="/settings/" method="get">
+            <button type="submit">
+              <i class="material-icons">settings</i>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <hr class="head-separator">
+
+      <div class="action-buttons">
+        <div class="filter-buttons">
+          <!--<button onclick="ChangeFilterVisibility()">
+            <i class="material-icons">filter_list</i>
+          </button>-->
+
+          <form method="GET" class="filter-form">
+            <div>
+              <label for="id_q"></label>
+              {{ filter.form.q }}
+
+              <button type="submit">
+                <i class="material-icons">search</i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <form method="GET" class="filter-form">
+          <div id="filterForm">
+            <div>
+              <label for="id_type">Type</label>
+              {{ filter.form.type }}
+            </div>
+            <div>
+              <label for="id_severity">Severity</label>
+              {{ filter.form.severity }}
+            </div>
+            <div>
+              <label for="id_priority">Prioridad</label>
+              {{ filter.form.priority }}
+            </div>
+            <div>
+              <label for="id_status">State</label>
+              {{ filter.form.status }}
+            </div>
+            <div>
+              <label for="created_by">Created by</label>
+              {{ filter.form.created_by }}
+            </div>
+            <div>
+              <label for="assigned">Assigned to</label>
+              {{ filter.form.assigned}}
+            </div>
+          </div>
+        </form>
+
+        <div class="issue-buttons">
+          <form action="new/" method="get">
+            <button type="submit">
+              <i class="material-icons">add</i>
+            </button>
+          </form>
+
+          <button type="button" onclick="document.getElementById('bulkForm').style.display = 'flex';">
+            <i class="material-icons">playlist_add</i>
+          </button>
+
+          <div id="bulkForm" style="display:none;">
+            <br>
+            <form method="POST">
+              <p>Bulk Insert Issues</p>
+              {% csrf_token %}
+              {{ bulkForm }}
+              <button type="submit">Crear Issues</button>
+              <button onclick="document.getElementById('bulkForm').style.display = 'none';">Cerrar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-content">
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <span>Type</span>
+                <a href="?sort_by=type__position&tab=issues">↑</a>
+                <a href="?sort_by=-type__position&tab=issues">↓</a>
+              </th>
+              <th>
+                <span>Severity</span>
+                <a href="?sort_by=severity__position&tab=assigned-issues">↑</a>
+                <a href="?sort_by=-severity__position&tab=assigned-issues">↓</a>
+              </th>
+              <th>
+                <span>Priority</span>
+                <a href="?sort_by=priority__position&tab=assigned-issues">↑</a>
+                <a href="?sort_by=-priority__position&tab=assigned-issues">↓</a>
+              </th>
+              <th>Issue</th>
+              <th>
+                <span>Status</span>
+                <a href="?sort_by=status__position&tab=assigned-issues">↑</a>
+                <a href="?sort_by=-status__position&tab=assigned-issues">↓</a>
+              </th>
+              <th>
+                <span>Modified</span>
+                <a href="?sort_by=modified_at&tab=assigned-issues">↑</a>
+                <a href="?sort_by=-modified_at&tab=assigned-issues">↓</a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for issue in issues %}
+            <tr>
+              <td>
+                <span class="colorDot" style="background-color: {{ issue.type.color|default:'#ccc' }}">
+                </span>
+              </td>
+              <td>
+                <span class="colorDot" style="background-color: {{ issue.severity.color|default:'#ccc' }}">
+                </span>
+              </td>
+              <td>
+                <span class="colorDot" style="background-color: {{ issue.priority.color|default:'#ccc' }}">
+                </span>
+              </td>
+              <td> <a href="/issue/{{issue.id}}">#{{ issue.id }} {{ issue.subject }} </a></td>
+              <td>{{ issue.status }}</td>
+              <td>{{ issue.modified_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      function ChangeFilterVisibility() {
+        const form = document.getElementById("filterForm");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+      }
+    </script>
+
 </body>
 
 </html>

@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+venv/*
+/staticfiles/
+boreal_forest.sqlite3
+/media/*

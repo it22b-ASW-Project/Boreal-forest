@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="{% static 'css/user.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<body>
+
+    <div class="container">
+        <a href="/issues" class="back-button">
+            <i class="material-icons">arrow_back</i>
+        </a>
+        <!-- Sidebar -->
+        <div class="profile-sidebar">
+            {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" alt="Profile Photo">
+            {% else %}
+            <img src="{% static 'img/default-profile.png' %}" alt="Profile Photo">
+            {% endif %}
+            <div class="avatar-controls">
+                <form method="post" enctype="multipart/form-data" id="avatar-form">
+                    {% csrf_token %}
+                    <input type="file" name="avatar" id="avatar-input" accept="image/*">
+                    <label for="avatar-input">Choose Photo</label>
+                    <input type="hidden" name="upload_avatar" value="true">
+                    <button type="submit" class="avatar-upload-button">Upload</button>
+                </form>
+
+                {% if profile.avatar %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" name="delete_avatar" class="text-button">Use default image</button>
+                </form>
+                {% endif %}
+            </div>
+            <h2>{{ full_name }}</h2>
+            <p>@{{ username }}</p>
+
+            <div class="stats">
+                <div>
+                    <p class="num"><strong>{{Numassigned_issues}}</strong></p>
+                    <p>Open Assigned Issues</p>
+                </div>
+                <div>
+                    <p class="num"><strong>{{Numwatched_issues }}</strong></p>
+                    <p>Watched Issues</p>
+                </div>
+                <div>
+                    <p class="num"><strong>{{ Numcomments }}</strong></p>
+                    <p>Comments</p>
+                </div>
+            </div>
+
+            {% if not edit_bio %}
+            <p class="break-word">{{ bio }}</p>
+            <a href="?edit_bio=true&tab={{active_tab}}" id="editBioButton" class="edit-bio">Edit Bio</a>
+            {% endif %}
+
+            {% if edit_bio %}
+            <div id="editBioForm">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.bio }}
+                    <button type="submit" id="SaveBioButton">Save</button>
+                    <a href="?tab={{ active_tab }}" class="edit-bio">Cancel</a>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="profile-content">
+            <div class="tabs">
+                <a href="?tab=assigned-issues"
+                    class="tab-button {% if active_tab == 'assigned-issues' %}active{% endif %}">Open Assigned
+                    Issues</a>
+                <a href="?tab=watched-issues"
+                    class="tab-button {% if active_tab == 'watched-issues' %}active{% endif %}">Watched Issues</a>
+                <a href="?tab=comments"
+                    class="tab-button {% if active_tab == 'comments' %}active{% endif %}">Comments</a>
+            </div>
+            <!-- Tab Content -->
+            <div class="tab-content">
+                {% if active_tab == 'assigned-issues' %}
+                <h3>Open Assigned Issues</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                <span>Type</span>
+                                <a href="?sort_by=type__position&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-type__position&tab=assigned-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>Severity</span>
+                                <a href="?sort_by=severity__position&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-severity__position&tab=assigned-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>Priority</span>
+                                <a href="?sort_by=priority__position&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-priority__position&tab=assigned-issues">↓</a>
+                            </th>
+                            <th>Issue</th>
+                            <th>
+                                <span>Status</span>
+                                <a href="?sort_by=status__position&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-status__position&tab=assigned-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>Modified</span>
+                                <a href="?sort_by=modified_at&tab=assigned-issues">↑</a>
+                                <a href="?sort_by=-modified_at&tab=assigned-issues">↓</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for issue in assigned_issues %}
+                        <tr>
+                            <td>
+                                <span class="colorDot"
+                                    style="background-color: {{ issue.issue.type.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="colorDot"
+                                    style="background-color: {{ issue.issue.severity.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="colorDot"
+                                    style="background-color: {{ issue.issue.priority.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>#{{ issue.issue.id }} {{ issue.issue.subject }}</td>
+                            <td>{{ issue.issue.status }}</td>
+                            <td>{{ issue.issue.modified_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% elif active_tab == 'watched-issues' %}
+                <h3>Watched Issues</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                <span>T</span>
+                                <a href="?sort_by=type__position&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-type__position&tab=watched-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>S</span>
+                                <a href="?sort_by=severity__position&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-severity__position&tab=watched-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>P</span>
+                                <a href="?sort_by=priority__position&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-priority__position&tab=watched-issues">↓</a>
+                            </th>
+                            <th>Issue</th>
+                            <th>
+                                <span>Status</span>
+                                <a href="?sort_by=status__position&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-status__position&tab=watched-issues">↓</a>
+                            </th>
+                            <th>
+                                <span>Modified</span>
+                                <a href="?sort_by=modified_at&tab=watched-issues">↑</a>
+                                <a href="?sort_by=-modified_at&tab=watched-issues">↓</a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for issue in watched_issues %}
+                        <tr>
+                            <td>
+                                <span class="colorDot"
+                                    style="background-color: {{ issue.issue.type.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="colorDot"
+                                    style="background-color: {{ issue.issue.severity.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="colorDot"
+                                    style="background-color: {{ issue.issue.priority.color|default:'#ccc' }}">
+                                </span>
+                            </td>
+                            <td>#{{ issue.issue.id }} {{ issue.issue.subject }}</td>
+                            <td>{{ issue.issue.status }}</td>
+                            <td>{{ issue.issue.modified_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% elif active_tab == 'comments' %}
+                <h3>Comments</h3>
+                <ul>
+                    {% for comment in comments %}
+                    <div class="comment-container">
+                        <h3 class="comment-title">
+                            <a href="/issue/{{ comment.issue.id }}">#{{ comment.issue.id }} {{ comment.issue.subject }}</a>
+                            <span class="comment-date">{{ comment.created_at|date:"d M Y H:i" }}</span>
+                        </h3>
+                        <p class="comment-text">{{ comment.comment }}</p>
+                    </div>
+                    {% empty %}
+                    <li>No comments available.</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>Select a tab to view content.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
