@@ -547,7 +547,7 @@ def severities_settings(request):
         print(f"Action: {action}")
         if action not in( 'add_new', 'edit_name', 'start_editting', 'new_color'):
             severity_name = request.POST.get('severity_name')
-            severity = Status.objects.get(name=severity_name)
+            severity = Severity.objects.get(name=severity_name)
 
         if action == 'delete_severity':
             severity.delete()
@@ -623,7 +623,7 @@ def severities_settings(request):
         elif "move_down" in request.POST:
 
             if severity.position < len(severities):
-                    next_severity = Status.objects.get(position=severity.position + 1)
+                    next_severity = Severity.objects.get(position=severity.position + 1)
                     # Intercambiar las posiciones
                     severity.position += 1
                     next_severity.position -= 1
