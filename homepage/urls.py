@@ -4,6 +4,25 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from . import views
+from .views import IssueListView
+
+
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Issue Tracker API",
+        default_version='v1',
+        description="API REST para gestionar issues",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="soporte@miapp.com"),
+        license=openapi.License(name="MIT License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 urlpatterns = [
     
@@ -24,6 +43,10 @@ urlpatterns = [
     path('', views.login), 
     path('issues/new/', views.createIssue),
     path('issue/<int:id>/', views.issueDetail, name='issueDetail'),
+
+    #api urls
+    path('api/issues/', IssueListView.as_view(), name='issue-list'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
 if settings.DEBUG:
