@@ -12,6 +12,8 @@ paths:
         - issues
       summary: Obtener todos los issues
       operationId: getAllIssues
+      security:
+        - ApiKeyAuth: []  
       responses:
         '200':
           description: Lista de issues obtenida correctamente
@@ -24,6 +26,11 @@ paths:
         '401':
           description: No autorizado
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: Authorization
+      in: header  
   schemas:
     Issue:
       type: object
