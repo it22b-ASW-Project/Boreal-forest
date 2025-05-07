@@ -1,0 +1,230 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0
+  title: Wall of Tweets
+  description: "This is the Open API documentation for the REST API of our beloved application **Wall of Tweets**. A webapp version is available at <https://waslab04.onrender.com/>.<br>All operations are executable. Only one operation requires authentication: `deleteTweet`. In this case, you must **Authorize** your request by providing the token value you got when you created the tweet."
+servers:
+  - url: 'https://wotapi.onrender.com/'
+paths:
+  /tweets:
+    post:
+      tags:
+      - tweets
+      summary: Adds a new Tweet to the Wall of Tweets
+      operationId: addTweet
+      requestBody:
+        description: Provide the author & content of the new Tweet
+        content:
+          application/json:
+            schema:
+              required:
+              - author
+              - content
+              type: object
+              properties:
+                author:
+                  type: string
+                  minLength: 4
+                  example: 'My name'
+                content:
+                  type: string
+                  minLength: 4
+                  maxLength: 280
+                  example: 'My content'
+        required: true
+      responses:
+        201:
+          description: Tweet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewTweet'
+        400:
+          description: 'Error: Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+    get:
+      tags:
+      - tweets
+      summary: Retrieves all the Tweets
+      operationId: getAllTweets
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tweet'
+  /tweets/{tweetId}:
+    get:
+      tags:
+      - tweets
+      summary: Finds a Tweet by its ID
+      description: Returns a single Tweet
+      operationId: getTweetById
+      parameters:
+      - name: tweetId
+        in: path
+        description: ID of Tweet to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+    delete:
+      tags:
+      - tweets
+      summary: If the Tweet exists, deletes it if the token is present and valid. If it does not exist, returns 204 No Content.
+      operationId: deleteTweet
+      parameters:
+      - name: tweetId
+        in: path
+        description: Tweet id to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        204:
+          description: No content
+          content:
+            application/json: {}
+        401:
+          description: 'Error: Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        403:
+          description: 'Error: Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error403'
+      security:
+      - ApiKeyAuth: []
+  /tweets/{tweetId}/likes:
+    post:
+      tags:
+      - tweets
+      summary: Likes a Tweet
+      operationId: likeTweet
+      parameters:
+      - name: tweetId
+        in: path
+        description: Tweet id to like
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Liked Tweet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        404:
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+components:
+  schemas:
+    Tweet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+        author:
+          type: string
+          minLength: 4
+          example: 'My name'
+        content:
+          type: string
+          minLength: 4
+          maxLength: 280
+          example: 'My content'
+        likes:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+          format: date-time
+        _links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: url
+              example: 'https://fib-asw-wotapi.fly.dev/tweets/2'
+    NewTweet:
+      allOf:
+        - $ref: '#/components/schemas/Tweet'
+        - type: object
+          properties:
+            token:
+              type: string
+              example: '9656f8894781485f7e9e168584a17ec002ad77379a3e2b3ff4604b916d98c0a7'
+          required:
+            - token
+    ErrorResult:
+      type: object
+      properties:
+        message: 
+          type: string
+          example: 'Content is too long (maximum is 280 characters)'
+      required:
+        - message
+  examples:
+    error400:
+      value:
+        message: "Content is too long (maximum is 280 characters)"
+    error401:
+      value:
+        message: "You provided no token"
+    error403:
+      value:
+        message: "You provided an invalid token"
+    error404:
+      value:
+        message: "There is no tweet with 'id'=8"
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: Authorization
+      in: header
