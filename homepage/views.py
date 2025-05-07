@@ -17,6 +17,11 @@ from django.db.models import Max
 
 from django.contrib import messages
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .serializers import IssueSerializer
+
 @login_required
 def showAllIssues(request):
     bulkForm = BulkIssueForm()
@@ -823,3 +828,13 @@ def confirm_delete_type(request):
         'type': type_to_delete,
         'other_types': other_types,
     })
+
+#API STUFF
+
+class IssueListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        issues = Issue.objects.all()
+        serializer = IssueSerializer(issues, many=True)
+        return Response(serializer.data)
