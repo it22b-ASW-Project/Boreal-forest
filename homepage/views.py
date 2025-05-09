@@ -19,8 +19,9 @@ from django.contrib import messages
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import IssueSerializer
+from .serializers import IssueSerializer, PrioritySerializer
 
 @login_required
 def showAllIssues(request):
@@ -842,3 +843,20 @@ class IssueListView(APIView):
         issues = Issue.objects.all()
         serializer = IssueSerializer(issues, many=True)
         return Response(serializer.data)
+    
+class PriorityListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        priorities = Priority.objects.all()
+        serializer = PrioritySerializer(priorities, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = PrioritySerializer(data=request.data)
+        if serializer.is_valid():
+            max_position = Priority.objects.aggregate(Max('position'))['position__max'] or 0
+            serializer.save(position=max_position + 1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
