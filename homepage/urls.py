@@ -38,6 +38,7 @@ urlpatterns = [
     path('settings/severities/', views.severities_settings, name='severities'),
     path('settings/types/', views.types_settings, name='types'),
     
+    path('user-profiles/', views.user_profiles, name='user_profiles'),
     path('user-profile/<int:id>/', views.user_profile, name='user_profile'),
     path('issues/', views.showAllIssues),
     path('', views.login), 

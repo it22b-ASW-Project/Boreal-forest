@@ -282,6 +282,10 @@ def login(request):
 def settings(request):
     return render(request, 'settings.html')
 
+@login_required
+def user_profiles(request):
+    users = SocialAccount.objects.all()
+    return render(request, 'user_profiles.html', {'users': users})
 
 @login_required
 def user_profile(request, id):
