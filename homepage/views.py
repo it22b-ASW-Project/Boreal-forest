@@ -21,7 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer
 
 @login_required
 def showAllIssues(request):
@@ -1095,3 +1095,11 @@ class MoveTypeDownView(APIView):
                 {"detail": "Type is already at the bottom."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+class StatusListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        statuses = Status.objects.all()
+        serializer = StatusSerializer(statuses, many=True)
+        return Response(serializer.data)
