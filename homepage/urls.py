@@ -48,6 +48,8 @@ urlpatterns = [
     path('api/issues/', views.IssueListView.as_view(), name='issue-list'),
     path('api/priorities/', views.PriorityListView.as_view(), name='priority-list'),
     path('api/priorities/<str:name>/', views.PriorityDetailView.as_view(), name='priority-detail'),
+    path('api/priorities/<str:name>/move-up/', views.MovePriorityUpView.as_view(), name='move-priority-up'),
+    path('api/priorities/<str:name>/move-down/', views.MovePriorityDownView.as_view(), name='move-priority-down'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
