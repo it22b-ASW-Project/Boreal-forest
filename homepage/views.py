@@ -755,8 +755,17 @@ def confirm_delete_priority(request):
         issues = Issue.objects.filter(priority=priority_to_delete)
         issues.update(priority=new_priority)
 
+        # Guardar la posición de la prioridad que se va a borrar
+        deleted_position = priority_to_delete.position
+
         # Eliminar la prioridad
         priority_to_delete.delete()
+
+        # Reordenar prioridades
+        priorities_to_update = Priority.objects.filter(position__gt=deleted_position)
+        for p in priorities_to_update:
+            p.position -= 1
+            p.save()
 
         messages.success(request, f'Priority "{priority_name}" deleted and issues changed to  "{new_priority.name}".')
         return redirect('priorities')
@@ -868,26 +877,36 @@ class PriorityDetailView(APIView):
 
     def put(self, request, name):
         try:
-            priority = self.get_object(name)  # Lanza 404 si no se encuentra
-            serializer = PrioritySerializer(priority, data=request.data)
+            instance = self.get_object(name)
+            serializer = PrioritySerializer(instance, data=request.data, partial=False)
+
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         except Http404:
             return Response({"detail": "Prioridad no encontrada."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(f"Error al actualizar la prioridad: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
     def delete(self, request, name):
         try:
-            priority = self.get_object(name)  # Lanza 404 si no se encuentra
+            priority = self.get_object(name) 
+            deleted_position = priority.position
             priority.delete()
+
+            priorities_to_update = Priority.objects.filter(position__gt=deleted_position)
+            for p in priorities_to_update:
+                p.position -= 1
+                p.save()
+
             return Response(status=status.HTTP_204_NO_CONTENT)
+
         except Http404:
             return Response({"detail": "Prioridad no encontrada."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(f"Error al eliminar la prioridad: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
