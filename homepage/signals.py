@@ -9,4 +9,4 @@ from allauth.account.signals import user_logged_in
 def create_auth_token(sender, request, sociallogin, **kwargs):
     user = sociallogin.user
     token, created = Token.objects.get_or_create(user=user)
-    #print(f"API Key generada para {user.username}: {token.key}")
+    print(f"API Key generada para {user.username}: {token.key}")
