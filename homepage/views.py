@@ -990,3 +990,28 @@ class TypeListView(APIView):
             serializer.save(position=max_position + 1)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class TypeDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, name):
+        return get_object_or_404(Type, name=name)   
+
+    def delete(self, request, name):
+        try:
+            type = self.get_object(name)
+            deleted_position = type.position
+            type.delete()
+
+            types_to_update = Type.objects.filter(position__gt=deleted_position)
+            for t in types_to_update:
+                t.position -= 1
+                t.save()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Http404:
+            return Response({"detail": "Tipo no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al eliminar el tipo: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

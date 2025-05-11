@@ -225,19 +225,38 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InputType'
+              $ref: '#/components/schemas/TypeInput'
       responses:
         '201':
           description: Type created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InputType'
+                $ref: '#/components/schemas/TypeInput'
         '400':
           description: Datos inválidos
         '401':
           description: No autorizado      
                           
+  /api/types/{name}/:
+    delete:
+      summary: Eliminar tipo
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado correctamente
+        '404':
+          description: Tipo no encontrado
+
 components:
   securitySchemes:
     ApiKeyAuth:
