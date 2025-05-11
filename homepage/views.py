@@ -1015,3 +1015,19 @@ class TypeDetailView(APIView):
         except Exception as e:
             print(f"Error al eliminar el tipo: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, name):
+        try:
+            instance = self.get_object(name)
+            serializer = TypeSerializer(instance, data=request.data, partial=False)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Http404:
+            return Response({"detail": "Tipo no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al actualizar el tipo: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
