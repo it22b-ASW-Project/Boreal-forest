@@ -213,6 +213,30 @@ paths:
                   $ref: '#/components/schemas/Type'
         '401':
           description: No autorizado
+
+    post:
+      summary: Crear una nueva prioridad
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriorityInput'
+      responses:
+        '201':
+          description: Prioridad creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriorityInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado      
                           
 components:
   securitySchemes:
