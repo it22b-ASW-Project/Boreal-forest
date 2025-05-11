@@ -101,12 +101,414 @@ paths:
                   $ref: '#/components/examples/error401'
       security:
         - ApiKeyAuth: []
+
+  /api/priorities/:
+    get:
+      summary: Obtener todas las prioridades
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de prioridades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Priority'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: Crear una nueva prioridad
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriorityInput'
+      responses:
+        '201':
+          description: Prioridad creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriorityInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado
+
+  /api/priorities/{name}/:
+    put:
+      summary: Actualizar prioridad existente
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Prio actualizada"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Prioridad actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Prioridad no encontrada
+
+    delete:
+      summary: Eliminar prioridad
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminada correctamente
+        '404':
+          description: Prioridad no encontrada
+  
+  /api/priorities/{name}/move-up/:
+    post:
+      summary: Mover prioridad hacia arriba
+      description: Intercambia la posición de esta prioridad con la que está justo encima.
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la prioridad
+      responses:
+        '200':
+          description: Prioridad movida hacia arriba correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más arriba
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Prioridad no encontrada
+
+  /api/priorities/{name}/move-down/:
+    post:
+      summary: Mover prioridad hacia abajo
+      description: Intercambia la posición de esta prioridad con la que está justo debajo.
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la prioridad
+      responses:
+        '200':
+          description: Prioridad movida hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Prioridad no encontrada
+          
+  /api/types/:
+    get:
+      summary: Obtener todos los tipos
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de tipos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Type'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: New type created
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeInput'
+      responses:
+        '201':
+          description: Type created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypeInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado      
+                          
+  /api/types/{name}/:
+    delete:
+      summary: Eliminar tipo
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado correctamente
+        '404':
+          description: Tipo no encontrado
+
+    put:
+      summary: Actualizar tipo existente
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Type actualizada"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Tipo actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Tipo no encontrado
+
+  /api/types/{name}/move-up/:
+    post:
+      summary: Mover tipo hacia arriba
+      description: Intercambia la posición de este tipo con el que está justo encima.
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del tipo
+      responses:
+        '200':
+          description: Tipo movido hacia arriba correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más arriba
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Tipo no encontrado
+
+  /api/types/{name}/move-down/:
+    post:
+      summary: Mover tipo hacia abajo
+      description: Intercambia la posición de este tipo con el que está justo debajo.
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del tipo
+      responses:
+        '200':
+          description: Tipo movido hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Tipo no encontrado
+
+  /api/statuses/:
+    get:
+      summary: Obtener todos los estados
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de estados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: Crear un nuevo estado
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusInput'
+      responses:
+        '201':
+          description: Estado creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado      
+
+  /api/statuses/{name}/:      
+    delete:
+      summary: Eliminar estado
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado correctamente
+        '404':
+          description: Estado no encontrado
+
+
 components:
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
       name: Authorization
-      in: header
+      in: header  
   schemas:
     Issue:
       type: object
@@ -154,6 +556,76 @@ components:
           enum: ["Bad Request", "Unauthorized", "Forbidden", "Not Found", "Conflict"]
         message: 
           type: string
+          
+    Priority:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+          
+    PriorityInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+
+    Type:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+
+    TypeInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+  
+    Status:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+
+    StatusInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"  
+    
   examples:
     error400:
       value:
