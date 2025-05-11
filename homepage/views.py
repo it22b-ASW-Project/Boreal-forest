@@ -1111,3 +1111,28 @@ class StatusListView(APIView):
             serializer.save(position=max_position + 1)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class StatusDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, name):
+        return get_object_or_404(Status, name=name)   
+
+    def delete(self, request, name):
+        try:
+            status = self.get_object(name)
+            deleted_position = status.position
+            status.delete()
+
+            statuses_to_update = Status.objects.filter(position__gt=deleted_position)
+            for s in statuses_to_update:
+                s.position -= 1
+                s.save()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Http404:
+            return Response({"detail": "Estado no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al eliminar el estado: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

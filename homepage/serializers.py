@@ -38,7 +38,6 @@ class TypeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         new_name = validated_data.get('name', instance.name)
         if new_name != instance.name:
-            # Borrar el viejo e insertar uno nuevo
             instance.delete()
             instance.name = new_name
 
@@ -60,7 +59,6 @@ class StatusSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         new_name = validated_data.get('name', instance.name)
         if new_name != instance.name:
-            # Borrar el viejo e insertar uno nuevo
             instance.delete()
             instance.name = new_name
 

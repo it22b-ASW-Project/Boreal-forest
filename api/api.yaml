@@ -407,6 +407,26 @@ paths:
         '401':
           description: No autorizado      
 
+  /api/statuses/{name}/:      
+    delete:
+      summary: Eliminar estado
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado correctamente
+        '404':
+          description: Estado no encontrado
+
+
 components:
   securitySchemes:
     ApiKeyAuth:
