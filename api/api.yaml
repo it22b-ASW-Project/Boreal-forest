@@ -194,7 +194,176 @@ paths:
                     type: string
         '404':
           description: Prioridad no encontrada
+          
+  /api/types/:
+    get:
+      summary: Obtener todos los tipos
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de tipos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Type'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: New type created
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeInput'
+      responses:
+        '201':
+          description: Type created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypeInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado      
                           
+  /api/types/{name}/:
+    delete:
+      summary: Eliminar tipo
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado correctamente
+        '404':
+          description: Tipo no encontrado
+
+  put:
+      summary: Actualizar tipo existente
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Type actualizada"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Tipo actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Tipo no encontrado
+
+  /api/types/{name}/move-up/:
+    post:
+      summary: Mover tipo hacia arriba
+      description: Intercambia la posición de este tipo con el que está justo encima.
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del tipo
+      responses:
+        '200':
+          description: Tipo movido hacia arriba correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más arriba
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Tipo no encontrado
+
+  /api/types/{name}/move-down/:
+    post:
+      summary: Mover tipo hacia abajo
+      description: Intercambia la posición de este tipo con el que está justo debajo.
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del tipo
+      responses:
+        '200':
+          description: Tipo movido hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Tipo no encontrado
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -243,4 +412,25 @@ components:
           type: string
           example: "#FF0000"
 
-    
+    Type:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+
+    TypeInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"      

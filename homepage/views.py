@@ -21,7 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import IssueSerializer, PrioritySerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer
 
 @login_required
 def showAllIssues(request):
@@ -972,5 +972,126 @@ class MovePriorityDownView(APIView):
         else:
             return Response(
                 {"detail": "Priority is already at the bottom."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+class TypeListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        types = Type.objects.all()
+        serializer = TypeSerializer(types, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = TypeSerializer(data=request.data)
+        if serializer.is_valid():
+            max_position = Type.objects.aggregate(Max('position'))['position__max'] or 0
+            serializer.save(position=max_position + 1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class TypeDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, name):
+        return get_object_or_404(Type, name=name)   
+
+    def delete(self, request, name):
+        try:
+            type = self.get_object(name)
+            deleted_position = type.position
+            type.delete()
+
+            types_to_update = Type.objects.filter(position__gt=deleted_position)
+            for t in types_to_update:
+                t.position -= 1
+                t.save()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Http404:
+            return Response({"detail": "Tipo no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al eliminar el tipo: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, name):
+        try:
+            instance = self.get_object(name)
+            serializer = TypeSerializer(instance, data=request.data, partial=False)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Http404:
+            return Response({"detail": "Tipo no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al actualizar el tipo: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+        
+class MoveTypeUpView(APIView):
+    def post(self, request, name):
+        # Obtener el tipo que queremos mover
+        type = get_object_or_404(Type, name=name)
+
+        # Verificar si el tipo no está en la primera posición
+        if type.position > 1:
+            # Obtener el tipo que está justo por encima de este
+            higher_type = Type.objects.filter(position__lt=type.position).order_by('-position').first()
+
+            if higher_type:
+                # Intercambiar las posiciones
+                higher_type.position, type.position = type.position, higher_type.position
+                higher_type.save()
+                type.save()
+
+                return Response(
+                    {"message": "Type moved up successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No higher type to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Type is already at the top."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+class MoveTypeDownView(APIView):
+    def post(self, request, name):
+        # Obtener el tipo que queremos mover
+        type = get_object_or_404(Type, name=name)
+
+        # Verificar si el tipo no está en la última posición
+        highest_position = Type.objects.all().aggregate(Max('position'))['position__max']
+
+        if type.position < highest_position:
+            # Obtener el tipo que está justo por debajo de este
+            lower_type = Type.objects.filter(position__gt=type.position).order_by('position').first()
+
+            if lower_type:
+                # Intercambiar las posiciones
+                lower_type.position, type.position = type.position, lower_type.position
+                lower_type.save()
+                type.save()
+
+                return Response(
+                    {"message": "Type moved down successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No lower type to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Type is already at the bottom."},
                 status=status.HTTP_400_BAD_REQUEST
             )
