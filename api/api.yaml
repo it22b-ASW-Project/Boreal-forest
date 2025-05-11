@@ -383,6 +383,30 @@ paths:
         '401':
           description: No autorizado
 
+    post:
+      summary: Crear un nuevo estado
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusInput'
+      responses:
+        '201':
+          description: Estado creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado      
+
 components:
   securitySchemes:
     ApiKeyAuth:

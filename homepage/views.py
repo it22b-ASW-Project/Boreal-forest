@@ -1103,3 +1103,11 @@ class StatusListView(APIView):
         statuses = Status.objects.all()
         serializer = StatusSerializer(statuses, many=True)
         return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = StatusSerializer(data=request.data)
+        if serializer.is_valid():
+            max_position = Status.objects.aggregate(Max('position'))['position__max'] or 0
+            serializer.save(position=max_position + 1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
