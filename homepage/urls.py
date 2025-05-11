@@ -4,7 +4,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from . import views
-from .views import IssueListView
 
 
 from rest_framework import permissions
@@ -38,6 +37,7 @@ urlpatterns = [
     path('settings/severities/', views.severities_settings, name='severities'),
     path('settings/types/', views.types_settings, name='types'),
     
+    path('user-profiles/', views.user_profiles, name='user_profiles'),
     path('user-profile/<int:id>/', views.user_profile, name='user_profile'),
     path('issues/', views.showAllIssues),
     path('', views.login), 
@@ -45,7 +45,15 @@ urlpatterns = [
     path('issue/<int:id>/', views.issueDetail, name='issueDetail'),
 
     #api urls
-    path('api/issues/', IssueListView.as_view(), name='issue-list'),
+    path('api/issues/', views.IssueListView.as_view(), name='issue-list'),
+    path('api/priorities/', views.PriorityListView.as_view(), name='priority-list'),
+    path('api/priorities/<str:name>/', views.PriorityDetailView.as_view(), name='priority-detail'),
+    path('api/priorities/<str:name>/move-up/', views.MovePriorityUpView.as_view(), name='move-priority-up'),
+    path('api/priorities/<str:name>/move-down/', views.MovePriorityDownView.as_view(), name='move-priority-down'),
+    path('api/types/', views.TypeListView.as_view(), name='type-list'),
+    path('api/types/<str:name>/', views.TypeDetailView.as_view(), name='type-detail'),
+    path('api/types/<str:name>/move-up/', views.MoveTypeUpView.as_view(), name='move-type-up'),
+    path('api/types/<str:name>/move-down/', views.MoveTypeDownView.as_view(), name='move-type-down'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
