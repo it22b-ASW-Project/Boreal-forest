@@ -29,6 +29,8 @@ paths:
   /api/priorities/:
     get:
       summary: Obtener todas las prioridades
+      tags:
+        - Priorities
       security:
         - ApiKeyAuth: []  
       responses:
@@ -45,6 +47,8 @@ paths:
 
     post:
       summary: Crear una nueva prioridad
+      tags:
+        - Priorities
       security:
         - ApiKeyAuth: []  
       requestBody:
@@ -68,6 +72,8 @@ paths:
   /api/priorities/{name}/:
     put:
       summary: Actualizar prioridad existente
+      tags:
+        - Priorities
       security:
         - ApiKeyAuth: []  
       parameters:
@@ -85,7 +91,7 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "Nueva prioridad actualizada"
+                  example: "Prio actualizada"
                 color:
                   type: string
                   example: "#00FF00"
@@ -99,6 +105,8 @@ paths:
 
     delete:
       summary: Eliminar prioridad
+      tags:
+        - Priorities
       security:
         - ApiKeyAuth: []  
       parameters:
@@ -110,6 +118,80 @@ paths:
       responses:
         '204':
           description: Eliminada correctamente
+        '404':
+          description: Prioridad no encontrada
+  
+  /api/priorities/{name}/move-up/:
+    post:
+      summary: Mover prioridad hacia arriba
+      description: Intercambia la posición de esta prioridad con la que está justo encima.
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la prioridad
+      responses:
+        '200':
+          description: Prioridad movida hacia arriba correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más arriba
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Prioridad no encontrada
+
+  /api/priorities/{name}/move-down/:
+    post:
+      summary: Mover prioridad hacia abajo
+      description: Intercambia la posición de esta prioridad con la que está justo debajo.
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la prioridad
+      responses:
+        '200':
+          description: Prioridad movida hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
         '404':
           description: Prioridad no encontrada
                           
