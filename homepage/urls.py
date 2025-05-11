@@ -51,7 +51,7 @@ urlpatterns = [
     path('api/priorities/<str:name>/move-up/', views.MovePriorityUpView.as_view(), name='move-priority-up'),
     path('api/priorities/<str:name>/move-down/', views.MovePriorityDownView.as_view(), name='move-priority-down'),
     path('api/types/', views.TypeListView.as_view(), name='type-list'),
-    #path('api/types/<str:name>/', views.TypeDetailView.as_view(), name='type-detail'),
+    path('api/types/<str:name>/', views.TypeDetailView.as_view(), name='type-detail'),
     #path('api/types/<str:name>/move-up/', views.MoveTypeUpView.as_view(), name='move-type-up'),
     #path('api/types/<str:name>/move-down/', views.MoveTypeDownView.as_view(), name='move-type-down'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
