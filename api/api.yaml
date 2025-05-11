@@ -194,6 +194,25 @@ paths:
                     type: string
         '404':
           description: Prioridad no encontrada
+          
+  /api/types/:
+    get:
+      summary: Obtener todos los tipos
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de tipos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Type'
+        '401':
+          description: No autorizado
                           
 components:
   securitySchemes:
@@ -243,4 +262,13 @@ components:
           type: string
           example: "#FF0000"
 
-    
+    Type:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
