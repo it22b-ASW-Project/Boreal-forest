@@ -10,21 +10,97 @@ paths:
     get:
       tags:
         - issues
-      summary: Obtener todos los issues
+      summary: View all issues
       operationId: getAllIssues
-      security:
-        - ApiKeyAuth: []  
+      description: Get all the issues
+      parameters:
+        - name: q
+          in: query
+          description: Search by subject or description of the issue
+          required: false
+          schema:
+            type: string
+        - name: priority
+          in: query
+          description: Filter by the priority of the issue
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Filter by the type of the issue.
+          required: false 
+          schema:
+            type: string
+        - name: severity
+          in: query
+          description: Filter by the severity of the issue (Important, etc)
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter by the status of the issue
+          required: false
+          schema:
+            type: string
+        - name: created_by
+          in: query
+          description: Filter by the user who created the issue.
+          required: false
+          schema:
+            type: integer
+        - name: assigned_to
+          in: query
+          description: Filter by the user the issue is assigned to. Use "0" for unassigned issues.
+          required: false
+          schema:
+            type: integer
+        - name: sortBy
+          in: query
+          description: Field to sort the results by (Status, Priority, Type, Severity, Modified)
+          required: false
+          schema:
+            type: string
+            enum: [status, priority, type, severity, modified]
+        - name: sortOrder
+          in: query
+          description: The order to sort by. 
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         '200':
-          description: Lista de issues obtenida correctamente
+          description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Issue'
+        '400':
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'          
         '401':
-          description: No autorizado
+          description: 'Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+      security:
+        - ApiKeyAuth: []
 
   /api/priorities/:
     get:
@@ -257,7 +333,7 @@ paths:
         '404':
           description: Tipo no encontrado
 
-  put:
+    put:
       summary: Actualizar tipo existente
       tags:
         - Types
@@ -364,6 +440,69 @@ paths:
         '404':
           description: Tipo no encontrado
 
+  /api/statuses/:
+    get:
+      summary: Obtener todos los estados
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de estados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: Crear un nuevo estado
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusInput'
+      responses:
+        '201':
+          description: Estado creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado      
+
+  /api/statuses/{name}/:      
+    delete:
+      summary: Eliminar estado
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado correctamente
+        '404':
+          description: Estado no encontrado
+
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -379,14 +518,43 @@ components:
           example: 1
         title:
           type: string
-          example: "Error en el login"
+          example: "No funcionen els issues del Taiga"
         description:
           type: string
-          example: "No se puede iniciar sesión usando Google."
+          example: "Els issues del Taiga han deixat de funcionar després de l'últim commit"
         status:
           type: string
-          example: "open"
+          example: "In progress"
         created_at:
+          type: string
+          format: date-time
+          example: "2025-04-11T01:04:05.766197+02:00"
+        modified_at:
+          type: string
+          format: date-time
+          example: "2025-04-11T01:04:05.766213+02:00"
+        type:
+          type: string
+          example: "Question"
+        severity:
+          type: string
+          example: "Normal"
+        priority:
+          type: string
+          example: "Low"
+        created_by:
+          type: integer
+          example: 1
+    ErrorResult:
+      type: object
+      properties:
+        status:
+          type: integer
+          enum: [400, 401, 403, 404, 409]
+        error: 
+          type: string
+          enum: ["Bad Request", "Unauthorized", "Forbidden", "Not Found", "Conflict"]
+        message: 
           type: string
           
     Priority:
@@ -433,4 +601,54 @@ components:
           type: string
         color:
           type: string
-          example: "#FF0000"      
+          example: "#FF0000"
+  
+    Status:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+
+    StatusInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"  
+    
+  examples:
+    error400:
+      value:
+        status: 400
+        error: "Bad Request"
+        message: "The request data is invalid."
+    error401:
+      value:
+        status: 401
+        error: "Unauthorized"
+        message: "You provided no api key (Authorization Header)."
+    error403:
+      value:
+        status: 403
+        error: "Forbidden"
+        message: "You do not have permission to access this resource."
+    error404:
+      value:
+        status: 404
+        error: "Not Found"
+        message: "The requested resource could not be found."
+    error409:
+      value:
+        status: 409
+        error: "Conflict"
+        message: "The request could not be completed due to a conflict with the current state."
