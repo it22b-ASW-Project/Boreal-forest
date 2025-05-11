@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
@@ -19,8 +19,9 @@ from django.contrib import messages
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import IssueSerializer
+from .serializers import IssueSerializer, PrioritySerializer
 
 @login_required
 def showAllIssues(request):
@@ -754,8 +755,17 @@ def confirm_delete_priority(request):
         issues = Issue.objects.filter(priority=priority_to_delete)
         issues.update(priority=new_priority)
 
+        # Guardar la posición de la prioridad que se va a borrar
+        deleted_position = priority_to_delete.position
+
         # Eliminar la prioridad
         priority_to_delete.delete()
+
+        # Reordenar prioridades
+        priorities_to_update = Priority.objects.filter(position__gt=deleted_position)
+        for p in priorities_to_update:
+            p.position -= 1
+            p.save()
 
         messages.success(request, f'Priority "{priority_name}" deleted and issues changed to  "{new_priority.name}".')
         return redirect('priorities')
@@ -842,3 +852,125 @@ class IssueListView(APIView):
         issues = Issue.objects.all()
         serializer = IssueSerializer(issues, many=True)
         return Response(serializer.data)
+    
+class PriorityListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        priorities = Priority.objects.all()
+        serializer = PrioritySerializer(priorities, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = PrioritySerializer(data=request.data)
+        if serializer.is_valid():
+            max_position = Priority.objects.aggregate(Max('position'))['position__max'] or 0
+            serializer.save(position=max_position + 1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PriorityDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, name):
+        return get_object_or_404(Priority, name=name)
+
+    def put(self, request, name):
+        try:
+            instance = self.get_object(name)
+            serializer = PrioritySerializer(instance, data=request.data, partial=False)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Http404:
+            return Response({"detail": "Prioridad no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al actualizar la prioridad: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def delete(self, request, name):
+        try:
+            priority = self.get_object(name) 
+            deleted_position = priority.position
+            priority.delete()
+
+            priorities_to_update = Priority.objects.filter(position__gt=deleted_position)
+            for p in priorities_to_update:
+                p.position -= 1
+                p.save()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Http404:
+            return Response({"detail": "Prioridad no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al eliminar la prioridad: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class MovePriorityUpView(APIView):
+    def post(self, request, name):
+        # Obtener la prioridad que queremos mover
+        priority = get_object_or_404(Priority, name=name)
+
+        # Verificar si la prioridad no está en la primera posición
+        if priority.position > 1:
+            # Obtener la prioridad que está justo por encima de esta
+            higher_priority = Priority.objects.filter(position__lt=priority.position).order_by('-position').first()
+
+            if higher_priority:
+                # Intercambiar las posiciones
+                higher_priority.position, priority.position = priority.position, higher_priority.position
+                higher_priority.save()
+                priority.save()
+
+                return Response(
+                    {"message": "Priority moved up successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No higher priority to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Priority is already at the top."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+class MovePriorityDownView(APIView):
+    def post(self, request, name):
+        # Obtener la prioridad que queremos mover
+        priority = get_object_or_404(Priority, name=name)
+
+        # Verificar si la prioridad no está en la última posición
+        highest_position = Priority.objects.all().aggregate(Max('position'))['position__max']
+
+        if priority.position < highest_position:
+            # Obtener la prioridad que está justo por debajo de esta
+            lower_priority = Priority.objects.filter(position__gt=priority.position).order_by('position').first()
+
+            if lower_priority:
+                # Intercambiar las posiciones
+                lower_priority.position, priority.position = priority.position, lower_priority.position
+                lower_priority.save()
+                priority.save()
+
+                return Response(
+                    {"message": "Priority moved down successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No lower priority to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Priority is already at the bottom."},
+                status=status.HTTP_400_BAD_REQUEST
+            )

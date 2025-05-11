@@ -25,6 +25,94 @@ paths:
                   $ref: '#/components/schemas/Issue'
         '401':
           description: No autorizado
+
+  /api/priorities/:
+    get:
+      summary: Obtener todas las prioridades
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de prioridades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Priority'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: Crear una nueva prioridad
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriorityInput'
+      responses:
+        '201':
+          description: Prioridad creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriorityInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado
+
+  /api/priorities/{name}/:
+    put:
+      summary: Actualizar prioridad existente
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Nueva prioridad actualizada"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Prioridad actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Prioridad no encontrada
+
+    delete:
+      summary: Eliminar prioridad
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminada correctamente
+        '404':
+          description: Prioridad no encontrada
+                          
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -49,5 +137,28 @@ components:
           example: "open"
         created_at:
           type: string
-          format: date-time
-          example: "2025-05-07T10:23:45Z"
+          
+    Priority:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+          
+    PriorityInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+
+    
