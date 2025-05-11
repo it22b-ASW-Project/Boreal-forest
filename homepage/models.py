@@ -5,7 +5,7 @@ from django.utils.timezone import now
 class Priority(models.Model):
     name = models.CharField(max_length=20, primary_key=True) 
     color = models.CharField(max_length=7, default="#808080") 
-    position = models.IntegerField(default = 0)
+    position = models.IntegerField()
 
     def __str__(self):
         return self.name
