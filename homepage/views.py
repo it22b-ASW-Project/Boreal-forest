@@ -910,3 +910,67 @@ class PriorityDetailView(APIView):
         except Exception as e:
             print(f"Error al eliminar la prioridad: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class MovePriorityUpView(APIView):
+    def post(self, request, name):
+        # Obtener la prioridad que queremos mover
+        priority = get_object_or_404(Priority, name=name)
+
+        # Verificar si la prioridad no está en la primera posición
+        if priority.position > 1:
+            # Obtener la prioridad que está justo por encima de esta
+            higher_priority = Priority.objects.filter(position__lt=priority.position).order_by('-position').first()
+
+            if higher_priority:
+                # Intercambiar las posiciones
+                higher_priority.position, priority.position = priority.position, higher_priority.position
+                higher_priority.save()
+                priority.save()
+
+                return Response(
+                    {"message": "Priority moved up successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No higher priority to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Priority is already at the top."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+class MovePriorityDownView(APIView):
+    def post(self, request, name):
+        # Obtener la prioridad que queremos mover
+        priority = get_object_or_404(Priority, name=name)
+
+        # Verificar si la prioridad no está en la última posición
+        highest_position = Priority.objects.all().aggregate(Max('position'))['position__max']
+
+        if priority.position < highest_position:
+            # Obtener la prioridad que está justo por debajo de esta
+            lower_priority = Priority.objects.filter(position__gt=priority.position).order_by('position').first()
+
+            if lower_priority:
+                # Intercambiar las posiciones
+                lower_priority.position, priority.position = priority.position, lower_priority.position
+                lower_priority.save()
+                priority.save()
+
+                return Response(
+                    {"message": "Priority moved down successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No lower priority to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Priority is already at the bottom."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
