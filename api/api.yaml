@@ -879,6 +879,31 @@ paths:
                 items:
                   $ref: '#/components/schemas/Issue'
         '401':
+          description: No autorizado        
+
+  /api/users/{id}/watching:
+    get:
+      summary: Obtener todos los issues que un usuario está observando
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de issues que el usuario está observando
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Issue'
+        '401':
           description: No autorizado         
 
 components:
