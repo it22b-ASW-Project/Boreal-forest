@@ -1152,3 +1152,67 @@ class StatusDetailView(APIView):
         except Exception as e:
             print(f"Error al actualizar el estado: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class MoveStatusUpView(APIView):
+    def post(self, request, name):
+        # Obtener el estado que queremos mover
+        status_obj = get_object_or_404(Status, name=name)
+
+        # Verificar si el estado no está en la primera posición
+        if status_obj.position > 1:
+            # Obtener el estado que está justo por encima de este
+            higher_state = Status.objects.filter(position__lt=status_obj.position).order_by('-position').first()
+
+            if higher_state:
+                # Intercambiar las posiciones
+                higher_state.position, status_obj.position = status_obj.position, higher_state.position
+                higher_state.save()
+                status_obj.save()
+
+                return Response(
+                    {"message": "Status moved up successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No higher status to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Status is already at the top."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+class MoveStatusDownView(APIView):
+    def post(self, request, name):
+        # Obtener el estado que queremos mover
+        status_obj = get_object_or_404(Status, name=name)
+
+        # Verificar si el estado no está en la última posición
+        highest_position = Status.objects.all().aggregate(Max('position'))['position__max']
+
+        if status_obj.position < highest_position:
+            # Obtener el estado que está justo por debajo de este
+            lower_status = Status.objects.filter(position__gt=status_obj.position).order_by('position').first()
+
+            if lower_status:
+                # Intercambiar las posiciones
+                lower_status.position, status_obj.position = status_obj.position, lower_status.position
+                lower_status.save()
+                status_obj.save()
+
+                return Response(
+                    {"message": "Status moved down successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No lower status to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Status is already at the bottom."},
+                status=status.HTTP_400_BAD_REQUEST
+            )

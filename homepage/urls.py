@@ -56,8 +56,8 @@ urlpatterns = [
     path('api/types/<str:name>/move-down/', views.MoveTypeDownView.as_view(), name='move-type-down'),
     path('api/statuses/', views.StatusListView.as_view(), name='status-list'),
     path('api/statuses/<str:name>/', views.StatusDetailView.as_view(), name='status-detail'),
-    #path('api/statuses/<str:name>/move-up/', views.MoveStatusUpView.as_view(), name='move-status-up'),
-    #path('api/statuses/<str:name>/move-down/', views.MoveStatusDownView.as_view(), name='move-status-down'),
+    path('api/statuses/<str:name>/move-up/', views.MoveStatusUpView.as_view(), name='move-status-up'),
+    path('api/statuses/<str:name>/move-down/', views.MoveStatusDownView.as_view(), name='move-status-down'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
