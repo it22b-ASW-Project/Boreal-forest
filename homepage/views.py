@@ -21,8 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status 
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer
 
 @login_required
 def showAllIssues(request):
@@ -1185,5 +1184,126 @@ class MoveTypeDownView(APIView):
         else:
             return Response(
                 {"detail": "Type is already at the bottom."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+class StatusListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        statuses = Status.objects.all()
+        serializer = StatusSerializer(statuses, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = StatusSerializer(data=request.data)
+        if serializer.is_valid():
+            max_position = Status.objects.aggregate(Max('position'))['position__max'] or 0
+            serializer.save(position=max_position + 1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class StatusDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, name):
+        return get_object_or_404(Status, name=name)   
+
+    def delete(self, request, name):
+        try:
+            status_obj = self.get_object(name)
+            deleted_position = status_obj.position
+            status_obj.delete()
+
+            statuses_to_update = Status.objects.filter(position__gt=deleted_position)
+            for s in statuses_to_update:
+                s.position -= 1
+                s.save()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Http404:
+            return Response({"detail": "Estado no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al eliminar el estado: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, name):
+        try:
+            instance = self.get_object(name)
+            serializer = StatusSerializer(instance, data=request.data, partial=False)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Http404:
+            return Response({"detail": "Estado no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al actualizar el estado: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class MoveStatusUpView(APIView):
+    def post(self, request, name):
+        # Obtener el estado que queremos mover
+        status_obj = get_object_or_404(Status, name=name)
+
+        # Verificar si el estado no está en la primera posición
+        if status_obj.position > 1:
+            # Obtener el estado que está justo por encima de este
+            higher_state = Status.objects.filter(position__lt=status_obj.position).order_by('-position').first()
+
+            if higher_state:
+                # Intercambiar las posiciones
+                higher_state.position, status_obj.position = status_obj.position, higher_state.position
+                higher_state.save()
+                status_obj.save()
+
+                return Response(
+                    {"message": "Status moved up successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No higher status to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Status is already at the top."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+class MoveStatusDownView(APIView):
+    def post(self, request, name):
+        # Obtener el estado que queremos mover
+        status_obj = get_object_or_404(Status, name=name)
+
+        # Verificar si el estado no está en la última posición
+        highest_position = Status.objects.all().aggregate(Max('position'))['position__max']
+
+        if status_obj.position < highest_position:
+            # Obtener el estado que está justo por debajo de este
+            lower_status = Status.objects.filter(position__gt=status_obj.position).order_by('position').first()
+
+            if lower_status:
+                # Intercambiar las posiciones
+                lower_status.position, status_obj.position = status_obj.position, lower_status.position
+                lower_status.save()
+                status_obj.save()
+
+                return Response(
+                    {"message": "Status moved down successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No lower status to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Status is already at the bottom."},
                 status=status.HTTP_400_BAD_REQUEST
             )

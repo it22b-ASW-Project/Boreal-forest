@@ -455,6 +455,7 @@ paths:
               schema:
                 type: array
                 items:
+                  type: string
                   $ref: '#/components/schemas/Status'
         '401':
           description: No autorizado
@@ -502,6 +503,112 @@ paths:
         '404':
           description: Estado no encontrado
 
+    put:
+      summary: Actualizar estado existente
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Estado actualizado"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Estado actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Estado no encontrado
+
+  /api/statuses/{name}/move-up/:
+    post:
+      summary: Mover estado hacia arriba
+      description: Intercambia la posición de este estado con el que está justo encima.
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del estado
+      responses:
+        '200':
+          description: Estado movido hacia arriba correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más arriba
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Estado no encontrado
+
+  /api/statuses/{name}/move-down/:
+    post:
+      summary: Mover estado hacia abajo
+      description: Intercambia la posición de este estado con el que está justo debajo.
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del estado
+      responses:
+        '200':
+          description: Estado movido hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Estado no encontrado
 
 components:
   securitySchemes:
