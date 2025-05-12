@@ -21,7 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer
 
 @login_required
 def showAllIssues(request):
@@ -1307,3 +1307,19 @@ class MoveStatusDownView(APIView):
                 {"detail": "Status is already at the bottom."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+class SeverityListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        severities = Severity.objects.all()
+        serializer = SeveritySerializer(severities, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = SeveritySerializer(data=request.data)
+        if serializer.is_valid():
+            max_position = Severity.objects.aggregate(Max('position'))['position__max'] or 0
+            serializer.save(position=max_position + 1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
