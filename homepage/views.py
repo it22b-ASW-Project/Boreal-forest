@@ -1120,9 +1120,9 @@ class StatusDetailView(APIView):
 
     def delete(self, request, name):
         try:
-            status = self.get_object(name)
-            deleted_position = status.position
-            status.delete()
+            status_obj = self.get_object(name)
+            deleted_position = status_obj.position
+            status_obj.delete()
 
             statuses_to_update = Status.objects.filter(position__gt=deleted_position)
             for s in statuses_to_update:
