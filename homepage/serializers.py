@@ -64,7 +64,7 @@ class TypeSerializer(serializers.ModelSerializer):
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = ['name', 'color']
+        fields = ['name', 'color', 'isClosed']
         read_only_fields = ['position']
 
     def update(self, instance, validated_data):
