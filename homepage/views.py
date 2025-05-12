@@ -849,8 +849,99 @@ class IssueListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+
+        valid_sort_fields = {
+        'status': 'status__position', 
+        'priority': 'priority__position', 
+        'type': 'type__position', 
+        'severity': 'severity__position', 
+        'modified': 'modified_at'
+        }
+
+        # Obtenir els parámetres d'ordenació
+        sort_by = request.GET.get('sortBy', '-created_at')
+        sort_order = request.GET.get('sortOrder', 'desc')
+        created_by = request.GET.get('created_by', None)
+        assigned_to = request.GET.get('assigned_to', None) 
+
+        priority = request.GET.get('priority')
+        type_ = request.GET.get('type')
+        severity = request.GET.get('severity')
+        issue_status = request.GET.get('status')
+
+        def is_valid_choice(model, value):
+            return model.objects.filter(name__iexact=value).exists()
+
+        # Verificar la validez de cada campo filtrable
+        if priority and not is_valid_choice(Priority, priority):
+            return Response(
+                {"error": f"Invalid priority: '{priority}'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if type_ and not is_valid_choice(Type, type_):
+            return Response(
+                {"error": f"Invalid type: '{type_}'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if severity and not is_valid_choice(Severity, severity):
+            return Response(
+                {"error": f"Invalid severity: '{severity}'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if issue_status and not is_valid_choice(Status, issue_status):
+            return Response(
+                {"error": f"Invalid status: '{issue_status}'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+        if created_by  and not UserProfile.objects.filter(user_id=created_by).exists():
+            return Response(
+                {"error": f"Invalid user ID: '{created_by}'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if assigned_to and not Assigned.objects.filter(assigned_id=assigned_to).exists() and assigned_to != '0':
+            return Response(
+                {"error": f"Invalid user ID: '{assigned_to}'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         issues = Issue.objects.all()
-        serializer = IssueSerializer(issues, many=True)
+
+        # Filtro de 'assigned_to'
+        if assigned_to:
+            if assigned_to == '0':
+                issues = issues.exclude(id__in=Assigned.objects.values('issue'))
+            else:
+                issues = issues.filter(id__in=Assigned.objects.filter(assigned__user_id=assigned_to).values_list('issue', flat=True))
+        
+           
+        # Validar y configurar el camp d'ordenació
+        
+        #valid_sort_fields = ['status', 'priority', 'type', 'severity', 'modified_at']
+
+
+        if sort_by.lstrip('-') not in valid_sort_fields:
+            sort_by = '-created_at'
+
+        order_by_field = valid_sort_fields.get(sort_by.lstrip('-'), 'created_at')
+
+        if sort_order == 'asc':
+            order_by_field = order_by_field.lstrip('-')
+        elif sort_order == 'desc':
+            order_by_field = f'-{order_by_field}'
+
+        print(order_by_field)
+        # Apliquem filtres
+        filtered_issues = IssueFilter(request.GET, queryset=issues.order_by(order_by_field))
+
+        # Serialitzem els resultats
+        serializer = IssueSerializer(filtered_issues.qs, many=True)
+
         return Response(serializer.data)
     
 class PriorityListView(APIView):
