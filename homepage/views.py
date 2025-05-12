@@ -21,7 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer
 
 @login_required
 def showAllIssues(request):
@@ -1305,5 +1305,118 @@ class MoveStatusDownView(APIView):
         else:
             return Response(
                 {"detail": "Status is already at the bottom."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+class SeverityListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        severities = Severity.objects.all()
+        serializer = SeveritySerializer(severities, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = SeveritySerializer(data=request.data)
+        if serializer.is_valid():
+            max_position = Severity.objects.aggregate(Max('position'))['position__max'] or 0
+            serializer.save(position=max_position + 1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+    
+class SeverityDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, name):
+        return get_object_or_404(Severity, name=name)   
+
+    def delete(self, request, name):
+        try:
+            severity = self.get_object(name)
+            deleted_position = severity.position
+            severity.delete()
+
+            severities_to_update = Severity.objects.filter(position__gt=deleted_position)
+            for s in severities_to_update:
+                s.position -= 1
+                s.save()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Http404:
+            return Response({"detail": "Severidad no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al eliminar la severidad: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, name):
+        try:
+            instance = self.get_object(name)
+            serializer = SeveritySerializer(instance, data=request.data, partial=False)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Http404:
+            return Response({"detail": "Severidad no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al actualizar la severidad: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class MoveSeverityUpView(APIView):
+    def post(self, request, name):
+        severity = get_object_or_404(Severity, name=name)
+
+        if severity.position > 1:
+            higher_severity = Severity.objects.filter(position__lt=severity.position).order_by('-position').first()
+
+            if higher_severity:
+                higher_severity.position, severity.position = severity.position, higher_severity.position
+                higher_severity.save()
+                severity.save()
+
+                return Response(
+                    {"message": "Severity moved up successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No higher severity to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Severity is already at the top."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+class MoveSeverityDownView(APIView):
+    def post(self, request, name):
+        severity = get_object_or_404(Severity, name=name)
+
+        highest_position = Severity.objects.all().aggregate(Max('position'))['position__max']
+
+        if severity.position < highest_position:
+            lower_severity = Severity.objects.filter(position__gt=severity.position).order_by('position').first()
+
+            if lower_severity:
+                lower_severity.position, severity.position = severity.position, lower_severity.position
+                lower_severity.save()
+                severity.save()
+
+                return Response(
+                    {"message": "Severity moved down successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No lower severity to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Severity is already at the bottom."},
                 status=status.HTTP_400_BAD_REQUEST
             )
