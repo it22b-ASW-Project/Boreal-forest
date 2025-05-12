@@ -426,6 +426,39 @@ paths:
         '404':
           description: Estado no encontrado
 
+    put:
+      summary: Actualizar estado existente
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Estado actualizado"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Estado actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Estado no encontrado        
+
 
 components:
   securitySchemes:
