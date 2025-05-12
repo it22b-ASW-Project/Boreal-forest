@@ -29,6 +29,7 @@ class Severity(models.Model):
 class Status(models.Model):
     name = models.CharField(max_length=20, primary_key=True)  
     color = models.CharField(max_length=7, default="#808080")
+    isClosed = models.BooleanField(default=False)
     position = models.IntegerField(default = 0)
 
     def __str__(self):

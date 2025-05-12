@@ -334,7 +334,7 @@ def user_profile(request, id):
     else:
         form = EditBioForm(instance=profile)
 
-    assigned_issues = Assigned.objects.filter(assigned=user, issue__status__name__in=['New', 'In progress', 'Ready for test', 'Needs info', 'Rejected', 'Postponed']).select_related('issue').order_by(order_by_field)
+    assigned_issues = Assigned.objects.filter(assigned=user, issue__status__isClosed=False).select_related('issue').order_by(order_by_field)
     watched_issues = Watch.objects.filter(watcher=user).select_related('issue').order_by(order_by_field)
     comments = Comments.objects.filter(user_id=id).select_related('issue').order_by(f'-created_at')
 
