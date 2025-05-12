@@ -705,6 +705,80 @@ paths:
         '404':
           description: Severidad no encontrada   
 
+  /api/severities/{name}/move-up/:
+    post:
+      summary: Mover severidad hacia arriba
+      description: Intercambia la posición de esta severidad con la que está justo encima.
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la severidad
+      responses:
+        '200':
+          description: Severidad movida hacia arriba correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más arriba
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Severidad no encontrada
+
+  /api/severities/{name}/move-down/:
+    post:
+      summary: Mover severidad hacia abajo
+      description: Intercambia la posición de esta severidad con la que está justo debajo.
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la severidad
+      responses:
+        '200':
+          description: Severidad movida hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Severidad no encontrada        
+
 components:
   securitySchemes:
     ApiKeyAuth:
