@@ -923,12 +923,6 @@ class IssueListView(APIView):
             else:
                 issues = issues.filter(id__in=Assigned.objects.filter(assigned__user_id=assigned_to).values_list('issue', flat=True))
         
-           
-        # Validar y configurar el camp d'ordenació
-        
-        #valid_sort_fields = ['status', 'priority', 'type', 'severity', 'modified_at']
-
-
         if sort_by.lstrip('-') not in valid_sort_fields:
             sort_by = '-created_at'
 
@@ -948,6 +942,38 @@ class IssueListView(APIView):
 
         return Response(serializer.data)
     
+
+class IssueDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        try:
+
+            try:
+                # Intentar obtener el issue por ID
+                issue = Issue.objects.get(id=id)
+            except Issue.DoesNotExist:
+                return Response({"detail": "There's no issue with this id"}, status=status.HTTP_404_NOT_FOUND)
+
+            # Obtener los watchers del issue (relación con la tabla Watch)
+            watchers = list(Watch.objects.filter(issue_id=id).values_list('id', flat=True))
+            assigned = list(Assigned.objects.filter(issue_id=id).values_list('assigned_id', flat=True))
+
+            # Serializar el issue
+            serializer = IssueSerializer(issue)
+
+            # Añadir los campos adicionales de watchers y assigned
+            data = serializer.data
+            data['watchers'] = watchers
+            data['assigned'] = assigned
+
+            return Response(data, status=status.HTTP_200_OK)
+        except Http404:
+            return Response({"detail": "There's no issue with this id"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al obtener el issue: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class PriorityListView(APIView):
     permission_classes = [IsAuthenticated]
 
