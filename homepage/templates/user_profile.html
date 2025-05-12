@@ -23,24 +23,33 @@
             {% else %}
             <img src="{% static 'img/default-profile.png' %}" alt="Profile Photo">
             {% endif %}
-            <div class="avatar-controls">
-                <form method="post" enctype="multipart/form-data" id="avatar-form">
-                    {% csrf_token %}
-                    <input type="file" name="avatar" id="avatar-input" accept="image/*">
-                    <label for="avatar-input">Choose Photo</label>
-                    <input type="hidden" name="upload_avatar" value="true">
-                    <button type="submit" class="avatar-upload-button">Upload</button>
-                </form>
 
-                {% if profile.avatar %}
-                <form method="post">
-                    {% csrf_token %}
-                    <button type="submit" name="delete_avatar" class="text-button">Use default image</button>
-                </form>
+
+            <div class="avatar-controls">
+                {% if is_own_profile %}
+                    <form method="post" enctype="multipart/form-data" id="avatar-form">
+                        {% csrf_token %}
+                        <input type="file" name="avatar" id="avatar-input" accept="image/*">
+                        <label for="avatar-input">Choose Photo</label>
+                        <input type="hidden" name="upload_avatar" value="true">
+                        <button type="submit" class="avatar-upload-button">Upload</button>
+                    </form>
+
+                    {% if profile.avatar %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="delete_avatar" class="text-button">Use default image</button>
+                    </form>
+                    {% endif %}
                 {% endif %}
+            
+
             </div>
             <h2>{{ full_name }}</h2>
             <p>@{{ username }}</p>
+            {% if is_own_profile %}
+            <p>Token {{ token }}</p>
+            {% endif %}
 
             <div class="stats">
                 <div>
@@ -59,7 +68,9 @@
 
             {% if not edit_bio %}
             <p class="break-word">{{ bio }}</p>
-            <a href="?edit_bio=true&tab={{active_tab}}" id="editBioButton" class="edit-bio">Edit Bio</a>
+                {% if is_own_profile %}
+                    <a href="?edit_bio=true&tab={{active_tab}}" id="editBioButton" class="edit-bio">Edit Bio</a>
+                {% endif %}
             {% endif %}
 
             {% if edit_bio %}
