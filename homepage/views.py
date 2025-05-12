@@ -21,6 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer
 
 @login_required
@@ -292,6 +293,7 @@ def user_profiles(request):
 def user_profile(request, id):
     user = SocialAccount.objects.get(id=id)
     profile, created = UserProfile.objects.get_or_create(user_id=id)
+    token = Token.objects.get(user=user.user)
     active_tab = request.GET.get('tab', 'assigned-issues') 
     sort_by = request.GET.get('sort_by', '-modified_at') 
     edit_bio = request.GET.get('edit_bio', 'false') == 'true'
@@ -352,6 +354,8 @@ def user_profile(request, id):
         'active_tab': active_tab,
         'edit_bio': edit_bio,
         'messages': messages.get_messages(request),
+        'token': token.key,
+        'is_own_profile': request.user.id == user.user.id,
     }
     return render(request, 'user_profile.html', context)
 
