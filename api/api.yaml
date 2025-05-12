@@ -9,7 +9,7 @@ paths:
   /api/issues/:
     get:
       tags:
-        - issues
+        - Issues
       summary: View all issues
       operationId: getAllIssues
       description: Get all the issues
@@ -101,6 +101,46 @@ paths:
                   $ref: '#/components/examples/error401'
       security:
         - ApiKeyAuth: []
+  /api/issues/{id}:
+    get:
+      summary: View an issue with the id specified
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IssueDetail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+      
+        '404':
+          description: The id does not correspond to an issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+                  
+      security:
+        - ApiKeyAuth: []  
 
   /api/priorities/:
     get:
@@ -821,6 +861,54 @@ components:
         created_by:
           type: integer
           example: 1
+          
+    IssueDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "No funcionen els issues del Taiga"
+        description:
+          type: string
+          example: "Els issues del Taiga han deixat de funcionar després de l'últim commit"
+        status:
+          type: string
+          example: "In progress"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-04-11T01:04:05.766197+02:00"
+        modified_at:
+          type: string
+          format: date-time
+          example: "2025-04-11T01:04:05.766213+02:00"
+        type:
+          type: string
+          example: "Question"
+        severity:
+          type: string
+          example: "Normal"
+        priority:
+          type: string
+          example: "Low"
+        created_by:
+          type: integer
+          example: 1
+        watchers:
+          type: array
+          items:
+            type: integer
+            example: 2
+        assigned:
+          type: array
+          items:
+            type: integer
+            example: 3
+      
+        
     ErrorResult:
       type: object
       properties:
