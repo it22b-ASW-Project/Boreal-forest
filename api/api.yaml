@@ -610,6 +610,49 @@ paths:
         '404':
           description: Estado no encontrado
 
+  /api/severities/:
+    get:
+      summary: Obtener todas las severidades
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de severidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Severity'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: Crear una nueva severidad
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeverityInput'
+      responses:
+        '201':
+          description: Severidad creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeverityInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado        
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -732,6 +775,29 @@ components:
         color:
           type: string
           example: "#FF0000"  
+
+    Severity:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+
+    SeverityInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"      
     
   examples:
     error400:
