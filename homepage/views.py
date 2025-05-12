@@ -1450,3 +1450,18 @@ class MoveSeverityDownView(APIView):
                 {"detail": "Severity is already at the bottom."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+class AssignedIssuesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user = SocialAccount.objects.get(pk=user_id)
+        except SocialAccount.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        assigned_qs = Assigned.objects.filter(assigned_id=user).select_related('issue')
+        issues = [a.issue for a in assigned_qs]
+
+        serializer = IssueSerializer(issues, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
