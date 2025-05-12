@@ -47,22 +47,29 @@ urlpatterns = [
     #api urls
     path('api/issues/', views.IssueListView.as_view(), name='issue-list'),
     path('api/issues/<int:id>/', IssueDetailView.as_view(), name='issue-detail'),
+
     path('api/priorities/', views.PriorityListView.as_view(), name='priority-list'),
     path('api/priorities/<str:name>/', views.PriorityDetailView.as_view(), name='priority-detail'),
     path('api/priorities/<str:name>/move-up/', views.MovePriorityUpView.as_view(), name='move-priority-up'),
     path('api/priorities/<str:name>/move-down/', views.MovePriorityDownView.as_view(), name='move-priority-down'),
+
     path('api/types/', views.TypeListView.as_view(), name='type-list'),
     path('api/types/<str:name>/', views.TypeDetailView.as_view(), name='type-detail'),
     path('api/types/<str:name>/move-up/', views.MoveTypeUpView.as_view(), name='move-type-up'),
     path('api/types/<str:name>/move-down/', views.MoveTypeDownView.as_view(), name='move-type-down'),
+
     path('api/statuses/', views.StatusListView.as_view(), name='status-list'),
     path('api/statuses/<str:name>/', views.StatusDetailView.as_view(), name='status-detail'),
     path('api/statuses/<str:name>/move-up/', views.MoveStatusUpView.as_view(), name='move-status-up'),
     path('api/statuses/<str:name>/move-down/', views.MoveStatusDownView.as_view(), name='move-status-down'),
+
     path('api/severities/', views.SeverityListView.as_view(), name='severity-list'),
     path('api/severities/<str:name>/', views.SeverityDetailView.as_view(), name='severity-detail'),
     path('api/severities/<str:name>/move-up/', views.MoveSeverityUpView.as_view(), name='move-severity-up'),
     path('api/severities/<str:name>/move-down/', views.MoveSeverityDownView.as_view(), name='move-severity-down'),
+
+    path('api/users/<int:user_id>/assigned/', views.AssignedIssuesView.as_view(), name='assigned-issues'),
+
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
