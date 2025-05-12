@@ -1460,7 +1460,7 @@ class AssignedIssuesView(APIView):
         except SocialAccount.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        assigned_qs = Assigned.objects.filter(assigned_id=user).select_related('issue')
+        assigned_qs = Assigned.objects.filter(assigned_id=user, issue__status__isClosed=False).select_related('issue')
         issues = [a.issue for a in assigned_qs]
 
         serializer = IssueSerializer(issues, many=True)
