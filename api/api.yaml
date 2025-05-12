@@ -817,7 +817,32 @@ paths:
                   detail:
                     type: string
         '404':
-          description: Severidad no encontrada        
+          description: Severidad no encontrada       
+
+  /api/users/{id}/assigned:
+    get:
+      summary: Obtener todos los issues asignados a un usuario
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de issues asignados al usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Issue'
+        '401':
+          description: No autorizado         
 
 components:
   securitySchemes:
