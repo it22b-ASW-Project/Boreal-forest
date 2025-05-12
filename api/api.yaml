@@ -651,7 +651,59 @@ paths:
         '400':
           description: Datos inválidos
         '401':
-          description: No autorizado        
+          description: No autorizado     
+
+  /api/severities/{name}/:
+    delete:
+      summary: Eliminar severidad
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminada correctamente
+        '404':
+          description: Severidad no encontrada
+
+    put:
+      summary: Actualizar severidad existente
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Severidad actualizada"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Severidad actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Severidad no encontrada   
 
 components:
   securitySchemes:

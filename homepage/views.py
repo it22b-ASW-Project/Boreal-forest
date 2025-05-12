@@ -1323,3 +1323,44 @@ class SeverityListView(APIView):
             serializer.save(position=max_position + 1)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+    
+class SeverityDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, name):
+        return get_object_or_404(Severity, name=name)   
+
+    def delete(self, request, name):
+        try:
+            severity = self.get_object(name)
+            deleted_position = severity.position
+            severity.delete()
+
+            severities_to_update = Severity.objects.filter(position__gt=deleted_position)
+            for s in severities_to_update:
+                s.position -= 1
+                s.save()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Http404:
+            return Response({"detail": "Severidad no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al eliminar la severidad: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, name):
+        try:
+            instance = self.get_object(name)
+            serializer = SeveritySerializer(instance, data=request.data, partial=False)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Http404:
+            return Response({"detail": "Severidad no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al actualizar la severidad: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
