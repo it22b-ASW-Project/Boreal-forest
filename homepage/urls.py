@@ -70,6 +70,7 @@ urlpatterns = [
     path('api/severities/<str:name>/move-down/', views.MoveSeverityDownView.as_view(), name='move-severity-down'),
 
     path('api/users/<int:user_id>/assigned/', views.AssignedIssuesView.as_view(), name='assigned-issues'),
+    path('api/users/<int:user_id>/watching/', views.WatchedIssuesView.as_view(), name='watched-issues'),
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

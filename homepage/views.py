@@ -1480,3 +1480,18 @@ class AssignedIssuesView(APIView):
 
         serializer = IssueSerializer(issues, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class WatchedIssuesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user = SocialAccount.objects.get(pk=user_id)
+        except SocialAccount.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        watched_qs = Watch.objects.filter(watcher_id=user).select_related('issue')
+        issues = [w.issue for w in watched_qs]
+
+        serializer = IssueSerializer(issues, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
