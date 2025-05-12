@@ -1274,6 +1274,21 @@ class StatusDetailView(APIView):
             print(f"Error al actualizar el estado: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+class ToggleStatusClosedView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, name):
+        try:
+            status_obj = Status.objects.get(name=name)
+        except Status.DoesNotExist:
+            return Response({'detail': 'Status not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Alternar booleano directamente
+        status_obj.isClosed = not status_obj.isClosed
+        status_obj.save()
+
+        return Response({'is_closed': status_obj.isClosed}, status=status.HTTP_200_OK)
+
 class MoveStatusUpView(APIView):
     def post(self, request, name):
         # Obtener el estado que queremos mover

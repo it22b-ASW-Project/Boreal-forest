@@ -62,6 +62,7 @@ urlpatterns = [
     path('api/statuses/<str:name>/', views.StatusDetailView.as_view(), name='status-detail'),
     path('api/statuses/<str:name>/move-up/', views.MoveStatusUpView.as_view(), name='move-status-up'),
     path('api/statuses/<str:name>/move-down/', views.MoveStatusDownView.as_view(), name='move-status-down'),
+    path('api/statuses/<str:name>/change-closed/', views.ToggleStatusClosedView.as_view(), name='toggle-status-closed'),
 
     path('api/severities/', views.SeverityListView.as_view(), name='severity-list'),
     path('api/severities/<str:name>/', views.SeverityDetailView.as_view(), name='severity-detail'),
