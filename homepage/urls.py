@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from . import views
-
+from .views import IssueDetailView
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -46,6 +46,7 @@ urlpatterns = [
 
     #api urls
     path('api/issues/', views.IssueListView.as_view(), name='issue-list'),
+    path('api/issues/<int:id>/', IssueDetailView.as_view(), name='issue-detail'),
     path('api/priorities/', views.PriorityListView.as_view(), name='priority-list'),
     path('api/priorities/<str:name>/', views.PriorityDetailView.as_view(), name='priority-detail'),
     path('api/priorities/<str:name>/move-up/', views.MovePriorityUpView.as_view(), name='move-priority-up'),
