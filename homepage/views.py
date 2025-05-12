@@ -1364,3 +1364,59 @@ class SeverityDetailView(APIView):
         except Exception as e:
             print(f"Error al actualizar la severidad: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class MoveSeverityUpView(APIView):
+    def post(self, request, name):
+        severity = get_object_or_404(Severity, name=name)
+
+        if severity.position > 1:
+            higher_severity = Severity.objects.filter(position__lt=severity.position).order_by('-position').first()
+
+            if higher_severity:
+                higher_severity.position, severity.position = severity.position, higher_severity.position
+                higher_severity.save()
+                severity.save()
+
+                return Response(
+                    {"message": "Severity moved up successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No higher severity to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Severity is already at the top."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+class MoveSeverityDownView(APIView):
+    def post(self, request, name):
+        severity = get_object_or_404(Severity, name=name)
+
+        highest_position = Severity.objects.all().aggregate(Max('position'))['position__max']
+
+        if severity.position < highest_position:
+            lower_severity = Severity.objects.filter(position__gt=severity.position).order_by('position').first()
+
+            if lower_severity:
+                lower_severity.position, severity.position = severity.position, lower_severity.position
+                lower_severity.save()
+                severity.save()
+
+                return Response(
+                    {"message": "Severity moved down successfully."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"detail": "No lower severity to move."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "Severity is already at the bottom."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
