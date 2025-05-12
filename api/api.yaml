@@ -817,7 +817,44 @@ paths:
                   detail:
                     type: string
         '404':
-          description: Severidad no encontrada       
+          description: Severidad no encontrada   
+
+  /api/statuses/{name}/change-closed/:
+    post:
+      summary: Toggle the 'isClosed' field of a status
+      description: Alterna el valor booleano del campo `isClosed` para un status dado por nombre.
+      tags:
+        - Statuses    
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Nombre único del status a modificar
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Estado actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isClosed:
+                    type: boolean
+                    example: true
+        '404':
+          description: Status no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Status not found.
 
   /api/users/{id}/assigned:
     get:
