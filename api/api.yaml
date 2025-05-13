@@ -904,7 +904,61 @@ paths:
                 items:
                   $ref: '#/components/schemas/Issue'
         '401':
-          description: No autorizado         
+          description: No autorizado
+
+  /api/users/{id}/comments/:
+    get:
+      summary: Obtener los comentarios de un usuario agrupados por issue
+      security:
+        - ApiKeyAuth: []
+      description: Retorna los issues en los que el usuario ha comentado, incluyendo los comentarios hechos por ese usuario en cada issue.
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario (`SocialAccount`) cuyos comentarios se desean consultar.
+      responses:
+        '200':
+          description: Lista de issues con comentarios del usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 5
+                    titulo:
+                      type: string
+                      example: Error en login
+                    comments:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          comment:
+                            type: string
+                            example: No puedo iniciar sesión.
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: 2025-05-13T13:12:00Z
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: User not found.                 
 
 components:
   securitySchemes:

@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, IssueWithCommentsSerializer
 
 @login_required
 def showAllIssues(request):
@@ -1494,4 +1494,20 @@ class WatchedIssuesView(APIView):
         issues = [w.issue for w in watched_qs]
 
         serializer = IssueSerializer(issues, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class UserCommentsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user = SocialAccount.objects.get(pk=user_id)
+        except SocialAccount.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        comments_qs = Comments.objects.filter(user_id=user).select_related('issue')
+        issues = set(comment.issue for comment in comments_qs)
+
+        serializer = IssueWithCommentsSerializer(issues, many=True, context={'user': user})
         return Response(serializer.data, status=status.HTTP_200_OK)
