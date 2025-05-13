@@ -1509,9 +1509,27 @@ class WatchedIssuesView(APIView):
         except SocialAccount.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        watched_qs = Watch.objects.filter(watcher_id=user).select_related('issue')
-        issues = [w.issue for w in watched_qs]
+        valid_sort_fields = {
+        'status': 'issue__status__position', 
+        'priority': 'issue__priority__position', 
+        'type': 'issue__type__position', 
+        'severity': 'issue__severity__position', 
+        'modified': 'issue__modified_at'
+        }
 
+        # Obtenir els parámetres d'ordenació
+        sort_by = request.GET.get('sortBy', 'created')
+        sort_order = request.GET.get('sortOrder', 'desc')
+
+        sort_field = valid_sort_fields.get(sort_by, 'issue__created_at')
+        if sort_order == 'desc':
+            sort_field = f'-{sort_field}'
+
+        assigned_qs = Watch.objects.filter(
+            watcher_id=user,
+        ).select_related('issue').order_by(sort_field)
+
+        issues = [a.issue for a in assigned_qs]
         serializer = IssueSerializer(issues, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
