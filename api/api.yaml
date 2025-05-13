@@ -863,7 +863,7 @@ paths:
       tags:
         - Users
       security:
-        - ApiKeyAuth: []  
+        - ApiKeyAuth: []
       parameters:
         - in: path
           name: id
@@ -876,24 +876,18 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/UserResponse'
+  
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    example: 1
-                  username:
+                  detail:
                     type: string
-                    example: "johndoe"
-          '404':
-            description: Usuario no encontrado
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    detail:
-                      type: string
-                      example: User not found.
+                    example: User not found.
 
 
   /api/users/{id}/assigned:
@@ -1193,6 +1187,36 @@ components:
         color:
           type: string
           example: "#FF0000"      
+
+    UserResponse:
+      type: object
+      properties:
+        user:
+          type: integer
+          example: 7
+        full_name:
+          type: string
+          example: "Alex Johnson"
+        username:
+          type: string
+          example: "alexj"
+        bio:
+          type: string
+          example: "Desarrollador web apasionado por la tecnología."
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://example.com/media/avatars/default.jpg"
+        open_assigned_issues:
+          type: integer
+          example: 5
+        watched_issues:
+          type: integer
+          example: 3
+        comments_count:
+          type: integer
+          example: 12      
     
   examples:
     error400:
