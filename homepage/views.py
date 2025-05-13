@@ -955,10 +955,65 @@ class IssueDetailView(APIView):
             except Issue.DoesNotExist:
                 return Response({"detail": "There's no issue with this id"}, status=status.HTTP_404_NOT_FOUND)
 
-            # Obtener los watchers del issue (relación con la tabla Watch)
-            watchers = list(Watch.objects.filter(issue_id=id).values_list('id', flat=True))
-            assigned = list(Assigned.objects.filter(issue_id=id).values_list('assigned_id', flat=True))
+            # Obtener los watchers del issue 
+            watchers = [
+                {
+                    "id": w.watcher.id,  # ID del SocialAccount
+                    "name": w.watcher.extra_data.get('name', 'No Name'),
+                    "avatar": (
+                        UserProfile.objects.filter(user=w.watcher.user).values_list('avatar', flat=True).first()
+                    )
+                }
+                for w in Watch.objects.filter(issue_id=id).select_related('watcher')
+            ]
 
+            # Obtener los assigned del issue
+            assigned = [
+                    {
+                        "id": a.assigned.id,
+                        "name": a.assigned.extra_data.get('name', 'No Name'),
+                        "avatar": (
+                            UserProfile.objects.filter(user=a.assigned.user).values_list('avatar', flat=True).first()
+                        )
+                    }
+                    for a in Assigned.objects.filter(issue_id=id).select_related('assigned')
+                ]
+
+            #Obtener los attachments del issue
+            attachments = Attachment.objects.filter(issue_id=id).values(
+                'filename', 'filesize', 'description'
+            )
+            attachments_data = [
+                {
+                    'filename': attachment['filename'],
+                    'filesize': attachment['filesize'],
+                    'description': attachment['description'],
+                }
+                for attachment in attachments
+            ]
+
+            # Obtener los comentarios del issue
+            comments = Comments.objects.filter(issue_id=id).select_related('user')
+
+            comments_data = []
+            for comment in comments:
+                social_account = comment.user  
+
+                user_profile = UserProfile.objects.filter(user=social_account.user).first()
+
+                user_data = {
+                    "id": social_account.id,
+                    "name": social_account.extra_data.get('name', 'No Name'),
+                    "avatar": (
+                        UserProfile.objects.filter(user=social_account.user).values_list('avatar', flat=True).first()
+                    )
+                }
+               
+                comments_data.append({
+                    'comment': comment.comment,
+                    'user': user_data,
+                    'created_at': comment.created_at
+                })
             # Serializar el issue
             serializer = IssueSerializer(issue)
 
@@ -966,6 +1021,8 @@ class IssueDetailView(APIView):
             data = serializer.data
             data['watchers'] = watchers
             data['assigned'] = assigned
+            data['attachments'] = attachments_data
+            data['comments'] = comments_data
 
             return Response(data, status=status.HTTP_200_OK)
         except Http404:
