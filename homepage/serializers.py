@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Issue, Priority, Status, Severity, Type, UserProfile
+from .models import Issue, Priority, Status, Severity, Type, UserProfile, Comments
 from django.db.models import Max
 import re
 
@@ -112,7 +112,7 @@ class SeveritySerializer(serializers.ModelSerializer):
         if not re.match(r'^#[0-9a-fA-F]{6}$', value):
             raise serializers.ValidationError("El color debe estar en formato hexadecimal (#RRGGBB).")
         return value
-    
+   
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
@@ -123,4 +123,21 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if len(value) > 500:
             raise serializers.ValidationError("La biografía no puede exceder los 500 caracteres.")
         return value
-    
+
+class CommentDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comments
+        fields = ['comment', 'created_at']
+
+class IssueWithCommentsSerializer(serializers.ModelSerializer):
+    comments = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Issue
+        fields = ['id', 'subject', 'comments']
+
+    def get_comments(self, obj):
+        user = self.context.get('user')
+        comments = obj.comments_set.filter(user=user)
+        return CommentDetailSerializer(comments, many=True).data
+

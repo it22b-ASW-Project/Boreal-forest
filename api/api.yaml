@@ -101,6 +101,7 @@ paths:
                   $ref: '#/components/examples/error401'
       security:
         - ApiKeyAuth: []
+
   /api/issues/{id}:
     get:
       summary: View an issue with the id specified
@@ -856,13 +857,13 @@ paths:
                     type: string
                     example: Status not found.
 
-  /api/users/{id}/assigned:
+  /api/users/{id}:
     get:
-      summary: Obtener todos los issues asignados a un usuario
+      summary: Obtener un usuario por su ID
       tags:
         - Users
       security:
-        - ApiKeyAuth: []  
+        - ApiKeyAuth: []
       parameters:
         - in: path
           name: id
@@ -871,40 +872,153 @@ paths:
             type: integer
       responses:
         '200':
-          description: Lista de issues asignados al usuario
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+  
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: User not found.
+
+
+  /api/users/{id}/assigned:
+    get:
+      summary: Obtener issues asignadas a un usuario
+      description: Devuelve las issues asignadas a un usuario que aún no están cerradas. Permite ordenar los resultados.
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [status, priority, type, severity, modified]
+          description: Campo por el que se ordenarán las issues
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Dirección de ordenamiento (ascendente o descendente)
+      responses:
+        '200':
+          description: Lista de issues asignadas
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Issue'
-        '401':
-          description: No autorizado        
+                  $ref: '#/components/schemas/Issue'     
 
   /api/users/{id}/watching:
     get:
-      summary: Obtener todos los issues que un usuario está observando
+      summary: Obtener issues vigiladas a un usuario
+      description: Devuelve las issues vigiladas a un usuario que aún no están cerradas. Permite ordenar los resultados.
       tags:
         - Users
       security:
-        - ApiKeyAuth: []  
+        - ApiKeyAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
+          description: ID del usuario
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [status, priority, type, severity, modified]
+          description: Campo por el que se ordenarán las issues
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Dirección de ordenamiento (ascendente o descendente)
       responses:
         '200':
-          description: Lista de issues que el usuario está observando
+          description: Lista de issues vigiladas
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Issue'
-        '401':
-          description: No autorizado         
+                  $ref: '#/components/schemas/Issue'  
+
+  /api/users/{id}/comments/:
+    get:
+      summary: Obtener los comentarios de un usuario agrupados por issue
+      security:
+        - ApiKeyAuth: []
+      description: Retorna los issues en los que el usuario ha comentado, incluyendo los comentarios hechos por ese usuario en cada issue.
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario (`SocialAccount`) cuyos comentarios se desean consultar.
+      responses:
+        '200':
+          description: Lista de issues con comentarios del usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 5
+                    titulo:
+                      type: string
+                      example: Error en login
+                    comments:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          comment:
+                            type: string
+                            example: No puedo iniciar sesión.
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: 2025-05-13T13:12:00Z
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: User not found.                 
 
 components:
   securitySchemes:
@@ -1099,6 +1213,36 @@ components:
         color:
           type: string
           example: "#FF0000"      
+
+    UserResponse:
+      type: object
+      properties:
+        user:
+          type: integer
+          example: 7
+        full_name:
+          type: string
+          example: "Alex Johnson"
+        username:
+          type: string
+          example: "alexj"
+        bio:
+          type: string
+          example: "Desarrollador web apasionado por la tecnología."
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://example.com/media/avatars/default.jpg"
+        open_assigned_issues:
+          type: integer
+          example: 5
+        watched_issues:
+          type: integer
+          example: 3
+        comments_count:
+          type: integer
+          example: 12      
     
   examples:
     error400:

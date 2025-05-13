@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer, IssueWithCommentsSerializer
 
 @login_required
 def showAllIssues(request):
@@ -1475,9 +1475,28 @@ class AssignedIssuesView(APIView):
         except SocialAccount.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        assigned_qs = Assigned.objects.filter(assigned_id=user, issue__status__isClosed=False).select_related('issue')
-        issues = [a.issue for a in assigned_qs]
+        valid_sort_fields = {
+        'status': 'issue__status__position', 
+        'priority': 'issue__priority__position', 
+        'type': 'issue__type__position', 
+        'severity': 'issue__severity__position', 
+        'modified': 'issue__modified_at'
+        }
 
+        # Obtenir els parámetres d'ordenació
+        sort_by = request.GET.get('sortBy', 'created')
+        sort_order = request.GET.get('sortOrder', 'desc')
+
+        sort_field = valid_sort_fields.get(sort_by, 'issue__created_at')
+        if sort_order == 'desc':
+            sort_field = f'-{sort_field}'
+
+        assigned_qs = Assigned.objects.filter(
+            assigned_id=user,
+            issue__status__isClosed=False
+        ).select_related('issue').order_by(sort_field)
+
+        issues = [a.issue for a in assigned_qs]
         serializer = IssueSerializer(issues, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -1490,9 +1509,27 @@ class WatchedIssuesView(APIView):
         except SocialAccount.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        watched_qs = Watch.objects.filter(watcher_id=user).select_related('issue')
-        issues = [w.issue for w in watched_qs]
+        valid_sort_fields = {
+        'status': 'issue__status__position', 
+        'priority': 'issue__priority__position', 
+        'type': 'issue__type__position', 
+        'severity': 'issue__severity__position', 
+        'modified': 'issue__modified_at'
+        }
 
+        # Obtenir els parámetres d'ordenació
+        sort_by = request.GET.get('sortBy', 'created')
+        sort_order = request.GET.get('sortOrder', 'desc')
+
+        sort_field = valid_sort_fields.get(sort_by, 'issue__created_at')
+        if sort_order == 'desc':
+            sort_field = f'-{sort_field}'
+
+        assigned_qs = Watch.objects.filter(
+            watcher_id=user,
+        ).select_related('issue').order_by(sort_field)
+
+        issues = [a.issue for a in assigned_qs]
         serializer = IssueSerializer(issues, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -1502,4 +1539,20 @@ class UserProfileListView(APIView):
     def get(self, request):
         user_profiles = UserProfile.objects.all()
         serializer = UserProfileSerializer(user_profiles, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserCommentsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user = SocialAccount.objects.get(pk=user_id)
+        except SocialAccount.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        comments_qs = Comments.objects.filter(user_id=user).select_related('issue')
+        issues = set(comment.issue for comment in comments_qs)
+
+        serializer = IssueWithCommentsSerializer(issues, many=True, context={'user': user})
         return Response(serializer.data, status=status.HTTP_200_OK)
