@@ -14,7 +14,7 @@ from .filters import IssueFilter
 from django.utils import timezone
 
 from django.db.models import Max
-
+from django.db.models import F, Subquery, OuterRef 
 from django.contrib import messages
 
 from rest_framework.views import APIView
@@ -858,14 +858,15 @@ class IssueListView(APIView):
             'priority': 'priority__position', 
             'type': 'type__position', 
             'severity': 'severity__position', 
-            'modified': 'modified_at'
+            'modified': 'modified_at',
+            'assigned': 'assigned_user_id',
         }
 
         # Obtener parámetros de ordenación
         sort_by = request.GET.get('sortBy', '-created_at')
         sort_order = request.GET.get('sortOrder', 'desc')
         created_by = request.GET.get('created_by', None)
-        assigned_to = request.GET.get('assigned_to', None) 
+        assigned_to = request.GET.get('assigned_to', None)
 
         priority = request.GET.get('priority')
         type_ = request.GET.get('type')
@@ -890,6 +891,11 @@ class IssueListView(APIView):
 
         if created_by and not UserProfile.objects.filter(user_id=created_by).exists():
             return Response({"error": f"Invalid user ID: '{created_by}'"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if assigned_to and not UserProfile.objects.filter(user_id=assigned_to).exists():
+            return Response({"error": f"Invalid user ID: '{assigned_to}'"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
 
         issues = Issue.objects.all()
 
@@ -913,6 +919,13 @@ class IssueListView(APIView):
             order_by_field = order_by_field.lstrip('-')
         elif sort_order == 'desc':
             order_by_field = f'-{order_by_field}'
+
+        assigned_user_subquery = Assigned.objects.filter(issue_id=OuterRef('id')).values('assigned__user_id')[:1]
+
+        # Realizar la subconsulta para agregar el 'assigned_user_id' al queryset
+        issues = issues.annotate(
+            assigned_user_id=Subquery(assigned_user_subquery)
+        )
 
         # Filtrar y ordenar los issues
         filtered_issues = IssueFilter(request.GET, queryset=issues.order_by(order_by_field))
