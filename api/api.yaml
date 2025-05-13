@@ -4,7 +4,7 @@ info:
   title: Issue Tracker API
   description: API para gestionar issues en la aplicación
 servers:
-  - url: http://127.0.0.1:8000/
+  - url: https://boreal-forest.onrender.com/
 paths:
   /api/issues/:
     get:
@@ -140,7 +140,134 @@ paths:
                   $ref: '#/components/examples/error404'
                   
       security:
-        - ApiKeyAuth: []  
+        - ApiKeyAuth: []
+
+  api/issues/new:
+    post:
+      tags:
+        - Issues
+      summary: Agregar un nuevo issue
+      operationId: addIssue
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - title
+                - description
+                - status
+                - type
+                - severity
+                - priority
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  example: 'Error en la aplicación'
+                description:
+                  type: string
+                  minLength: 1
+                  example: 'Descripción del error que ocurre al iniciar la app.'
+                status:
+                  type: string
+                  enum: [New, In progress, Ready for test, Closed, Needs info, Rejected, Postponed]
+                  default: New
+                  description: Estado del issue (por defecto "New")
+                type:
+                  type: string
+                  enum: [Bug, Question, Enhancement]
+                  default: Bug
+                  description: Tipo de issue (por defecto "Bug")
+                severity:
+                  type: string
+                  enum: [Wishlist, Minor, Normal, Important, Critical]
+                  default: Wishlist
+                  description: Severidad del issue (por defecto "Wishlist")
+                priority:
+                  type: string
+                  enum: [Low, Normal, High]
+                  default: Low
+                  description: Prioridad del issue (por defecto "Low")
+      responses:
+        '201':
+          description: Issue creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  status:
+                    type: string
+                  type:
+                    type: string
+                  severity:
+                    type: string
+                  priority:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  value:
+                    message: 'El título o la descripción no pueden estar vacíos.'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+
+  api/issues/{id}/:
+    delete:
+      tags:
+        - Issues
+      summary: Eliminar un issue
+      description: Elimina un issue por ID.
+      operationId: deleteIssue
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID del issue a eliminar
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Issue eliminado correctamente
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+        '404':
+          description: Issue no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
 
   /api/priorities/:
     get:
