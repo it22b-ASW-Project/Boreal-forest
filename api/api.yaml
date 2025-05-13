@@ -930,28 +930,41 @@ paths:
 
   /api/users/{id}/watching:
     get:
-      summary: Obtener todos los issues que un usuario está observando
+      summary: Obtener issues vigiladas a un usuario
+      description: Devuelve las issues vigiladas a un usuario que aún no están cerradas. Permite ordenar los resultados.
       tags:
         - Users
       security:
-        - ApiKeyAuth: []  
+        - ApiKeyAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
+          description: ID del usuario
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [status, priority, type, severity, modified]
+          description: Campo por el que se ordenarán las issues
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Dirección de ordenamiento (ascendente o descendente)
       responses:
         '200':
-          description: Lista de issues que el usuario está observando
+          description: Lista de issues vigiladas
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Issue'
-        '401':
-          description: No autorizado
+                  $ref: '#/components/schemas/Issue'  
 
   /api/users/{id}/comments/:
     get:
