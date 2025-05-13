@@ -1055,23 +1055,19 @@ components:
         id:
           type: integer
           example: 1
-        title:
+        subject:
           type: string
           example: "No funcionen els issues del Taiga"
-        description:
-          type: string
-          example: "Els issues del Taiga han deixat de funcionar després de l'últim commit"
-        status:
-          type: string
-          example: "In progress"
-        created_at:
-          type: string
+        deadline: 
           format: date-time
           example: "2025-04-11T01:04:05.766197+02:00"
         modified_at:
           type: string
           format: date-time
           example: "2025-04-11T01:04:05.766213+02:00"
+        status:
+          type: string
+          example: "In progress"
         type:
           type: string
           example: "Question"
@@ -1081,9 +1077,22 @@ components:
         priority:
           type: string
           example: "Low"
-        created_by:
-          type: integer
-          example: 1
+        assigned:
+          type: array
+          items:
+            type: object
+            properties: 
+              id:
+                type: integer
+                example: 2
+              name: 
+                type: string
+                example: "Maria Robles García"
+              avatar: 
+                type: string
+                format: uri
+                nullable: true
+                example: "avatars/default.jpg"
           
     IssueDetail:
       type: object
