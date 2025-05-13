@@ -853,16 +853,15 @@ class IssueListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-
         valid_sort_fields = {
-        'status': 'status__position', 
-        'priority': 'priority__position', 
-        'type': 'type__position', 
-        'severity': 'severity__position', 
-        'modified': 'modified_at'
+            'status': 'status__position', 
+            'priority': 'priority__position', 
+            'type': 'type__position', 
+            'severity': 'severity__position', 
+            'modified': 'modified_at'
         }
 
-        # Obtenir els parámetres d'ordenació
+        # Obtener parámetros de ordenación
         sort_by = request.GET.get('sortBy', '-created_at')
         sort_order = request.GET.get('sortOrder', 'desc')
         created_by = request.GET.get('created_by', None)
@@ -876,53 +875,35 @@ class IssueListView(APIView):
         def is_valid_choice(model, value):
             return model.objects.filter(name__iexact=value).exists()
 
-        # Verificar la validez de cada campo filtrable
+        # Validación de filtros
         if priority and not is_valid_choice(Priority, priority):
-            return Response(
-                {"error": f"Invalid priority: '{priority}'"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({"error": f"Invalid priority: '{priority}'"}, status=status.HTTP_400_BAD_REQUEST)
+
         if type_ and not is_valid_choice(Type, type_):
-            return Response(
-                {"error": f"Invalid type: '{type_}'"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({"error": f"Invalid type: '{type_}'"}, status=status.HTTP_400_BAD_REQUEST)
+
         if severity and not is_valid_choice(Severity, severity):
-            return Response(
-                {"error": f"Invalid severity: '{severity}'"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({"error": f"Invalid severity: '{severity}'"}, status=status.HTTP_400_BAD_REQUEST)
+
         if issue_status and not is_valid_choice(Status, issue_status):
-            return Response(
-                {"error": f"Invalid status: '{issue_status}'"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": f"Invalid status: '{issue_status}'"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-        if created_by  and not UserProfile.objects.filter(user_id=created_by).exists():
-            return Response(
-                {"error": f"Invalid user ID: '{created_by}'"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if assigned_to and not Assigned.objects.filter(assigned_id=assigned_to).exists() and assigned_to != '0':
-            return Response(
-                {"error": f"Invalid user ID: '{assigned_to}'"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        if created_by and not UserProfile.objects.filter(user_id=created_by).exists():
+            return Response({"error": f"Invalid user ID: '{created_by}'"}, status=status.HTTP_400_BAD_REQUEST)
 
         issues = Issue.objects.all()
 
         # Filtro de 'assigned_to'
         if assigned_to:
             if assigned_to == '0':
+                # Si se solicita asignados vacíos
                 issues = issues.exclude(id__in=Assigned.objects.values('issue'))
             else:
-                issues = issues.filter(id__in=Assigned.objects.filter(assigned__user_id=assigned_to).values_list('issue', flat=True))
-        
+                # Filtrar por asignado si el usuario existe, sino dejar vacío
+                assigned_issues = Assigned.objects.filter(assigned__user_id=assigned_to).values_list('issue', flat=True)
+                issues = issues.filter(id__in=assigned_issues)
+
+        # Ordenación
         if sort_by.lstrip('-') not in valid_sort_fields:
             sort_by = '-created_at'
 
@@ -933,14 +914,41 @@ class IssueListView(APIView):
         elif sort_order == 'desc':
             order_by_field = f'-{order_by_field}'
 
-        print(order_by_field)
-        # Apliquem filtres
+        # Filtrar y ordenar los issues
         filtered_issues = IssueFilter(request.GET, queryset=issues.order_by(order_by_field))
 
-        # Serialitzem els resultats
-        serializer = IssueSerializer(filtered_issues.qs, many=True)
+        # Construcción de la respuesta con los campos específicos
+        response_data = []
+        for issue in filtered_issues.qs:
+            # Obtener el usuario asignado si existe
+            assigned = Assigned.objects.filter(issue=issue).first()
+            if assigned:
+                user_profile = UserProfile.objects.filter(user_id=assigned.assigned.id).first()
+                if user_profile:
+                    assigned_data = {
+                        'id': user_profile.user.id,
+                        'name': user_profile.user.get_full_name(),
+                        'avatar': user_profile.avatar.url if user_profile.avatar else None
+                    }
+                else:
+                    assigned_data = None
+            else:
+                assigned_data = None
 
-        return Response(serializer.data)
+            issue_data = {
+                'id': issue.id,
+                'subject': issue.subject,
+                'deadline': issue.deadline,
+                'modified_at': issue.modified_at,
+                'status': issue.status.name if issue.status else None,
+                'type': issue.type.name if issue.type else None,
+                'severity': issue.severity.name if issue.severity else None,
+                'priority': issue.priority.name if issue.priority else None,
+                'assigned': assigned_data
+            }
+            response_data.append(issue_data)
+
+        return Response(response_data, status=status.HTTP_200_OK)
     
 
 class IssueDetailView(APIView):
@@ -966,6 +974,13 @@ class IssueDetailView(APIView):
                 }
                 for w in Watch.objects.filter(issue_id=id).select_related('watcher')
             ]
+            for w in watchers:
+                if w['avatar']:
+                    user_profile = UserProfile.objects.filter(user_id=w['id']).first()
+                    if user_profile and user_profile.avatar:
+                        w['avatar'] = user_profile.avatar.url
+                    else:
+                        w['avatar'] = None
 
             # Obtener los assigned del issue
             assigned = [
@@ -978,6 +993,13 @@ class IssueDetailView(APIView):
                     }
                     for a in Assigned.objects.filter(issue_id=id).select_related('assigned')
                 ]
+            for assignee in assigned:
+                if assignee['avatar']:
+                    user_profile = UserProfile.objects.filter(user_id=assignee['id']).first()
+                    if user_profile and user_profile.avatar:
+                        assignee['avatar'] = user_profile.avatar.url
+                    else:
+                        assignee['avatar'] = None
 
             #Obtener los attachments del issue
             attachments = Attachment.objects.filter(issue_id=id).values(
@@ -997,18 +1019,24 @@ class IssueDetailView(APIView):
 
             comments_data = []
             for comment in comments:
-                social_account = comment.user  
+                social_account = comment.user  # Directamente el objeto SocialAccount
 
-                user_profile = UserProfile.objects.filter(user=social_account.user).first()
+                if social_account:
+                    # Intentar obtener el perfil asociado para la foto
+                    user_profile = UserProfile.objects.filter(user=social_account.user).first()
 
-                user_data = {
-                    "id": social_account.id,
-                    "name": social_account.extra_data.get('name', 'No Name'),
-                    "avatar": (
-                        UserProfile.objects.filter(user=social_account.user).values_list('avatar', flat=True).first()
-                    )
-                }
-               
+                    user_data = {
+                        "id": social_account.id,
+                        "name": social_account.extra_data.get('name', 'No Name'),
+                        "picture": user_profile.avatar.url if user_profile and user_profile.avatar else None
+                    }
+                else:
+                    user_data = {
+                        "id": None,
+                        "name": "Usuario Desconocido",
+                        "picture": None
+                    }
+
                 comments_data.append({
                     'comment': comment.comment,
                     'user': user_data,
