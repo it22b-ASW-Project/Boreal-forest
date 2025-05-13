@@ -2,179 +2,1385 @@ openapi: 3.0.2
 info:
   version: 1.0.0
   title: Issue Tracker API
-  description: API para la gestión de issues. Permite crear y administrar issues.
+  description: API para gestionar issues en la aplicación
 servers:
-  - url: 'https://boreal-forest.onrender.com/'
+  - url: http://127.0.0.1:8000/
 paths:
-  /auth/login:
-    post:
+  /api/issues/:
+    get:
       tags:
-        - auth
-      summary: Autenticación de usuario y obtención de token
-      operationId: login
+        - Issues
+      summary: Obtener todos los issues 
+      operationId: getAllIssues
+      parameters:
+        - name: q
+          in: query
+          description: Busqueda por titulo o descripción del issue
+          required: false
+          schema:
+            type: string
+        - name: priority
+          in: query
+          description: Filtrar por prioridad 
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Filtrar por el tipo 
+          required: false 
+          schema:
+            type: string
+        - name: severity
+          in: query
+          description: Filtrar por la severidad 
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filtrar por el estado
+          required: false
+          schema:
+            type: string
+        - name: created_by
+          in: query
+          description: Filtrar por el usuario creador del issue
+          required: false
+          schema:
+            type: integer
+        - name: assigned_to
+          in: query
+          description: Filtrar por el usuario asignado. Utilizar "0" para issues no assignados. 
+          required: false
+          schema:
+            type: integer
+        - name: sortBy
+          in: query
+          description: Campo para ordenar los issues por (Status, Priority, Type, Severity, Modified)
+          required: false
+          schema:
+            type: string
+            enum: [status, priority, type, severity, modified]
+        - name: sortOrder
+          in: query
+          description: El orden en el que se mostraran
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Issue'
+        '400':
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'          
+        '401':
+          description: 'Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+      security:
+        - ApiKeyAuth: []
+
+  /api/issues/{id}:
+    get:
+      summary: Ver detalles de un issue
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IssueDetail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+      
+        '404':
+          description: The id does not correspond to an issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+                  
+      security:
+        - ApiKeyAuth: []  
+
+  /api/priorities/:
+    get:
+      summary: Obtener todas las prioridades
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de prioridades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Priority'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: Crear una nueva prioridad
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
       requestBody:
-        description: Proporciona las credenciales del usuario (nombre de usuario y contraseña)
+        required: true
         content:
           application/json:
             schema:
-              required:
-                - username
-                - password
+              $ref: '#/components/schemas/PriorityInput'
+      responses:
+        '201':
+          description: Prioridad creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriorityInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado
+
+  /api/priorities/{name}/:
+    put:
+      summary: Actualizar prioridad existente
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
               type: object
               properties:
-                username:
+                name:
                   type: string
-                  example: 'usuario_prueba'
-                password:
+                  example: "Prio actualizada"
+                color:
                   type: string
-                  example: 'contraseña_segura'
-        required: true
+                  example: "#00FF00"
       responses:
-        200:
-          description: Token generado exitosamente
+        '200':
+          description: Prioridad actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Prioridad no encontrada
+
+    delete:
+      summary: Eliminar prioridad
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminada correctamente
+        '404':
+          description: Prioridad no encontrada
+  
+  /api/priorities/{name}/move-up/:
+    post:
+      summary: Mover prioridad hacia arriba
+      description: Intercambia la posición de esta prioridad con la que está justo encima.
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la prioridad
+      responses:
+        '200':
+          description: Prioridad movida hacia arriba correctamente
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  token:
+                  message:
                     type: string
-                    example: 'valid_token_example_12345'
-        401:
-          description: 'Error: Credenciales inválidas'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  value:
-                    message: 'Credenciales inválidas.'
-paths:
-  /issues/new:
-    post:
-      tags:
-        - issues
-      summary: Agrega un nuevo issue
-      operationId: addIssue
-      requestBody:
-        description: Proporciona el título y la descripción del nuevo issue
-        content:
-          application/json:
-            schema:
-              required:
-                - title
-                - description
-                - status
-                - type
-                - severity
-                - priority
-              type: object
-              properties:
-                title:
-                  type: string
-                  minLength: 1
-                  example: 'Error en la aplicación'
-                description:
-                  type: string
-                  minLength: 1
-                  example: 'Descripción del error que ocurre al iniciar la app.'
-                status:
-                  type: string
-                  enum:
-                    - New
-                    - In progress
-                    - Ready for test
-                    - Closed
-                    - Needs info
-                    - Rejected
-                    - Postponed
-                  default: New
-                  description: Estado del issue (por defecto "New")
-                type:
-                  type: string
-                  enum:
-                    - Bug
-                    - Question
-                    - Enhancement
-                  default: Bug
-                  description: Tipo de issue (por defecto "Bug")
-                severity:
-                  type: string
-                  enum:
-                    - Whishlist
-                    - Minor
-                    - Normal
-                    - Important
-                    - Critical
-                  default: Wishlist
-                  description: Severidad del issue (por defecto "Wishlist")
-                priority:
-                  type: string
-                  enum:
-                    - Low
-                    - Normal
-                    - High
-                  default: Low
-                  description: Prioridad del issue (por defecto "Low")
-        required: true
-      responses:
-        201:
-          description: Issue creado exitosamente
+        '400':
+          description: No se puede mover más arriba
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                  title:
+                  detail:
                     type: string
-                  description:
+        '404':
+          description: Prioridad no encontrada
+
+  /api/priorities/{name}/move-down/:
+    post:
+      summary: Mover prioridad hacia abajo
+      description: Intercambia la posición de esta prioridad con la que está justo debajo.
+      tags:
+        - Priorities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la prioridad
+      responses:
+        '200':
+          description: Prioridad movida hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
-                  status:
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
                     type: string
-                  type:
+        '404':
+          description: Prioridad no encontrada
+          
+  /api/types/:
+    get:
+      summary: Obtener todos los tipos
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de tipos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Type'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: Crear un nuevo tipo
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeInput'
+      responses:
+        '201':
+          description: Type created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TypeInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado      
+                          
+  /api/types/{name}/:
+    delete:
+      summary: Eliminar tipo
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado correctamente
+        '404':
+          description: Tipo no encontrado
+
+    put:
+      summary: Actualizar tipo existente
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Type actualizada"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Tipo actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Tipo no encontrado
+
+  /api/types/{name}/move-up/:
+    post:
+      summary: Mover tipo hacia arriba
+      description: Intercambia la posición de este tipo con el que está justo encima.
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del tipo
+      responses:
+        '200':
+          description: Tipo movido hacia arriba correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
-                  severity:
+        '400':
+          description: No se puede mover más arriba
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
                     type: string
-                  priority:
+        '404':
+          description: Tipo no encontrado
+
+  /api/types/{name}/move-down/:
+    post:
+      summary: Mover tipo hacia abajo
+      description: Intercambia la posición de este tipo con el que está justo debajo.
+      tags:
+        - Types
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del tipo
+      responses:
+        '200':
+          description: Tipo movido hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
-                  created_at:
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
                     type: string
-                    format: date-time
-        400:
-          description: 'Error: Solicitud incorrecta'
+        '404':
+          description: Tipo no encontrado
+
+  /api/statuses/:
+    get:
+      summary: Obtener todos los estados
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de estados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  $ref: '#/components/schemas/Status'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: Crear un nuevo estado
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusInput'
+      responses:
+        '201':
+          description: Estado creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado      
+
+  /api/statuses/{name}/:      
+    delete:
+      summary: Eliminar estado
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminado correctamente
+        '404':
+          description: Estado no encontrado
+
+    put:
+      summary: Actualizar estado existente
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Estado actualizado"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Estado actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Estado no encontrado
+
+  /api/statuses/{name}/move-up/:
+    post:
+      summary: Mover estado hacia arriba
+      description: Intercambia la posición de este estado con el que está justo encima.
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del estado
+      responses:
+        '200':
+          description: Estado movido hacia arriba correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más arriba
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Estado no encontrado
+
+  /api/statuses/{name}/move-down/:
+    post:
+      summary: Mover estado hacia abajo
+      description: Intercambia la posición de este estado con el que está justo debajo.
+      tags:
+        - Statuses
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) del estado
+      responses:
+        '200':
+          description: Estado movido hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Estado no encontrado
+
+  /api/severities/:
+    get:
+      summary: Obtener todas las severidades
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      responses:
+        '200':
+          description: Lista de severidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Severity'
+        '401':
+          description: No autorizado
+
+    post:
+      summary: Crear una nueva severidad
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeverityInput'
+      responses:
+        '201':
+          description: Severidad creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeverityInput'
+        '400':
+          description: Datos inválidos
+        '401':
+          description: No autorizado     
+
+  /api/severities/{name}/:
+    delete:
+      summary: Eliminar severidad
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Eliminada correctamente
+        '404':
+          description: Severidad no encontrada
+
+    put:
+      summary: Actualizar severidad existente
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Severidad actualizada"
+                color:
+                  type: string
+                  example: "#00FF00"
+      responses:
+        '200':
+          description: Severidad actualizada correctamente
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Severidad no encontrada   
+
+  /api/severities/{name}/move-up/:
+    post:
+      summary: Mover severidad hacia arriba
+      description: Intercambia la posición de esta severidad con la que está justo encima.
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la severidad
+      responses:
+        '200':
+          description: Severidad movida hacia arriba correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más arriba
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Severidad no encontrada
+
+  /api/severities/{name}/move-down/:
+    post:
+      summary: Mover severidad hacia abajo
+      description: Intercambia la posición de esta severidad con la que está justo debajo.
+      tags:
+        - Severities
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nombre (clave primaria) de la severidad
+      responses:
+        '200':
+          description: Severidad movida hacia abajo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: No se puede mover más abajo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '404':
+          description: Severidad no encontrada   
+
+  /api/statuses/{name}/change-closed/:
+    post:
+      summary: Toggle the 'isClosed' field of a status
+      description: Alterna el valor booleano del campo `isClosed` para un status dado por nombre.
+      tags:
+        - Statuses    
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Nombre único del status a modificar
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Estado actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isClosed:
+                    type: boolean
+                    example: true
+        '404':
+          description: Status no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Status not found.
+  /api/users/:
+    get:
+      summary: Obtener todos los perfiles
+      description: Devuelve una lista de todos los perfiles de usuario.
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsersResponse'
+        '401':
+          description: No autenticado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  value:
-                    message: 'El título o la descripción no pueden estar vacíos.'
-        401:
-          description: 'Error: No autorizado'
+                
+  /api/users/{id}:
+    get:
+      summary: Obtener un usuario por su ID
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResult'
-              examples:
-                errorExample:
-                  value:
-                    message: 'Se requiere un token de autenticación.'
+                $ref: '#/components/schemas/UserResponse'
+  
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: User not found.
+
+
+  /api/users/{id}/assigned:
+    get:
+      summary: Obtener issues asignadas a un usuario
+      description: Devuelve las issues asignadas a un usuario que aún no están cerradas. Permite ordenar los resultados.
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [status, priority, type, severity, modified]
+          description: Campo por el que se ordenarán las issues
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Dirección de ordenamiento (ascendente o descendente)
+      responses:
+        '200':
+          description: Lista de issues asignadas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Issue'     
+
+  /api/users/{id}/watching:
+    get:
+      summary: Obtener issues vigiladas a un usuario
+      description: Devuelve las issues vigiladas a un usuario que aún no están cerradas. Permite ordenar los resultados.
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [status, priority, type, severity, modified]
+          description: Campo por el que se ordenarán las issues
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Dirección de ordenamiento (ascendente o descendente)
+      responses:
+        '200':
+          description: Lista de issues vigiladas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Issue'  
+
+  /api/users/{id}/comments/:
+    get:
+      summary: Obtener los comentarios de un usuario agrupados por issue
+      security:
+        - ApiKeyAuth: []
+      description: Retorna los issues en los que el usuario ha comentado, incluyendo los comentarios hechos por ese usuario en cada issue.
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario (`SocialAccount`) cuyos comentarios se desean consultar.
+      responses:
+        '200':
+          description: Lista de issues con comentarios del usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 5
+                    titulo:
+                      type: string
+                      example: Error en login
+                    comments:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          comment:
+                            type: string
+                            example: No puedo iniciar sesión.
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: 2025-05-13T13:12:00Z
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: User not found.                 
+
 components:
-  schemas:
-    ErrorResult:
-      type: object
-      properties:
-        message: 
-          type: string
-          example: 'El título o la descripción no pueden estar vacíos.'
-      required:
-        - message
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
       name: Authorization
-      in: header  # El token se espera en la cabecera 'Authorization'
+      in: header  
+  schemas:
+    Issue:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        subject:
+          type: string
+          example: "No funcionen els issues del Taiga"
+        deadline: 
+          format: date-time
+          example: "2025-04-11T01:04:05.766197+02:00"
+        modified_at:
+          type: string
+          format: date-time
+          example: "2025-04-11T01:04:05.766213+02:00"
+        status:
+          type: string
+          example: "In progress"
+        type:
+          type: string
+          example: "Question"
+        severity:
+          type: string
+          example: "Normal"
+        priority:
+          type: string
+          example: "Low"
+        assigned:
+          type: array
+          items:
+            type: object
+            properties: 
+              id:
+                type: integer
+                example: 2
+              name: 
+                type: string
+                example: "Maria Robles García"
+              avatar: 
+                type: string
+                format: uri
+                nullable: true
+                example: "avatars/default.jpg"
+          
+    IssueDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "No funcionen els issues del Taiga"
+        description:
+          type: string
+          example: "Els issues del Taiga han deixat de funcionar després de l'últim commit"
+        status:
+          type: string
+          example: "In progress"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-04-11T01:04:05.766197+02:00"
+        modified_at:
+          type: string
+          format: date-time
+          example: "2025-04-11T01:04:05.766213+02:00"
+        type:
+          type: string
+          example: "Question"
+        severity:
+          type: string
+          example: "Normal"
+        priority:
+          type: string
+          example: "Low"
+        created_by:
+          type: integer
+          example: 1
+        watchers:
+          type: array
+          items:
+            type: object
+            properties: 
+              id:
+                type: integer
+                example: 2
+              name: 
+                type: string
+                example: "Maria Robles García"
+              avatar: 
+                type: string
+                format: uri
+                nullable: true
+                example: "avatars/default.jpg"
+        assigned:
+          type: array
+          items:
+            type: object
+            properties: 
+              id:
+                type: integer
+                example: 1
+              name: 
+                type: string
+                example: "Juan Pérez Salamanca"
+              avatar: 
+                type: string
+                format: uri
+                nullable: true
+                example: "avatars/default.jpg"
+        attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              filename:
+                type: string
+                example: "file_name.pdf"
+              filesize:
+                type: integer
+                example: 1095848
+              description:
+                type: string
+                example: "Documento adjunto"
+        comments:
+          type: array
+          items:
+            type: object
+            properties:
+              comment:
+                type: string
+                example: "El colors son diferents al Taiga"
+              user:
+                $ref: '#/components/schemas/User'
+              avatar: 
+                type: string
+                format: uri
+                nullable: true
+                example: "avatars/default.jpg"
+              created_at:
+                type: string
+                format: date-time
+                example: "2025-04-11T09:25:39.292386Z"
+      
+        
+    ErrorResult:
+      type: object
+      properties:
+        status:
+          type: integer
+          enum: [400, 401, 403, 404, 409]
+        error: 
+          type: string
+          enum: ["Bad Request", "Unauthorized", "Forbidden", "Not Found", "Conflict"]
+        message: 
+          type: string
+          
+    Priority:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+          
+    PriorityInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+
+    Type:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+
+    TypeInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+  
+    Status:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+
+    StatusInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"  
+
+    Severity:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"
+        position:
+          type: integer
+
+    SeverityInput:
+      type: object
+      required:
+        - name
+        - color
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+          example: "#FF0000"      
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        name:
+          type: string
+          example: "Ana Smith"
+        picture:
+          type: string
+          format: uri
+          example: "/profilePicture.png"
+          
+    UserResponse:
+      type: object
+      properties:
+        user:
+          type: integer
+          example: 7
+        full_name:
+          type: string
+          example: "Alex Johnson"
+        username:
+          type: string
+          example: "alexj"
+        bio:
+          type: string
+          example: "Desarrollador web apasionado por la tecnología."
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://example.com/media/avatars/default.jpg"
+        open_assigned_issues:
+          type: integer
+          example: 5
+        watched_issues:
+          type: integer
+          example: 3
+        comments_count:
+          type: integer
+          example: 12      
+          
+    UsersResponse:
+      type: object
+      properties:
+        user:
+          type: integer
+          example: 1
+        avatar:
+          type: string
+          format: uri
+          example: "https://taiga-issues-mhka-2025.s3.amazonaws.com/media/avatars/1/profilePicture.jpg"
+        bio:
+          type: string
+          format: uri
+          example: "Estudiante de la FIB"
+    
+  examples:
+    error400:
+      value:
+        status: 400
+        error: "Bad Request"
+        message: "The request data is invalid."
+    error401:
+      value:
+        status: 401
+        error: "Unauthorized"
+        message: "You provided no api key (Authorization Header)."
+    error403:
+      value:
+        status: 403
+        error: "Forbidden"
+        message: "You do not have permission to access this resource."
+    error404:
+      value:
+        status: 404
+        error: "Not Found"
+        message: "The requested resource could not be found."
+    error409:
+      value:
+        status: 409
+        error: "Conflict"
+        message: "The request could not be completed due to a conflict with the current state."
