@@ -112,3 +112,15 @@ class SeveritySerializer(serializers.ModelSerializer):
         if not re.match(r'^#[0-9a-fA-F]{6}$', value):
             raise serializers.ValidationError("El color debe estar en formato hexadecimal (#RRGGBB).")
         return value
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['user', 'avatar', 'bio']
+        read_only_fields = ['user']
+    
+    def validate_bio(self, value):
+        if len(value) > 500:
+            raise serializers.ValidationError("La biografía no puede exceder los 500 caracteres.")
+        return value
+    
