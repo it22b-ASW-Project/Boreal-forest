@@ -101,6 +101,7 @@ paths:
                   $ref: '#/components/examples/error401'
       security:
         - ApiKeyAuth: []
+
   /api/issues/{id}:
     get:
       summary: View an issue with the id specified
@@ -855,6 +856,45 @@ paths:
                   detail:
                     type: string
                     example: Status not found.
+
+  /api/users/{id}:
+    get:
+      summary: Obtener un usuario por su ID
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []  
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: "johndoe"
+          '404':
+            description: Usuario no encontrado
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    detail:
+                      type: string
+                      example: User not found.
+
 
   /api/users/{id}/assigned:
     get:

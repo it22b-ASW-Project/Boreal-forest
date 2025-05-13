@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, IssueWithCommentsSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, IssueWithCommentsSerializer, UserProfileSerializer  
 
 @login_required
 def showAllIssues(request):
@@ -1465,6 +1465,18 @@ class MoveSeverityDownView(APIView):
                 {"detail": "Severity is already at the bottom."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+class UserDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user = UserProfile.objects.get(pk=user_id)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AssignedIssuesView(APIView):
     permission_classes = [IsAuthenticated]
