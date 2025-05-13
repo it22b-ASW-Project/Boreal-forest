@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, IssueWithCommentsSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer, IssueWithCommentsSerializer
 
 @login_required
 def showAllIssues(request):
@@ -1533,6 +1533,14 @@ class WatchedIssuesView(APIView):
         serializer = IssueSerializer(issues, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+class UserProfileListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_profiles = UserProfile.objects.all()
+        serializer = UserProfileSerializer(user_profiles, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class UserCommentsView(APIView):
     permission_classes = [IsAuthenticated]
