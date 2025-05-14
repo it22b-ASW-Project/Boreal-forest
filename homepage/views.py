@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer, IssueWithCommentsSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer, IssueWithCommentsSerializer, IssueInputSerializer
 
 @login_required
 def showAllIssues(request):
@@ -962,6 +962,22 @@ class IssueListView(APIView):
             response_data.append(issue_data)
 
         return Response(response_data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        serializer = IssueInputSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+
+            social_account = getattr(user, 'socialaccount_set', None)
+            if not social_account.exists():
+                return Response(
+                    {'created_by': ['No se pudo determinar el creador del issue.']},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            serializer.save(created_by=social_account.first())
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class IssueDetailView(APIView):

@@ -8,6 +8,11 @@ class IssueSerializer(serializers.ModelSerializer):
         model = Issue
         fields = '__all__'
 
+class IssueInputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Issue
+        fields = ['subject', 'description', 'status', 'type', 'severity', 'priority', 'created_by']
+
 class PrioritySerializer(serializers.ModelSerializer):
     class Meta:
         model = Priority
