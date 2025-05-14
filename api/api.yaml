@@ -101,6 +101,44 @@ paths:
       security:
         - ApiKeyAuth: []
 
+    post:
+      tags:
+        - Issues
+      summary: Crear un nuevo issue
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IssueInput'
+      responses:
+        '201':
+          description: Issue creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueInput'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+      security:
+        - ApiKeyAuth: []
+
   /api/issues/{id}/:
     get:
       tags:
@@ -143,6 +181,40 @@ paths:
                   
       security:
         - ApiKeyAuth: []  
+
+    delete:
+      tags:
+        - Issues
+      summary: Eliminar un issue
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Issue eliminado correctamente
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
+        '404':
+          description: The id does not correspond to an issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+      security:
+        - ApiKeyAuth: []    
 
     put:
       summary: "Actualizar parcialmente un Issue"
@@ -1148,6 +1220,62 @@ paths:
                   detail:
                     type: string
                     example: User not found.
+    post:
+      summary: Actualizar avatar o biografía del usuario
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: Archivo de imagen para el avatar
+                bio:
+                  type: string
+                  description: Texto de la biografía
+      responses:
+        '200':
+          description: Avatar o biografía actualizados con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bio updated successfully!
+        '400':
+          description: Error en la solicitud
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: No valid data provided.
+        
+        '403':
+          description: No tiene permisos para modificar este perfil.
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/ErrorResult'
+
+
+  /api/users/{id}/assigned/:
 
   /api/users/{id}/assigned/:
     get:
@@ -1432,7 +1560,40 @@ components:
                 format: date-time
                 example: "2025-04-11T09:25:39.292386Z"
       
-        
+    IssueInput:
+      type: object
+      properties:
+        subject:
+          type: string
+          example: "No funcionen els issues del Taiga"
+        description:
+          type: string
+          example: "Ningu els hi està fent cas"
+        status:
+          type: string
+          example: "In progress"
+        type:
+          type: string
+          example: "Question"
+        severity:
+          type: string
+          example: "Normal"
+        priority:
+          type: string
+          example: "Low"
+        attachments:
+          type: array
+          items:
+            type: string
+            format: binary  
+      required:
+        - subject
+        - description
+        - status
+        - type
+        - severity
+        - priority
+          
     ErrorResult:
       type: object
       properties:
