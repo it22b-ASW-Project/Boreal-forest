@@ -199,6 +199,45 @@ paths:
         '500':
           description: "Error interno del servidor"  
 
+  /api/issues/bulk-create/:
+    post:
+      summary: Crear múltiples issues
+      tags:
+        - Issues
+      description: Crea múltiples issues con solo títulos. Asigna valores por defecto donde `position=1` para prioridad, tipo, estado y severidad.
+      security:
+        - ApiKeyAuth: []  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issues:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Primer issue", "Segundo issue"]
+      responses:
+        '201':
+          description: Lista de issues creados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created_issues:
+                    type: array
+                    items:
+                      type: integer
+                    example: [1, 2, 3]
+        '400':
+          description: Entrada inválida
+        '500':
+          description: Error interno del servidor
+    
+
   /api/priorities/:
     get:
       summary: Obtener todas las prioridades
