@@ -13,6 +13,12 @@ class IssueInputSerializer(serializers.ModelSerializer):
         model = Issue
         fields = ['subject', 'description', 'status', 'type', 'severity', 'priority', 'created_by']
 
+class BulkTitlesSerializer(serializers.Serializer):
+    titles = serializers.ListField(
+        child=serializers.CharField(max_length=255),
+        allow_empty=False
+    )        
+
 class PrioritySerializer(serializers.ModelSerializer):
     class Meta:
         model = Priority
