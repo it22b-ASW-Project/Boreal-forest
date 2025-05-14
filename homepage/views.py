@@ -1192,11 +1192,34 @@ class PriorityDetailView(APIView):
 
 
     def delete(self, request, name):
+        new_priority_name = request.data.get('new_priority')
+        if not new_priority_name:
+            return Response({"detail": "Debe proporcionar 'new_priority' en el cuerpo de la solicitud."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if name == new_priority_name:
+            return Response({"detail": "La nueva prioridad no puede ser la misma que la que se desea eliminar."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            priority = self.get_object(name) 
+            priority = self.get_object(name)
             deleted_position = priority.position
+
+            try:
+                new_priority = Priority.objects.get(name=new_priority_name)
+            except Priority.DoesNotExist:
+                return Response({"detail": f"La nueva prioridad '{new_priority_name}' no existe."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            # Actualizar todos los issues que usaban esta prioridad
+            issues_to_update = Issue.objects.filter(priority=priority)
+            for issue in issues_to_update:
+                issue.priority = new_priority
+                issue.save()
+
+            # Eliminar la prioridad
             priority.delete()
 
+            # Reordenar las prioridades restantes
             priorities_to_update = Priority.objects.filter(position__gt=deleted_position)
             for p in priorities_to_update:
                 p.position -= 1
@@ -1297,11 +1320,34 @@ class TypeDetailView(APIView):
         return get_object_or_404(Type, name=name)   
 
     def delete(self, request, name):
+        new_type_name = request.data.get('new_type')
+        if not new_type_name:
+            return Response({"detail": "Debe proporcionar 'new_type' en el cuerpo de la solicitud."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if name == new_type_name:
+            return Response({"detail": "La nueva tipo no puede ser la misma que la que se desea eliminar."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         try:
             type = self.get_object(name)
             deleted_position = type.position
+
+            try:
+                new_type = Type.objects.get(name=new_type_name)
+            except Type.DoesNotExist:
+                return Response({"detail": f"La nueva tipo '{new_type_name}' no existe."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            # Actualizar todos los issues que usaban este tipo
+            issues_to_update = Issue.objects.filter(type=type)
+            for issue in issues_to_update:
+                issue.type = new_type
+                issue.save()
+
+            # Eliminar el tipo
             type.delete()
 
+            # Reordenar los tipos restantes
             types_to_update = Type.objects.filter(position__gt=deleted_position)
             for t in types_to_update:
                 t.position -= 1
@@ -1418,11 +1464,34 @@ class StatusDetailView(APIView):
         return get_object_or_404(Status, name=name)   
 
     def delete(self, request, name):
+        new_status_name = request.data.get('new_status')
+        if not new_status_name:
+            return Response({"detail": "Debe proporcionar 'new_status' en el cuerpo de la solicitud."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if name == new_status_name:
+            return Response({"detail": "La nueva estado no puede ser la misma que la que se desea eliminar."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         try:
             status_obj = self.get_object(name)
             deleted_position = status_obj.position
+
+            try:
+                new_status = Status.objects.get(name=new_status_name)
+            except Status.DoesNotExist:
+                return Response({"detail": f"La nueva estado '{new_status_name}' no existe."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            # Actualizar todos los issues que usaban esta estado
+            issues_to_update = Issue.objects.filter(status=status_obj)
+            for issue in issues_to_update:
+                issue.status = new_status
+                issue.save()
+
+            # Eliminar la estado
             status_obj.delete()
 
+            # Reordenar las estados restantes
             statuses_to_update = Status.objects.filter(position__gt=deleted_position)
             for s in statuses_to_update:
                 s.position -= 1
@@ -1554,11 +1623,34 @@ class SeverityDetailView(APIView):
         return get_object_or_404(Severity, name=name)   
 
     def delete(self, request, name):
+        new_severity_name = request.data.get('new_severity')
+        if not new_severity_name:
+            return Response({"detail": "Debe proporcionar 'new_severity' en el cuerpo de la solicitud."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if name == new_severity_name:
+            return Response({"detail": "La nueva severidad no puede ser la misma que la que se desea eliminar."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         try:
             severity = self.get_object(name)
             deleted_position = severity.position
+
+            try:
+                new_severity = Severity.objects.get(name=new_severity_name)
+            except Severity.DoesNotExist:
+                return Response({"detail": f"La nueva severidad '{new_severity_name}' no existe."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            # Actualizar todos los issues que usaban esta severidad
+            issues_to_update = Issue.objects.filter(status=severity)
+            for issue in issues_to_update:
+                issue.status = new_severity
+                issue.save()
+
+            # Eliminar la severidad
             severity.delete()
 
+            # Reordenar las severidades restantes
             severities_to_update = Severity.objects.filter(position__gt=deleted_position)
             for s in severities_to_update:
                 s.position -= 1
