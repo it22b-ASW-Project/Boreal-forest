@@ -263,18 +263,34 @@ paths:
       tags:
         - Priorities
       security:
-        - ApiKeyAuth: []  
+        - ApiKeyAuth: []
       parameters:
         - in: path
           name: name
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_priority:
+                  type: string
+                  description: Nombre de la prioridad que reemplazará a la eliminada
+              required:
+                - new_priority
       responses:
         '204':
           description: Eliminada correctamente
+        '400':
+          description: Datos inválidos o prioridad de reemplazo no existe
         '404':
           description: Prioridad no encontrada
+        '500':
+          description: Error interno del servidor
   
   /api/priorities/{name}/move-up/:
     post:
@@ -399,18 +415,34 @@ paths:
       tags:
         - Types
       security:
-        - ApiKeyAuth: []  
+        - ApiKeyAuth: []
       parameters:
         - in: path
           name: name
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_type:
+                  type: string
+                  description: Nombre del tipo que reemplazará al eliminado
+              required:
+                - new_type
       responses:
         '204':
           description: Eliminado correctamente
+        '400':
+          description: Datos inválidos o tipo de reemplazo no existe
         '404':
           description: Tipo no encontrado
+        '500':
+          description: Error interno del servidor
 
     put:
       summary: Actualizar tipo existente
@@ -566,21 +598,38 @@ paths:
   /api/statuses/{name}/:      
     delete:
       summary: Eliminar estado
+      description: Elimina un estado y lo reemplaza por otro.
       tags:
         - Statuses
       security:
-        - ApiKeyAuth: []  
+        - ApiKeyAuth: []
       parameters:
         - in: path
           name: name
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_status:
+                  type: string
+                  description: Nombre del estado que reemplazará al eliminado
+              required:
+                - new_status
       responses:
         '204':
           description: Eliminado correctamente
+        '400':
+          description: Datos inválidos o estado de reemplazo no existe
         '404':
           description: Estado no encontrado
+        '500':
+          description: Error interno del servidor
 
     put:
       summary: Actualizar estado existente
@@ -735,21 +784,38 @@ paths:
   /api/severities/{name}/:
     delete:
       summary: Eliminar severidad
+      description: Elimina una severidad y la reemplaza por otra.
       tags:
         - Severities
       security:
-        - ApiKeyAuth: []  
+        - ApiKeyAuth: []
       parameters:
         - in: path
           name: name
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_severity:
+                  type: string
+                  description: Nombre de la severidad que reemplazará a la eliminada
+              required:
+                - new_severity
       responses:
         '204':
-          description: Eliminada correctamente
+          description: Eliminado correctamente
+        '400':
+          description: Datos inválidos o severidad de reemplazo no existe
         '404':
           description: Severidad no encontrada
+        '500':
+          description: Error interno del servidor
 
     put:
       summary: Actualizar severidad existente
