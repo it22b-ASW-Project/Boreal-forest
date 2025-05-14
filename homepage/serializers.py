@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Issue, Priority, Status, Severity, Type, UserProfile, Comments
+from .models import Issue, Priority, Status, Severity, Type, UserProfile, Comments, Attachment
 from django.db.models import Max
 import re
 
@@ -7,6 +7,12 @@ class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = '__all__'
+
+class AttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attachment
+        fields = '__all__'
+
 
 class BulkTitlesSerializer(serializers.Serializer):
     titles = serializers.ListField(

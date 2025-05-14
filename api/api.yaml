@@ -150,7 +150,7 @@ paths:
         - Issues
       security:
         - ApiKeyAuth: []
-      description: "Permite actualizar parcialmente un Issue, solo los campos proporcionados serán modificados."
+      description: "Permite actualizar parcialmente un Issue. Además de modificar sus campos, permite asignar/quitar usuarios, watchers, añadir comentarios y subir archivos adjuntos."
       parameters:
         - in: path
           name: id
@@ -173,33 +173,107 @@ paths:
                   description: "Descripción del issue"
                 status:
                   type: string
-                  description: "nom del status del issue"
+                  description: "Nombre del status del issue"
                 type:
                   type: string
-                  description: "nom del tipo del issue"
+                  description: "Nombre del tipo del issue"
                 severity:
                   type: string
-                  description: "nom de la severidad del issue"
+                  description: "Nombre de la severidad del issue"
                 priority:
                   type: string
-                  description: "nom de la prioridad del issue"
+                  description: "Nombre de la prioridad del issue"
                 deadline:
                   type: string
                   format: date
-                  description: "Fecha límite del issue"
+                  description: "Fecha límite del issue (AAAA-MM-DD)"
+                add_assigned:
+                  type: integer
+                  description: "ID del usuario a asignar al issue"
+                remove_assigned:
+                  type: integer
+                  description: "ID del usuario asignado que se desea quitar del issue"
+                add_watchers:
+                  type: integer
+                  description: "ID del usuario a añadir como watcher"
+                remove_watchers:
+                  type: integer
+                  description: "ID del usuario watcher que se desea quitar"
+                comment:
+                  type: string
+                  description: "Comentario que se desea añadir al issue"
       responses:
         '200':
           description: "Issue actualizado correctamente"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Issue'
         '400':
-          description: "Datos de entrada no válidos"
+          description: "Datos inválidos o error de validación"
         '404':
           description: "Issue no encontrado"
         '500':
-          description: "Error interno del servidor"  
+          description: "Error interno del servidor"
+
+  /api/issues/{id}/attachment/:
+    post:
+      summary: "Añadir un archivo adjunto a un issue"
+      tags:
+        - Issues
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                attachment:
+                  type: string
+                  format: binary
+                  description: "Archivo adjunto"
+                attachment_description:
+                  type: string
+                  description: "Descripción del archivo adjunto (opcional)"
+      responses:
+        '201':
+          description: "Archivo adjunto añadido correctamente"
+        '400':
+          description: "Datos inválidos o error de validación"
+        '404':
+          description: "Issue no encontrado"
+        '500':
+          description: "Error interno del servidor"
+
+  /api/issues/{id}/attachment/{attachment_id}/:
+    delete:
+      summary: "Eliminar un archivo adjunto de un issue"
+      tags:
+        - Issues
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: attachment_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: "Archivo adjunto eliminado correctamente"
+        '404':
+          description: "Issue o archivo adjunto no encontrado"
+        '500':
+          description: "Error interno del servidor"
 
   /api/issues/bulk-create/:
     post:
