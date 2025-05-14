@@ -103,6 +103,8 @@ paths:
 
   /api/issues/{id}/:
     get:
+      tags:
+        - Issues
       summary: Ver detalles de un issue
       parameters:
         - in: path
@@ -975,7 +977,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResult'
                 
-  /api/users/{id}:
+  /api/users/{id}/:
     get:
       summary: Obtener un usuario por su ID
       tags:
@@ -1007,8 +1009,7 @@ paths:
                     type: string
                     example: User not found.
 
-
-  /api/users/{id}/assigned:
+  /api/users/{id}/assigned/:
     get:
       summary: Obtener issues asignadas a un usuario
       description: Devuelve las issues asignadas a un usuario que aún no están cerradas. Permite ordenar los resultados.
@@ -1046,7 +1047,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Issue'     
 
-  /api/users/{id}/watching:
+  /api/users/{id}/watching/:
     get:
       summary: Obtener issues vigiladas a un usuario
       description: Devuelve las issues vigiladas a un usuario que aún no están cerradas. Permite ordenar los resultados.
