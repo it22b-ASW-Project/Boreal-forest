@@ -23,9 +23,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from .serializers import (
-    IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, 
-UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer, UserProfileDetailSerializer,
-UserBioSerializer)
+    AttachmentSerializer, IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, 
+    UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer, UserProfileDetailSerializer,
+    UserBioSerializer
+)
 
 
 
@@ -1155,6 +1156,100 @@ class IssueDetailView(APIView):
             return Response({"detail": "Issue not found."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(f"Error deleting issue: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, id):
+        try:
+            issue = Issue.objects.get(pk=id)
+            serializer = IssueSerializer(issue, data=request.data, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+
+                user_id = request.data.get('add_assigned')
+                if user_id is not None:
+                    if not UserProfile.objects.filter(user_id=user_id).exists():
+                        return Response({"detail": f"L'usuari amb ID {user_id} no existeix."}, status=status.HTTP_400_BAD_REQUEST)
+                    Assigned.objects.get_or_create(issue=issue, assigned_id=user_id)
+
+                user_id = request.data.get('remove_assigned')
+                if user_id is not None:
+                    Assigned.objects.filter(issue=issue, assigned_id=user_id).delete()
+
+                user_id = request.data.get('add_watchers')
+                if user_id is not None:
+                    if not UserProfile.objects.filter(user_id=user_id).exists():
+                        return Response({"detail": f"L'usuari amb ID {user_id} no existeix."}, status=status.HTTP_400_BAD_REQUEST)
+                    Watch.objects.get_or_create(issue=issue, watcher_id=user_id)
+
+                user_id = request.data.get('remove_watchers')
+                if user_id is not None:
+                    Watch.objects.filter(issue=issue, watcher_id=user_id).delete()
+
+                comment = request.data.get('comment')
+                if comment:
+                    Comments.objects.create(issue=issue, user=request.user.socialaccount_set.first(), comment=comment)
+                    
+                serializer = IssueSerializer(issue)
+                serializer.data['watchers'] = [watcher.id for watcher in Watch.objects.filter(issue=issue)]
+                serializer.data['assigned'] = [assigned.id for assigned in Assigned.objects.filter(issue=issue)]
+                serializer.data['attachments'] = [attachment.filename for attachment in Attachment.objects.filter(issue=issue)]
+                serializer.data['comments'] = [comment.comment for comment in Comments.objects.filter(issue=issue)] 
+
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Issue.DoesNotExist:
+            return Response({"detail": "Issue not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class IssueAttachmentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, id):
+        try:
+            issue = Issue.objects.get(pk=id)
+            file = request.FILES.get('attachment')
+
+            if not file:
+                return Response({"detail": "No se ha enviado ningún archivo."}, status=400)
+
+            description = request.data.get('attachment_description', '')
+            Attachment.objects.create(
+                issue=issue,
+                file=file,
+                filename=file.name,
+                filesize=file.size,
+                description=description,
+                uploaded_by=request.user.socialaccount_set.first()
+            )
+
+            return Response({"detail": "Archivo subido correctamente."}, status=201)
+
+        except Issue.DoesNotExist:
+            return Response({"detail": "Issue no encontrado."}, status=404)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()  # imprime en consola
+            return Response({"detail": str(e)}, status=500)
+
+class IssueAttachmentDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, id, attachment_id):
+        try:
+            issue = Issue.objects.get(pk=id)
+            attachment = Attachment.objects.get(pk=attachment_id, issue=issue)
+            attachment.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Issue.DoesNotExist:
+            return Response({"detail": "Issue not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Attachment.DoesNotExist:
+            return Response({"detail": "Attachment not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error al eliminar el archivo adjunto: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PriorityListView(APIView):

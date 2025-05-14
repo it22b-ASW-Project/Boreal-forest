@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
+from django.core.validators import MinValueValidator
+from datetime import date
 
 class Priority(models.Model):
     name = models.CharField(max_length=20, primary_key=True) 
@@ -42,7 +44,7 @@ class Issue(models.Model):
     type = models.ForeignKey(Type, on_delete=models.SET_NULL, null=True, blank=True)
     severity =models.ForeignKey(Severity, on_delete=models.SET_NULL, null=True, blank=True)
     priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True)
-    deadline = models.DateField(null=True, blank=True)
+    deadline = models.DateField(null=True, blank=True, validators=[MinValueValidator(limit_value=date.today(), message="La fecha de vencimiento debe ser posterior a la fecha actual.")])
     created_by = models.ForeignKey('socialaccount.socialaccount', on_delete=models.SET_NULL, null=True, blank=True, related_name='creator')
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
