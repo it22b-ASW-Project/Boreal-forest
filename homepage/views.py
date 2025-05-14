@@ -975,7 +975,17 @@ class IssueListView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            serializer.save(created_by=social_account.first())
+            issue = serializer.save(created_by=social_account.first())
+            files = request.FILES.getlist('attachments')
+            for f in files:
+                Attachment.objects.create(
+                    issue=issue,
+                    file=f,
+                    filename=f.name,
+                    filesize=f.size,
+                    uploaded_by=social_account.first()
+                )
+                
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
