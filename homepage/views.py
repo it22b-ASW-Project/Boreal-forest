@@ -22,7 +22,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import AttachmentSerializer, IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer
+from .serializers import (
+    AttachmentSerializer, IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, 
+    UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer, UserProfileDetailSerializer,
+    UserBioSerializer
+)
+
+
 
 @login_required
 def showAllIssues(request):
@@ -963,6 +969,32 @@ class IssueListView(APIView):
 
         return Response(response_data, status=status.HTTP_200_OK)
     
+    def post(self, request):
+        serializer = IssueInputSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+
+            social_account = getattr(user, 'socialaccount_set', None)
+            if not social_account.exists():
+                return Response(
+                    {'created_by': ['No se pudo determinar el creador del issue.']},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            issue = serializer.save(created_by=social_account.first())
+            files = request.FILES.getlist('attachments')
+            for f in files:
+                Attachment.objects.create(
+                    issue=issue,
+                    file=f,
+                    filename=f.name,
+                    filesize=f.size,
+                    uploaded_by=social_account.first()
+                )
+                
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class BulkCreateIssuesView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -1113,6 +1145,17 @@ class IssueDetailView(APIView):
             return Response({"detail": "There's no issue with this id"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(f"Error al obtener el issue: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def delete(self, request, id):
+        try:
+            issue = Issue.objects.get(id=id)
+            issue.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Http404:
+            return Response({"detail": "Issue not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error deleting issue: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def put(self, request, id):
@@ -1868,6 +1911,48 @@ class UserProfileListView(APIView):
         serializer = UserProfileSerializer(user_profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class UserDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user = UserProfile.objects.get(pk=user_id)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserProfileDetailSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    def post(self, request, user_id):
+        # Verificar si el perfil a modificar pertenece al usuario actual
+ 
+        if request.user.id != user_id:
+            return Response({"detail": "No tiene permisos para modificar este perfil."}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            user = UserProfile.objects.get(pk=user_id)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if 'avatar' in request.FILES:
+            try:
+                if user.avatar:
+                    user.delete_avatar()
+                user.avatar = request.FILES['avatar']
+                user.save()
+                return Response({"message": "Avatar uploaded successfully!"}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'bio' in request.data:
+            serializer = UserBioSerializer(user, data=request.data)
+            if serializer.is_valid():
+                user.bio = serializer.validated_data['bio']
+                user.save()
+                return Response({"message": "Bio updated successfully!"}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"error": "No valid data provided."}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserCommentsView(APIView):
     permission_classes = [IsAuthenticated]
