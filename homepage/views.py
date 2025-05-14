@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer, IssueWithCommentsSerializer, IssueInputSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer, IssueInputSerializer
 
 @login_required
 def showAllIssues(request):
@@ -989,6 +989,49 @@ class IssueListView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+class BulkCreateIssuesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            subjects = request.data.get('issues', [])
+            if not isinstance(subjects, list):
+                return Response({"detail": "Se requiere una lista de objetos con los títulos."}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                default_priority = Priority.objects.get(position=1)
+                default_type = Type.objects.get(position=1)
+                default_status = Status.objects.get(position=1)
+                default_severity = Severity.objects.get(position=1)
+            except (Priority.DoesNotExist, Type.DoesNotExist, Status.DoesNotExist, Severity.DoesNotExist) as e:
+                return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            social_account = getattr(request.user, 'socialaccount_set', None)
+            if not social_account.exists():
+                return Response(
+                    {'created_by': ['No se pudo determinar el creador del issue.']},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            created_issues = Issue.objects.bulk_create([
+                Issue(
+                    subject=subject,
+                    description="",
+                    priority=default_priority,
+                    type=default_type,
+                    status=default_status,
+                    severity=default_severity,
+                    created_by=social_account.first(),
+                )
+                for subject in subjects
+            ])
+
+            serializer = IssueSerializer(created_issues, many=True)
+
+            return Response({"created_issues": serializer.data}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(f"Error al crear los issues: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
 
 class IssueDetailView(APIView):
     permission_classes = [IsAuthenticated]
