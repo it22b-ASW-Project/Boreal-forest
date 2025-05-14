@@ -24,7 +24,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from .serializers import (
     IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, 
-UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer, UserProfileDetailSerializer)
+UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer, UserProfileDetailSerializer,
+UserBioSerializer)
 
 
 
@@ -1698,6 +1699,37 @@ class UserDetailView(APIView):
         serializer = UserProfileDetailSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
+    def post(self, request, user_id):
+        # Verificar si el perfil a modificar pertenece al usuario actual
+ 
+        if request.user.id != user_id:
+            return Response({"detail": "No tiene permisos para modificar este perfil."}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            user = UserProfile.objects.get(pk=user_id)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if 'avatar' in request.FILES:
+            try:
+                if user.avatar:
+                    user.delete_avatar()
+                user.avatar = request.FILES['avatar']
+                user.save()
+                return Response({"message": "Avatar uploaded successfully!"}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'bio' in request.data:
+            serializer = UserBioSerializer(user, data=request.data)
+            if serializer.is_valid():
+                user.bio = serializer.validated_data['bio']
+                user.save()
+                return Response({"message": "Bio updated successfully!"}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"error": "No valid data provided."}, status=status.HTTP_400_BAD_REQUEST)
+
 class UserCommentsView(APIView):
     permission_classes = [IsAuthenticated]
 
