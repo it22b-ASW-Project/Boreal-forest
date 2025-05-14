@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Issue, Priority, Status, Severity, Type, UserProfile, Comments, Watch, Assigned
+from .models import Issue, Priority, Status, Severity, Type, UserProfile, Comments, Attachment, Watch, Assigned
 from django.db.models import Max
 from allauth.socialaccount.models import SocialAccount
 import re
@@ -8,6 +8,12 @@ class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = '__all__'
+
+class AttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attachment
+        fields = '__all__'
+
 
 class IssueInputSerializer(serializers.ModelSerializer):
     class Meta:
