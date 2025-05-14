@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer
+from .serializers import IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer, IssueInputSerializer
 
 @login_required
 def showAllIssues(request):
@@ -963,6 +963,32 @@ class IssueListView(APIView):
 
         return Response(response_data, status=status.HTTP_200_OK)
     
+    def post(self, request):
+        serializer = IssueInputSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+
+            social_account = getattr(user, 'socialaccount_set', None)
+            if not social_account.exists():
+                return Response(
+                    {'created_by': ['No se pudo determinar el creador del issue.']},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            issue = serializer.save(created_by=social_account.first())
+            files = request.FILES.getlist('attachments')
+            for f in files:
+                Attachment.objects.create(
+                    issue=issue,
+                    file=f,
+                    filename=f.name,
+                    filesize=f.size,
+                    uploaded_by=social_account.first()
+                )
+                
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class BulkCreateIssuesView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -1113,6 +1139,17 @@ class IssueDetailView(APIView):
             return Response({"detail": "There's no issue with this id"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(f"Error al obtener el issue: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def delete(self, request, id):
+        try:
+            issue = Issue.objects.get(id=id)
+            issue.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Http404:
+            return Response({"detail": "Issue not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error deleting issue: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PriorityListView(APIView):
