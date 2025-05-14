@@ -1089,6 +1089,59 @@ paths:
                   detail:
                     type: string
                     example: User not found.
+    post:
+      summary: Actualizar avatar o biografía del usuario
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: Archivo de imagen para el avatar
+                bio:
+                  type: string
+                  description: Texto de la biografía
+      responses:
+        '200':
+          description: Avatar o biografía actualizados con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bio updated successfully!
+        '400':
+          description: Error en la solicitud
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: No valid data provided.
+        
+        '403':
+          description: No tiene permisos para modificar este perfil.
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/ErrorResult'
 
 
   /api/users/{id}/assigned/:
