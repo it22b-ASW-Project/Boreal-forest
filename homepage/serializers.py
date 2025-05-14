@@ -8,6 +8,12 @@ class IssueSerializer(serializers.ModelSerializer):
         model = Issue
         fields = '__all__'
 
+class BulkTitlesSerializer(serializers.Serializer):
+    titles = serializers.ListField(
+        child=serializers.CharField(max_length=255),
+        allow_empty=False
+    )        
+
 class PrioritySerializer(serializers.ModelSerializer):
     class Meta:
         model = Priority
