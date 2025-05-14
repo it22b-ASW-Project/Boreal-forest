@@ -46,6 +46,7 @@ urlpatterns = [
 
     #api urls
     path('api/issues/', views.IssueListView.as_view(), name='issue-list'),
+    path('api/issues/bulk-create/', views.BulkCreateIssuesView.as_view(), name='bulk-create-issues'),
     path('api/issues/<int:id>/', views.IssueDetailView.as_view(), name='issue-detail'),
 
     path('api/priorities/', views.PriorityListView.as_view(), name='priority-list'),
