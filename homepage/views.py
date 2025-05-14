@@ -1071,6 +1071,22 @@ class IssueDetailView(APIView):
         except Exception as e:
             print(f"Error al obtener el issue: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, id):
+        try:
+            issue = Issue.objects.get(pk=id)
+            serializer = IssueSerializer(issue, data=request.data, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Issue.DoesNotExist:
+            return Response({"detail": "Issue not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PriorityListView(APIView):
     permission_classes = [IsAuthenticated]

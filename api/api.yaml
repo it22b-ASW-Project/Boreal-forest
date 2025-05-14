@@ -101,7 +101,7 @@ paths:
       security:
         - ApiKeyAuth: []
 
-  /api/issues/{id}:
+  /api/issues/{id}/:
     get:
       summary: Ver detalles de un issue
       parameters:
@@ -141,6 +141,63 @@ paths:
                   
       security:
         - ApiKeyAuth: []  
+
+    put:
+      summary: "Actualizar parcialmente un Issue"
+      tags:
+        - Issues
+      security:
+        - ApiKeyAuth: []
+      description: "Permite actualizar parcialmente un Issue, solo los campos proporcionados serán modificados."
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: "ID del Issue a actualizar"
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject:
+                  type: string
+                  description: "Asunto del issue"
+                description:
+                  type: string
+                  description: "Descripción del issue"
+                status:
+                  type: string
+                  description: "nom del status del issue"
+                type:
+                  type: string
+                  description: "nom del tipo del issue"
+                severity:
+                  type: string
+                  description: "nom de la severidad del issue"
+                priority:
+                  type: string
+                  description: "nom de la prioridad del issue"
+                deadline:
+                  type: string
+                  format: date
+                  description: "Fecha límite del issue"
+      responses:
+        '200':
+          description: "Issue actualizado correctamente"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        '400':
+          description: "Datos de entrada no válidos"
+        '404':
+          description: "Issue no encontrado"
+        '500':
+          description: "Error interno del servidor"  
 
   /api/priorities/:
     get:
