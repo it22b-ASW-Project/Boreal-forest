@@ -1274,9 +1274,6 @@ paths:
               schema:
                  $ref: '#/components/schemas/ErrorResult'
 
-
-  /api/users/{id}/assigned/:
-
   /api/users/{id}/assigned/:
     get:
       summary: Obtener issues asignadas a un usuario
