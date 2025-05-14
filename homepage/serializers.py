@@ -121,15 +121,25 @@ class SeveritySerializer(serializers.ModelSerializer):
         return value
    
 class UserProfileSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = UserProfile
-        fields = ['user', 'avatar', 'bio']
-        read_only_fields = ['user']
-    
+        fields = ['full_name', 'avatar']
+        read_only_fields = ['full_name']
+
+    def get_full_name(self, obj):
+        try:
+            user = obj.user
+            return f'{user.first_name} {user.last_name}'.strip()
+        except AttributeError:
+            return 'Unknown User'
+
     def validate_bio(self, value):
         if len(value) > 500:
             raise serializers.ValidationError("La biografía no puede exceder los 500 caracteres.")
         return value
+
 
 class UserProfileDetailSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -180,6 +190,18 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
         if len(value) > 280:
             raise serializers.ValidationError("La biografía no puede exceder los 280 caracteres.")
         return value
+
+class UserProfilePictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['avatar']
+
+class UserBioSerializer(serializers.ModelSerializer):
+    bio = serializers.CharField(max_length=280)
+
+    class Meta:
+        model = UserProfile
+        fields = ['bio']
 
 class CommentDetailSerializer(serializers.ModelSerializer):
     class Meta:
