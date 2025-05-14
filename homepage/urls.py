@@ -48,6 +48,8 @@ urlpatterns = [
     path('api/issues/', views.IssueListView.as_view(), name='issue-list'),
     path('api/issues/bulk-create/', views.BulkCreateIssuesView.as_view(), name='bulk-create-issues'),
     path('api/issues/<int:id>/', views.IssueDetailView.as_view(), name='issue-detail'),
+    path('api/issues/<int:id>/attachment/', views.IssueAttachmentView.as_view(), name='issue-attachment'),
+    path('api/issues/<int:id>/attachment/<int:attachment_id>/', views.IssueAttachmentDetailView.as_view(), name='issue-attachment-detail'),
 
     path('api/priorities/', views.PriorityListView.as_view(), name='priority-list'),
     path('api/priorities/<str:name>/', views.PriorityDetailView.as_view(), name='priority-detail'),
