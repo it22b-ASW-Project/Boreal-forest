@@ -1071,6 +1071,17 @@ class IssueDetailView(APIView):
         except Exception as e:
             print(f"Error al obtener el issue: {e}")
             return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def delete(self, request, id):
+        try:
+            issue = Issue.objects.get(id=id)
+            issue.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Http404:
+            return Response({"detail": "Issue not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error deleting issue: {e}")
+            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PriorityListView(APIView):
     permission_classes = [IsAuthenticated]
