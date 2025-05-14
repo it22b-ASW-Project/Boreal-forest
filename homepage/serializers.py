@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Issue, Priority, Status, Severity, Type, UserProfile, Comments
+from .models import Issue, Priority, Status, Severity, Type, UserProfile, Comments, Watch, Assigned
 from django.db.models import Max
+from allauth.socialaccount.models import SocialAccount
 import re
 
 class IssueSerializer(serializers.ModelSerializer):
@@ -125,15 +126,87 @@ class SeveritySerializer(serializers.ModelSerializer):
         return value
    
 class UserProfileSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = UserProfile
-        fields = ['user', 'avatar', 'bio']
-        read_only_fields = ['user']
-    
+        fields = ['full_name', 'avatar']
+        read_only_fields = ['full_name']
+
+    def get_full_name(self, obj):
+        try:
+            user = obj.user
+            return f'{user.first_name} {user.last_name}'.strip()
+        except AttributeError:
+            return 'Unknown User'
+
     def validate_bio(self, value):
         if len(value) > 500:
             raise serializers.ValidationError("La biografía no puede exceder los 500 caracteres.")
         return value
+
+
+class UserProfileDetailSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+    open_assigned_issues = serializers.SerializerMethodField()
+    watched_issues = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'user', 'full_name', 'username', 'bio', 'avatar',
+            'open_assigned_issues', 'watched_issues', 'comments_count'
+        ]
+
+    def get_social_account(self, user):
+        try:
+            return SocialAccount.objects.get(user=user)
+        except SocialAccount.DoesNotExist:
+            return None
+
+    def get_full_name(self, obj):
+        user = obj.user
+        return f"{user.first_name} {user.last_name}".strip()
+
+    def get_username(self, obj):
+        return obj.user.username
+
+    def get_open_assigned_issues(self, obj):
+        social_account = self.get_social_account(obj.user)
+        if social_account:
+            return Assigned.objects.filter(assigned_id=social_account, issue__status__isClosed=False).count()
+        return 0
+
+    def get_watched_issues(self, obj):
+        social_account = self.get_social_account(obj.user)
+        if social_account:
+            return Watch.objects.filter(watcher_id=social_account).count()
+        return 0
+
+    def get_comments_count(self, obj):
+        social_account = self.get_social_account(obj.user)
+        if social_account:
+            return Comments.objects.filter(user=social_account).count()
+        return 0
+
+    def validate_bio(self, value):
+        if len(value) > 280:
+            raise serializers.ValidationError("La biografía no puede exceder los 280 caracteres.")
+        return value
+
+class UserProfilePictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['avatar']
+
+class UserBioSerializer(serializers.ModelSerializer):
+    bio = serializers.CharField(max_length=280)
+
+    class Meta:
+        model = UserProfile
+        fields = ['bio']
 
 class CommentDetailSerializer(serializers.ModelSerializer):
     class Meta:
