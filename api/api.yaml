@@ -152,7 +152,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: OK
+          description: Detalles de un issue
           content:
             application/json:
               schema:
@@ -160,21 +160,17 @@ paths:
                 items:
                   $ref: '#/components/schemas/IssueDetail'
         '401':
-          description: Unauthorized
+          description: No autorizado
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
                   $ref: '#/components/examples/error401'
       
         '404':
-          description: The id does not correspond to an issue
+          description: No encontrado
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
@@ -196,20 +192,16 @@ paths:
         '204':
           description: Issue eliminado correctamente
         '401':
-          description: Unauthorized
+          description: No autorizado
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
                   $ref: '#/components/examples/error401'
         '404':
-          description: The id does not correspond to an issue
+          description: El id no corresponde a ningún issue
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
@@ -278,11 +270,26 @@ paths:
         '200':
           description: "Issue actualizado correctamente"
         '400':
-          description: "Datos inválidos o error de validación"
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
-          description: "Issue no encontrado"
+          description: Issue no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: "Error interno del servidor"
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
 
   /api/issues/{id}/attachment/:
     post:
@@ -315,11 +322,26 @@ paths:
         '201':
           description: "Archivo adjunto añadido correctamente"
         '400':
-          description: "Datos inválidos o error de validación"
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
-          description: "Issue no encontrado"
+          description: Issue no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: "Error interno del servidor"
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
 
   /api/issues/{id}/attachment/{attachment_id}/:
     delete:
@@ -343,10 +365,19 @@ paths:
         '204':
           description: "Archivo adjunto eliminado correctamente"
         '404':
-          description: "Issue o archivo adjunto no encontrado"
+          description: Archivo no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: "Error interno del servidor"
-
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
   /api/issues/bulk-create/:
     post:
       summary: Crear múltiples issues
@@ -381,9 +412,19 @@ paths:
                       type: integer
                       $ref: '#/components/schemas/Issue'
         '400':
-          description: Entrada inválida
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '500':
-          description: Error interno del servidor
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
     
 
   /api/priorities/:
@@ -405,6 +446,11 @@ paths:
                   $ref: '#/components/schemas/Priority'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
 
     post:
       summary: Crear una nueva prioridad
@@ -426,9 +472,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Priority'
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
 
   /api/priorities/{name}/:
     put:
@@ -460,9 +516,19 @@ paths:
         '200':
           description: Prioridad actualizada correctamente
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
-          description: Prioridad no encontrada
+          description: Issue no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
 
     delete:
       summary: Eliminar prioridad
@@ -492,11 +558,26 @@ paths:
         '204':
           description: Eliminada correctamente
         '400':
-          description: Datos inválidos o prioridad de reemplazo no existe
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
-          description: Prioridad no encontrada
+          description: Issue no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: Error interno del servidor
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
   
   /api/priorities/{name}/move-up/:
     post:
@@ -1487,21 +1568,19 @@ components:
           type: string
           example: "Low"
         assigned:
-          type: array
-          items:
-            type: object
-            properties: 
-              id:
-                type: integer
-                example: 2
-              name: 
-                type: string
-                example: "Maria Robles García"
-              avatar: 
-                type: string
-                format: uri
-                nullable: true
-                example: "avatars/default.jpg"
+          type: object
+          properties: 
+            id:
+              type: integer
+              example: 2
+            name: 
+              type: string
+              example: "Maria Robles García"
+            avatar: 
+              type: string
+              format: uri
+              nullable: true
+              example: "avatars/default.jpg"
           
     IssueDetail:
       type: object
@@ -1643,10 +1722,10 @@ components:
       properties:
         status:
           type: integer
-          enum: [400, 401, 403, 404, 409]
+          enum: [400, 401, 403, 404]
         error: 
           type: string
-          enum: ["Bad Request", "Unauthorized", "Forbidden", "Not Found", "Conflict"]
+          enum: ["Solicitud incorrecta", "No autorizado", "Prohibido", "No Encontrado"]
         message: 
           type: string
           
@@ -1807,25 +1886,32 @@ components:
     error400:
       value:
         status: 400
-        error: "Bad Request"
-        message: "The request data is invalid."
+        error: "Solicitud incorrecta"
+        message: "Los datos de la solicitud no són válidos."
     error401:
       value:
         status: 401
-        error: "Unauthorized"
-        message: "You provided no api key (Authorization Header)."
+        error: "No autorizado"
+        message: "No hay autenticación o esta no es correcta."
     error403:
       value:
         status: 403
-        error: "Forbidden"
-        message: "You do not have permission to access this resource."
+        error: "Prohibido"
+        message: "No tienes permiso para realizar esta operación."
     error404:
       value:
         status: 404
-        error: "Not Found"
-        message: "The requested resource could not be found."
-    error409:
+        error: "No encontrado"
+        message: "El recurso solicitado no se pudo encontrar."
+    error500:
       value:
-        status: 409
-        error: "Conflict"
-        message: "The request could not be completed due to a conflict with the current state."
+        status: 500
+        error: "Error servidor"
+        message: "Error interno del servidor."
+        
+        
+        
+        
+        
+        
+
