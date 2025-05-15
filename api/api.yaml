@@ -389,6 +389,7 @@ paths:
   /api/priorities/:
     get:
       summary: Obtener todas las prioridades
+      description: Devuelve una lista de todas las prioridades ordenadas por posición.
       tags:
         - Priorities
       security:
@@ -423,7 +424,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PriorityInput'
+                $ref: '#/components/schemas/Priority'
         '400':
           description: Datos inválidos
         '401':
@@ -522,6 +523,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Prioridad movida hacia arriba con éxito"
         '400':
           description: No se puede mover más arriba
           content:
@@ -531,6 +533,7 @@ paths:
                 properties:
                   detail:
                     type: string
+                    example: "La prioridad ya está en la parte superior"
         '404':
           description: Prioridad no encontrada
 
@@ -559,6 +562,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Prioridad movida hacia abajo con éxito"
         '400':
           description: No se puede mover más abajo
           content:
@@ -568,6 +572,7 @@ paths:
                 properties:
                   detail:
                     type: string
+                    example: "La prioridad ya está en la parte inferior"
         '404':
           description: Prioridad no encontrada
           
@@ -608,7 +613,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TypeInput'
+                $ref: '#/components/schemas/Type'
         '400':
           description: Datos inválidos
         '401':
@@ -707,6 +712,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Tipo movido hacia arriba con éxito"
         '400':
           description: No se puede mover más arriba
           content:
@@ -716,6 +722,7 @@ paths:
                 properties:
                   detail:
                     type: string
+                    example: "El tipo ya está en la parte superior"
         '404':
           description: Tipo no encontrado
 
@@ -744,6 +751,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Tipo movido hacia abajo con éxito"
         '400':
           description: No se puede mover más abajo
           content:
@@ -753,6 +761,7 @@ paths:
                 properties:
                   detail:
                     type: string
+                    example: "El tipo ya está en la parte inferior"
         '404':
           description: Tipo no encontrado
 
@@ -794,7 +803,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatusInput'
+                $ref: '#/components/schemas/Status'
         '400':
           description: Datos inválidos
         '401':
@@ -894,6 +903,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Estado movido hacia arriba con éxito"
         '400':
           description: No se puede mover más arriba
           content:
@@ -903,6 +913,7 @@ paths:
                 properties:
                   detail:
                     type: string
+                    example: "El estado ya está en la parte superior"
         '404':
           description: Estado no encontrado
 
@@ -931,6 +942,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Estado movido hacia abajo con éxito"
         '400':
           description: No se puede mover más abajo
           content:
@@ -940,6 +952,7 @@ paths:
                 properties:
                   detail:
                     type: string
+                    example: "El estado ya está en la parte inferior"
         '404':
           description: Estado no encontrado
 
@@ -980,7 +993,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SeverityInput'
+                $ref: '#/components/schemas/Severity'
         '400':
           description: Datos inválidos
         '401':
@@ -1080,6 +1093,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Severidad movida hacia arriba con éxito"
         '400':
           description: No se puede mover más arriba
           content:
@@ -1089,6 +1103,7 @@ paths:
                 properties:
                   detail:
                     type: string
+                    example: "La severidad ya está en la parte superior"
         '404':
           description: Severidad no encontrada
 
@@ -1117,6 +1132,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Severidad movida hacia abajo con éxito"
         '400':
           description: No se puede mover más abajo
           content:
@@ -1126,6 +1142,7 @@ paths:
                 properties:
                   detail:
                     type: string
+                    example: "La severidad ya está en la parte inferior"
         '404':
           description: Severidad no encontrada   
 
@@ -1659,6 +1676,9 @@ components:
           example: "#FF0000"
         position:
           type: integer
+        isClosed:
+          type: boolean
+          example: false
 
     StatusInput:
       type: object

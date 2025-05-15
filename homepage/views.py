@@ -1256,7 +1256,7 @@ class PriorityListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        priorities = Priority.objects.all()
+        priorities = Priority.objects.all().order_by('position')
         serializer = PrioritySerializer(priorities, many=True)
         return Response(serializer.data)
     
@@ -1350,17 +1350,17 @@ class MovePriorityUpView(APIView):
                 priority.save()
 
                 return Response(
-                    {"message": "Priority moved up successfully."},
+                    {"message": "Prioridad movida hacia arriba con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No higher priority to move."},
+                    {"detail": "No se puede mover más arriba"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Priority is already at the top."},
+                {"detail": "La prioridad ya está en la parte superior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -1383,17 +1383,17 @@ class MovePriorityDownView(APIView):
                 priority.save()
 
                 return Response(
-                    {"message": "Priority moved down successfully."},
+                    {"message": "Prioridad movida hacia abajo con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No lower priority to move."},
+                    {"detail": "No se puede mover más abajo"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Priority is already at the bottom."},
+                {"detail": "La prioridad ya está en la parte inferior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -1401,7 +1401,7 @@ class TypeListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        types = Type.objects.all()
+        types = Type.objects.all().order_by('position')
         serializer = TypeSerializer(types, many=True)
         return Response(serializer.data)
     
@@ -1494,17 +1494,17 @@ class MoveTypeUpView(APIView):
                 type.save()
 
                 return Response(
-                    {"message": "Type moved up successfully."},
+                    {"message": "Tipo movido hacia arriba con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No higher type to move."},
+                    {"detail": "No se puede mover más arriba"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Type is already at the top."},
+                {"detail": "El tipo ya está en la parte superior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -1527,17 +1527,17 @@ class MoveTypeDownView(APIView):
                 type.save()
 
                 return Response(
-                    {"message": "Type moved down successfully."},
+                    {"message": "Tipo movido hacia abajo con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No lower type to move."},
+                    {"detail": "No se puede mover más abajo"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Type is already at the bottom."},
+                {"detail": "El tipo ya está en la parte inferior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -1545,7 +1545,7 @@ class StatusListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        statuses = Status.objects.all()
+        statuses = Status.objects.all().order_by('position')
         serializer = StatusSerializer(statuses, many=True)
         return Response(serializer.data)
     
@@ -1653,17 +1653,17 @@ class MoveStatusUpView(APIView):
                 status_obj.save()
 
                 return Response(
-                    {"message": "Status moved up successfully."},
+                    {"message": "Estado movido hacia arriba con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No higher status to move."},
+                    {"detail": "No se puede mover más arriba"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Status is already at the top."},
+                {"detail": "El estado ya está en la parte superior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -1686,17 +1686,17 @@ class MoveStatusDownView(APIView):
                 status_obj.save()
 
                 return Response(
-                    {"message": "Status moved down successfully."},
+                    {"message": "Estado movido hacia abajo con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No lower status to move."},
+                    {"detail": "No se puede mover más abajo"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Status is already at the bottom."},
+                {"detail": "El estado ya está en la parte inferior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -1704,7 +1704,7 @@ class SeverityListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        severities = Severity.objects.all()
+        severities = Severity.objects.all().order_by('position')
         serializer = SeveritySerializer(severities, many=True)
         return Response(serializer.data)
 
