@@ -777,7 +777,7 @@ def confirm_delete_priority(request):
             p.position -= 1
             p.save()
 
-        messages.success(request, f'Priority "{priority_name}" deleted and issues changed to  "{new_priority.name}".')
+        messages.success(request, f'Prioridad "{priority_name}" eliminada y los issues cambiados a "{new_priority.name}".')
         return redirect('priorities')
 
     return render(request, 'confirm_delete_priority.html', {
@@ -800,7 +800,7 @@ def confirm_delete_status(request):
 
         status_to_delete.delete()
 
-        messages.success(request, f'Status "{status_name}" deleted and issues changed to "{new_status.name}".')
+        messages.success(request, f'Estado "{status_name}" eliminado y los issues cambiados a "{new_status.name}".')
         return redirect('statuses')
 
     return render(request, 'confirm_delete_status.html', {
@@ -823,7 +823,7 @@ def confirm_delete_severity(request):
 
         severity_to_delete.delete()
 
-        messages.success(request, f'Severity "{severity_name}" deleted and issues changed to "{new_severity.name}".')
+        messages.success(request, f'Severidad "{severity_name}" eliminada y los issues cambiados a "{new_severity.name}".')
         return redirect('severities')
 
     return render(request, 'confirm_delete_severity.html', {
@@ -845,7 +845,7 @@ def confirm_delete_type(request):
         issues.update(type=new_type)
         type_to_delete.delete()
 
-        messages.success(request, f'Type "{type_name}" deleted and issues changed to  "{new_type.name}".')
+        messages.success(request, f'Tipo "{type_name}" eliminado correctamente ylos issues cambiados a "{new_type.name}".')
         return redirect('types')
 
     return render(request, 'confirm_delete_type.html', {
@@ -884,22 +884,22 @@ class IssueListView(APIView):
 
         # Validación de filtros
         if priority and not is_valid_choice(Priority, priority):
-            return Response({"error": f"Invalid priority: '{priority}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Prioridad no valida: '{priority}'"}, status=status.HTTP_400_BAD_REQUEST)
 
         if type_ and not is_valid_choice(Type, type_):
-            return Response({"error": f"Invalid type: '{type_}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Tipo no valido: '{type_}'"}, status=status.HTTP_400_BAD_REQUEST)
 
         if severity and not is_valid_choice(Severity, severity):
-            return Response({"error": f"Invalid severity: '{severity}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Severidad no valida: '{severity}'"}, status=status.HTTP_400_BAD_REQUEST)
 
         if issue_status and not is_valid_choice(Status, issue_status):
-            return Response({"error": f"Invalid status: '{issue_status}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Estado no valido: '{issue_status}'"}, status=status.HTTP_400_BAD_REQUEST)
 
         if created_by and not UserProfile.objects.filter(user_id=created_by).exists():
-            return Response({"error": f"Invalid user ID: '{created_by}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Identificador de usuario no valido: '{created_by}'"}, status=status.HTTP_400_BAD_REQUEST)
         
         if assigned_to and not UserProfile.objects.filter(user_id=assigned_to).exists():
-            return Response({"error": f"Invalid user ID: '{assigned_to}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Identificador de usuario no valido: '{assigned_to}'"}, status=status.HTTP_400_BAD_REQUEST)
         
 
 
@@ -1037,7 +1037,7 @@ class BulkCreateIssuesView(APIView):
             return Response({"created_issues": serializer.data}, status=status.HTTP_201_CREATED)
         except Exception as e:
             print(f"Error al crear los issues: {e}")
-            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+            return Response({"detail": "Error interno del servidor."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
 
 class IssueDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1049,7 +1049,7 @@ class IssueDetailView(APIView):
                 # Intentar obtener el issue por ID
                 issue = Issue.objects.get(id=id)
             except Issue.DoesNotExist:
-                return Response({"detail": "There's no issue with this id"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"detail": "No hay ningun issue con este identificador"}, status=status.HTTP_404_NOT_FOUND)
 
             # Obtener los watchers del issue 
             watchers = [
