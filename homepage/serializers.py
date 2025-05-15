@@ -29,7 +29,7 @@ class BulkTitlesSerializer(serializers.Serializer):
 class PrioritySerializer(serializers.ModelSerializer):
     class Meta:
         model = Priority
-        fields = ['name', 'color']
+        fields = ['name', 'color', 'position']
         read_only_fields = ['position']
 
     def update(self, instance, validated_data):
@@ -56,7 +56,7 @@ class PrioritySerializer(serializers.ModelSerializer):
 class TypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Type
-        fields = ['name', 'color']
+        fields = ['name', 'color', 'position']
         read_only_fields = ['position']
 
     def update(self, instance, validated_data):
@@ -82,7 +82,7 @@ class TypeSerializer(serializers.ModelSerializer):
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = ['name', 'color', 'isClosed']
+        fields = ['name', 'color', 'isClosed', 'position']
         read_only_fields = ['position']
 
     def update(self, instance, validated_data):
@@ -108,7 +108,7 @@ class StatusSerializer(serializers.ModelSerializer):
 class SeveritySerializer(serializers.ModelSerializer):
     class Meta:
         model = Severity
-        fields = ['name', 'color']
+        fields = ['name', 'color', 'position']
         read_only_fields = ['position']
 
     def update(self, instance, validated_data):
