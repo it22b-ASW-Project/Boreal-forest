@@ -13,7 +13,7 @@ paths:
       summary: Obtener todos los issues 
       operationId: getAllIssues
       parameters:
-        - name: title or description
+        - name: q
           in: query
           description: Busqueda por titulo o descripción del issue
           required: false
