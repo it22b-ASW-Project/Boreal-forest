@@ -1,4 +1,11 @@
 asgiref==3.8.1
+Django==5.1.7
+gunicorn==23.0.0
+packaging==24.2
+sqlparse==0.5.3
+tzdata==2025.1
+
+asgiref==3.8.1
 boto3==1.37.12
 botocore==1.37.12
 certifi==2025.1.31
