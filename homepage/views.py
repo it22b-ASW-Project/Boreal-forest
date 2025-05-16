@@ -25,7 +25,7 @@ from rest_framework.authtoken.models import Token
 from .serializers import (
     AttachmentSerializer, IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, 
     UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer, UserProfileDetailSerializer,
-    UserBioSerializer
+    UserBioSerializer, IssueInputSerializer, IssueMinimalSerializer
 )
 
 
@@ -936,38 +936,8 @@ class IssueListView(APIView):
         # Filtrar y ordenar los issues
         filtered_issues = IssueFilter(request.GET, queryset=issues.order_by(order_by_field))
 
-        # Construcción de la respuesta con los campos específicos
-        response_data = []
-        for issue in filtered_issues.qs:
-            # Obtener el usuario asignado si existe
-            assigned = Assigned.objects.filter(issue=issue).first()
-            if assigned:
-                user_profile = UserProfile.objects.filter(user_id=assigned.assigned.id).first()
-                if user_profile:
-                    assigned_data = {
-                        'id': user_profile.user.id,
-                        'name': user_profile.user.get_full_name(),
-                        'avatar': user_profile.avatar.url if user_profile.avatar else None
-                    }
-                else:
-                    assigned_data = None
-            else:
-                assigned_data = None
-
-            issue_data = {
-                'id': issue.id,
-                'subject': issue.subject,
-                'deadline': issue.deadline,
-                'modified_at': issue.modified_at,
-                'status': issue.status.name if issue.status else None,
-                'type': issue.type.name if issue.type else None,
-                'severity': issue.severity.name if issue.severity else None,
-                'priority': issue.priority.name if issue.priority else None,
-                'assigned': assigned_data
-            }
-            response_data.append(issue_data)
-
-        return Response(response_data, status=status.HTTP_200_OK)
+        serializer = IssueMinimalSerializer(filtered_issues.qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
         serializer = IssueInputSerializer(data=request.data)
@@ -1032,7 +1002,7 @@ class BulkCreateIssuesView(APIView):
                 for subject in subjects
             ])
 
-            serializer = IssueSerializer(created_issues, many=True)
+            serializer = IssueMinimalSerializer(created_issues, many=True)
 
             return Response({"created_issues": serializer.data}, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -1867,7 +1837,7 @@ class AssignedIssuesView(APIView):
         ).select_related('issue').order_by(sort_field)
 
         issues = [a.issue for a in assigned_qs]
-        serializer = IssueSerializer(issues, many=True)
+        serializer = IssueMinimalSerializer(issues, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class WatchedIssuesView(APIView):
@@ -1900,7 +1870,7 @@ class WatchedIssuesView(APIView):
         ).select_related('issue').order_by(sort_field)
 
         issues = [a.issue for a in assigned_qs]
-        serializer = IssueSerializer(issues, many=True)
+        serializer = IssueMinimalSerializer(issues, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class UserProfileListView(APIView):

@@ -9,6 +9,11 @@ class IssueSerializer(serializers.ModelSerializer):
         model = Issue
         fields = '__all__'
 
+class IssueMinimalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Issue
+        fields = ['id', 'subject', 'description', 'deadline', 'modified_at', 'status', 'type', 'severity', 'priority']
+
 class AttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attachment
