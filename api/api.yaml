@@ -4,7 +4,7 @@ info:
   title: Issue Tracker API
   description: API para gestionar issues en la aplicación
 servers:
-  - url: http://127.0.0.1:8000/
+  - url: https://boreal-forest.onrender.com
 paths:
   /api/issues/:
     get:
