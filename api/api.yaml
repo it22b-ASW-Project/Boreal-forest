@@ -1779,6 +1779,9 @@ components:
           items:
             type: object
             properties:
+              id:
+                type: integer
+                example: 1
               filename:
                 type: string
                 example: "file_name.pdf"
