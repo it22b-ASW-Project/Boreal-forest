@@ -1893,33 +1893,33 @@ class UserDetailView(APIView):
 
         serializer = UserProfileDetailSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
-    def post(self, request, user_id):
-        # Verificar si el perfil a modificar pertenece al usuario actual
- 
-        if request.user.id != user_id:
-            return Response({"detail": "No tiene permisos para modificar este perfil."}, status=status.HTTP_403_FORBIDDEN)
-        
+
+class UserProfileUpdateView(APIView):
+    permission_classes = [IsAuthenticated]        
+
+    def post(self, request):
+        user = request.user
+
         try:
-            user = UserProfile.objects.get(pk=user_id)
+            profile = UserProfile.objects.get(user=user)
         except UserProfile.DoesNotExist:
-            return Response({"detail": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Perfil de usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
         if 'avatar' in request.FILES:
             try:
-                if user.avatar:
-                    user.delete_avatar()
-                user.avatar = request.FILES['avatar']
-                user.save()
+                if profile.avatar:
+                    profile.delete_avatar()
+                profile.avatar = request.FILES['avatar']
+                profile.save()
                 return Response({"message": "Avatar subido con éxito!"}, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         if 'bio' in request.data:
-            serializer = UserBioSerializer(user, data=request.data)
+            serializer = UserBioSerializer(profile, data=request.data)
             if serializer.is_valid():
-                user.bio = serializer.validated_data['bio']
-                user.save()
+                profile.bio = serializer.validated_data['bio']
+                profile.save()
                 return Response({"message": "Bio actualizada con éxito!"}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
