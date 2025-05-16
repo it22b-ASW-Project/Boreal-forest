@@ -78,6 +78,7 @@ urlpatterns = [
 
     path('api/users/', views.UserProfileListView.as_view(), name='user-profile-list'),
     path('api/users/<int:user_id>/', views.UserDetailView.as_view(), name='user-detail'),
+    path('api/users/self/', views.UserProfileUpdateView.as_view(), name='user-profile-update'),
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
