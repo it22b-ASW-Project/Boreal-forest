@@ -1457,18 +1457,14 @@ paths:
                     type: string
                     example: 
                       $ref: '#/components/examples/error404' 
+
+  /api/users/self/:                    
     post:
       summary: Actualizar avatar o biografía del usuario
       tags:
         - Users
       security:
         - ApiKeyAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
       requestBody:
         content:
           multipart/form-data:
