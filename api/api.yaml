@@ -152,7 +152,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: OK
+          description: Detalles de un issue
           content:
             application/json:
               schema:
@@ -160,21 +160,17 @@ paths:
                 items:
                   $ref: '#/components/schemas/IssueDetail'
         '401':
-          description: Unauthorized
+          description: No autorizado
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
                   $ref: '#/components/examples/error401'
       
         '404':
-          description: The id does not correspond to an issue
+          description: No encontrado
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
@@ -196,20 +192,16 @@ paths:
         '204':
           description: Issue eliminado correctamente
         '401':
-          description: Unauthorized
+          description: No autorizado
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
                   $ref: '#/components/examples/error401'
         '404':
-          description: The id does not correspond to an issue
+          description: El id no corresponde a ningún issue
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
               examples:
                 errorExample:
                   $ref: '#/components/examples/error404'
@@ -278,11 +270,26 @@ paths:
         '200':
           description: "Issue actualizado correctamente"
         '400':
-          description: "Datos inválidos o error de validación"
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
-          description: "Issue no encontrado"
+          description: Issue no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: "Error interno del servidor"
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
 
   /api/issues/{id}/attachment/:
     post:
@@ -315,11 +322,26 @@ paths:
         '201':
           description: "Archivo adjunto añadido correctamente"
         '400':
-          description: "Datos inválidos o error de validación"
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
-          description: "Issue no encontrado"
+          description: Issue no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: "Error interno del servidor"
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
 
   /api/issues/{id}/attachment/{attachment_id}/:
     delete:
@@ -343,10 +365,19 @@ paths:
         '204':
           description: "Archivo adjunto eliminado correctamente"
         '404':
-          description: "Issue o archivo adjunto no encontrado"
+          description: Archivo no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: "Error interno del servidor"
-
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
   /api/issues/bulk-create/:
     post:
       summary: Crear múltiples issues
@@ -379,16 +410,27 @@ paths:
                     type: array
                     items:
                       type: integer
-                    example: [1, 2, 3]
+                      $ref: '#/components/schemas/Issue'
         '400':
-          description: Entrada inválida
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '500':
-          description: Error interno del servidor
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
     
 
   /api/priorities/:
     get:
       summary: Obtener todas las prioridades
+      description: Devuelve una lista de todas las prioridades ordenadas por posición.
       tags:
         - Priorities
       security:
@@ -404,6 +446,11 @@ paths:
                   $ref: '#/components/schemas/Priority'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
 
     post:
       summary: Crear una nueva prioridad
@@ -423,11 +470,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PriorityInput'
+                $ref: '#/components/schemas/Priority'
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
 
   /api/priorities/{name}/:
     put:
@@ -459,9 +516,19 @@ paths:
         '200':
           description: Prioridad actualizada correctamente
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Prioridad no encontrada
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
 
     delete:
       summary: Eliminar prioridad
@@ -491,11 +558,26 @@ paths:
         '204':
           description: Eliminada correctamente
         '400':
-          description: Datos inválidos o prioridad de reemplazo no existe
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Prioridad no encontrada
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: Error interno del servidor
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
   
   /api/priorities/{name}/move-up/:
     post:
@@ -520,20 +602,24 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-        '400':
-          description: No se puede mover más arriba
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
                   detail:
                     type: string
+                    example: "Prioridad movida hacia arriba con éxito"
+        '400':
+          description: La prioridad ya esta en la posición mas alta
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Prioridad no encontrada
-
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+                  
   /api/priorities/{name}/move-down/:
     post:
       summary: Mover prioridad hacia abajo
@@ -559,17 +645,21 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Prioridad movida hacia abajo con éxito"
         '400':
-          description: No se puede mover más abajo
+          description: La prioridad ya esta en la posición mas baja
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  detail:
-                    type: string
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Prioridad no encontrada
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
           
   /api/types/:
     get:
@@ -589,7 +679,11 @@ paths:
                   $ref: '#/components/schemas/Type'
         '401':
           description: No autorizado
-
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
     post:
       summary: Crear un nuevo tipo
       tags:
@@ -604,15 +698,25 @@ paths:
               $ref: '#/components/schemas/TypeInput'
       responses:
         '201':
-          description: Type created
+          description: Tipo creado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TypeInput'
+                $ref: '#/components/schemas/Type'
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '401':
-          description: No autorizado      
+          description: No autorizado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'     
                           
   /api/types/{name}/:
     delete:
@@ -643,11 +747,26 @@ paths:
         '204':
           description: Eliminado correctamente
         '400':
-          description: Datos inválidos o tipo de reemplazo no existe
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Tipo no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: Error interno del servidor
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
 
     put:
       summary: Actualizar tipo existente
@@ -678,9 +797,19 @@ paths:
         '200':
           description: Tipo actualizada correctamente
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
-          description: Tipo no encontrado
+          description: Tipo no encontrada
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
 
   /api/types/{name}/move-up/:
     post:
@@ -707,18 +836,22 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Tipo movido hacia arriba con éxito"
         '400':
-          description: No se puede mover más arriba
+          description: El tipo ya esta en la posición mas alta
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  detail:
-                    type: string
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Tipo no encontrado
-
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+          
   /api/types/{name}/move-down/:
     post:
       summary: Mover tipo hacia abajo
@@ -744,17 +877,21 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Tipo movido hacia abajo con éxito"
         '400':
-          description: No se puede mover más abajo
+          description: El tipo ya esta en la posición mas baja
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  detail:
-                    type: string
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Tipo no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
 
   /api/statuses/:
     get:
@@ -775,6 +912,11 @@ paths:
                   $ref: '#/components/schemas/Status'
         '401':
           description: No autorizado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
 
     post:
       summary: Crear un nuevo estado
@@ -794,11 +936,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatusInput'
+                $ref: '#/components/schemas/Status'
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '401':
-          description: No autorizado      
+          description: No autorizado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'   
 
   /api/statuses/{name}/:      
     delete:
@@ -830,12 +982,26 @@ paths:
         '204':
           description: Eliminado correctamente
         '400':
-          description: Datos inválidos o estado de reemplazo no existe
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Estado no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: Error interno del servidor
-
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
     put:
       summary: Actualizar estado existente
       tags:
@@ -865,9 +1031,19 @@ paths:
         '200':
           description: Estado actualizada correctamente
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Estado no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
 
   /api/statuses/{name}/move-up/:
     post:
@@ -894,17 +1070,22 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Estado movido hacia arriba con éxito"
         '400':
-          description: No se puede mover más arriba
+          description: El estado ya esta en la posición mas alta
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  detail:
-                    type: string
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Estado no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
+
 
   /api/statuses/{name}/move-down/:
     post:
@@ -931,17 +1112,21 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Estado movido hacia abajo con éxito"
         '400':
-          description: No se puede mover más abajo
+          description: El estado ya esta en la posición mas baja
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  detail:
-                    type: string
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Estado no encontrado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
 
   /api/severities/:
     get:
@@ -958,9 +1143,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Severity'
+                  $ref: '#/components/schemas/Severity' 
         '401':
           description: No autorizado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
 
     post:
       summary: Crear una nueva severidad
@@ -980,11 +1170,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SeverityInput'
+                $ref: '#/components/schemas/Severity'
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '401':
-          description: No autorizado     
+          description: No autorizado
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'    
 
   /api/severities/{name}/:
     delete:
@@ -1016,11 +1216,26 @@ paths:
         '204':
           description: Eliminado correctamente
         '400':
-          description: Datos inválidos o severidad de reemplazo no existe
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Severidad no encontrada
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
         '500':
-          description: Error interno del servidor
+          description: Error del servidor
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error500'
 
     put:
       summary: Actualizar severidad existente
@@ -1050,10 +1265,21 @@ paths:
       responses:
         '200':
           description: Severidad actualizada correctamente
+          
         '400':
-          description: Datos inválidos
+          description: Datos no validos
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
-          description: Severidad no encontrada   
+          description: Severidad no encontrada
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
 
   /api/severities/{name}/move-up/:
     post:
@@ -1080,17 +1306,21 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Severidad movida hacia arriba con éxito"
         '400':
-          description: No se puede mover más arriba
+          description: La severidad ya esta en la posición mas alta
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  detail:
-                    type: string
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
           description: Severidad no encontrada
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404'
 
   /api/severities/{name}/move-down/:
     post:
@@ -1117,21 +1347,25 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Severidad movida hacia abajo con éxito"
         '400':
-          description: No se puede mover más abajo
+          description: La severidad ya esta en la posición mas baja
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  detail:
-                    type: string
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         '404':
-          description: Severidad no encontrada   
+          description: Severidad no encontrada
+          content:
+            application/json:
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error404' 
 
   /api/statuses/{name}/change-closed/:
     post:
-      summary: Toggle the 'isClosed' field of a status
+      summary: Alternar el campo 'isClosed' de un estado
       description: Alterna el valor booleano del campo `isClosed` para un status dado por nombre.
       tags:
         - Statuses    
@@ -1164,7 +1398,8 @@ paths:
                 properties:
                   detail:
                     type: string
-                    example: Status not found.
+                    example: 
+                      $ref: '#/components/examples/error404' 
   /api/users/:
     get:
       summary: Obtener todos los perfiles
@@ -1181,13 +1416,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UsersResponse'
+                  $ref: '#/components/schemas/UsersResponse'  
         '401':
-          description: No autenticado
+          description: No autorizado
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResult'
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error401'
                 
   /api/users/{id}/:
     get:
@@ -1219,7 +1455,8 @@ paths:
                 properties:
                   detail:
                     type: string
-                    example: User not found.
+                    example: 
+                      $ref: '#/components/examples/error404' 
     post:
       summary: Actualizar avatar o biografía del usuario
       tags:
@@ -1255,24 +1492,32 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Bio updated successfully!
+                    example: Bio actualizada con éxito!
         '400':
-          description: Error en la solicitud
+          description: Datos no validos
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: No valid data provided.
+              examples:
+                errorExample:
+                  $ref: '#/components/examples/error400'
         
         '403':
           description: No tiene permisos para modificar este perfil.
           content:
             application/json:
               schema:
-                 $ref: '#/components/schemas/ErrorResult'
+                 $ref: '#/components/examples/error403'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: 
+                      $ref: '#/components/examples/error404'                
 
   /api/users/{id}/assigned/:
     get:
@@ -1311,6 +1556,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Issue'     
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: 
+                      $ref: '#/components/examples/error404'               
 
   /api/users/{id}/watching/:
     get:
@@ -1349,7 +1605,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Issue'  
-
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: 
+                      $ref: '#/components/examples/error404'                             
   /api/users/{id}/comments/:
     get:
       summary: Obtener los comentarios de un usuario agrupados por issue
@@ -1402,7 +1668,8 @@ paths:
                 properties:
                   detail:
                     type: string
-                    example: User not found.                 
+                    example: 
+                      $ref: '#/components/examples/error404'                     
 
 components:
   securitySchemes:
@@ -1439,22 +1706,6 @@ components:
         priority:
           type: string
           example: "Low"
-        assigned:
-          type: array
-          items:
-            type: object
-            properties: 
-              id:
-                type: integer
-                example: 2
-              name: 
-                type: string
-                example: "Maria Robles García"
-              avatar: 
-                type: string
-                format: uri
-                nullable: true
-                example: "avatars/default.jpg"
           
     IssueDetail:
       type: object
@@ -1596,10 +1847,10 @@ components:
       properties:
         status:
           type: integer
-          enum: [400, 401, 403, 404, 409]
+          enum: [400, 401, 403, 404]
         error: 
           type: string
-          enum: ["Bad Request", "Unauthorized", "Forbidden", "Not Found", "Conflict"]
+          enum: ["Solicitud incorrecta", "No autorizado", "Prohibido", "No Encontrado"]
         message: 
           type: string
           
@@ -1659,6 +1910,9 @@ components:
           example: "#FF0000"
         position:
           type: integer
+        isClosed:
+          type: boolean
+          example: false
 
     StatusInput:
       type: object
@@ -1748,34 +2002,37 @@ components:
           type: string
           format: uri
           example: "https://taiga-issues-mhka-2025.s3.amazonaws.com/media/avatars/1/profilePicture.jpg"
-        bio:
-          type: string
-          format: uri
-          example: "Estudiante de la FIB"
     
   examples:
     error400:
       value:
         status: 400
-        error: "Bad Request"
-        message: "The request data is invalid."
+        error: "Solicitud incorrecta"
+        message: "Los datos de la solicitud no són válidos."
     error401:
       value:
         status: 401
-        error: "Unauthorized"
-        message: "You provided no api key (Authorization Header)."
+        error: "No autorizado"
+        message: "No hay autenticación o esta no es correcta."
     error403:
       value:
         status: 403
-        error: "Forbidden"
-        message: "You do not have permission to access this resource."
+        error: "Prohibido"
+        message: "No tienes permiso para realizar esta operación."
     error404:
       value:
         status: 404
-        error: "Not Found"
-        message: "The requested resource could not be found."
-    error409:
+        error: "No encontrado"
+        message: "El recurso solicitado no se pudo encontrar."
+    error500:
       value:
-        status: 409
-        error: "Conflict"
-        message: "The request could not be completed due to a conflict with the current state."
+        status: 500
+        error: "Error servidor"
+        message: "Error interno del servidor."
+        
+        
+        
+        
+        
+        
+
