@@ -1061,10 +1061,11 @@ class IssueDetailView(APIView):
 
             #Obtener los attachments del issue
             attachments = Attachment.objects.filter(issue_id=id).values(
-                'filename', 'filesize', 'description'
+                'id','filename', 'filesize', 'description'
             )
             attachments_data = [
                 {
+                    'id': attachment['id'],
                     'filename': attachment['filename'],
                     'filesize': attachment['filesize'],
                     'description': attachment['description'],
