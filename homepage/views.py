@@ -25,7 +25,7 @@ from rest_framework.authtoken.models import Token
 from .serializers import (
     AttachmentSerializer, IssueSerializer, PrioritySerializer, TypeSerializer, StatusSerializer, SeveritySerializer, 
     UserProfileSerializer, IssueWithCommentsSerializer, BulkTitlesSerializer, UserProfileDetailSerializer,
-    UserBioSerializer
+    UserBioSerializer, IssueInputSerializer, IssueMinimalSerializer
 )
 
 
@@ -777,7 +777,7 @@ def confirm_delete_priority(request):
             p.position -= 1
             p.save()
 
-        messages.success(request, f'Priority "{priority_name}" deleted and issues changed to  "{new_priority.name}".')
+        messages.success(request, f'Prioridad "{priority_name}" eliminada y los issues cambiados a "{new_priority.name}".')
         return redirect('priorities')
 
     return render(request, 'confirm_delete_priority.html', {
@@ -800,7 +800,7 @@ def confirm_delete_status(request):
 
         status_to_delete.delete()
 
-        messages.success(request, f'Status "{status_name}" deleted and issues changed to "{new_status.name}".')
+        messages.success(request, f'Estado "{status_name}" eliminado y los issues cambiados a "{new_status.name}".')
         return redirect('statuses')
 
     return render(request, 'confirm_delete_status.html', {
@@ -823,7 +823,7 @@ def confirm_delete_severity(request):
 
         severity_to_delete.delete()
 
-        messages.success(request, f'Severity "{severity_name}" deleted and issues changed to "{new_severity.name}".')
+        messages.success(request, f'Severidad "{severity_name}" eliminada y los issues cambiados a "{new_severity.name}".')
         return redirect('severities')
 
     return render(request, 'confirm_delete_severity.html', {
@@ -845,7 +845,7 @@ def confirm_delete_type(request):
         issues.update(type=new_type)
         type_to_delete.delete()
 
-        messages.success(request, f'Type "{type_name}" deleted and issues changed to  "{new_type.name}".')
+        messages.success(request, f'Tipo "{type_name}" eliminado correctamente ylos issues cambiados a "{new_type.name}".')
         return redirect('types')
 
     return render(request, 'confirm_delete_type.html', {
@@ -884,22 +884,22 @@ class IssueListView(APIView):
 
         # Validación de filtros
         if priority and not is_valid_choice(Priority, priority):
-            return Response({"error": f"Invalid priority: '{priority}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Prioridad no valida: '{priority}'"}, status=status.HTTP_400_BAD_REQUEST)
 
         if type_ and not is_valid_choice(Type, type_):
-            return Response({"error": f"Invalid type: '{type_}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Tipo no valido: '{type_}'"}, status=status.HTTP_400_BAD_REQUEST)
 
         if severity and not is_valid_choice(Severity, severity):
-            return Response({"error": f"Invalid severity: '{severity}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Severidad no valida: '{severity}'"}, status=status.HTTP_400_BAD_REQUEST)
 
         if issue_status and not is_valid_choice(Status, issue_status):
-            return Response({"error": f"Invalid status: '{issue_status}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Estado no valido: '{issue_status}'"}, status=status.HTTP_400_BAD_REQUEST)
 
         if created_by and not UserProfile.objects.filter(user_id=created_by).exists():
-            return Response({"error": f"Invalid user ID: '{created_by}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Identificador de usuario no valido: '{created_by}'"}, status=status.HTTP_400_BAD_REQUEST)
         
         if assigned_to and not UserProfile.objects.filter(user_id=assigned_to).exists():
-            return Response({"error": f"Invalid user ID: '{assigned_to}'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Identificador de usuario no valido: '{assigned_to}'"}, status=status.HTTP_400_BAD_REQUEST)
         
 
 
@@ -936,38 +936,8 @@ class IssueListView(APIView):
         # Filtrar y ordenar los issues
         filtered_issues = IssueFilter(request.GET, queryset=issues.order_by(order_by_field))
 
-        # Construcción de la respuesta con los campos específicos
-        response_data = []
-        for issue in filtered_issues.qs:
-            # Obtener el usuario asignado si existe
-            assigned = Assigned.objects.filter(issue=issue).first()
-            if assigned:
-                user_profile = UserProfile.objects.filter(user_id=assigned.assigned.id).first()
-                if user_profile:
-                    assigned_data = {
-                        'id': user_profile.user.id,
-                        'name': user_profile.user.get_full_name(),
-                        'avatar': user_profile.avatar.url if user_profile.avatar else None
-                    }
-                else:
-                    assigned_data = None
-            else:
-                assigned_data = None
-
-            issue_data = {
-                'id': issue.id,
-                'subject': issue.subject,
-                'deadline': issue.deadline,
-                'modified_at': issue.modified_at,
-                'status': issue.status.name if issue.status else None,
-                'type': issue.type.name if issue.type else None,
-                'severity': issue.severity.name if issue.severity else None,
-                'priority': issue.priority.name if issue.priority else None,
-                'assigned': assigned_data
-            }
-            response_data.append(issue_data)
-
-        return Response(response_data, status=status.HTTP_200_OK)
+        serializer = IssueMinimalSerializer(filtered_issues.qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
         serializer = IssueInputSerializer(data=request.data)
@@ -1032,12 +1002,12 @@ class BulkCreateIssuesView(APIView):
                 for subject in subjects
             ])
 
-            serializer = IssueSerializer(created_issues, many=True)
+            serializer = IssueMinimalSerializer(created_issues, many=True)
 
             return Response({"created_issues": serializer.data}, status=status.HTTP_201_CREATED)
         except Exception as e:
             print(f"Error al crear los issues: {e}")
-            return Response({"detail": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+            return Response({"detail": "Error interno del servidor."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
 
 class IssueDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1049,7 +1019,7 @@ class IssueDetailView(APIView):
                 # Intentar obtener el issue por ID
                 issue = Issue.objects.get(id=id)
             except Issue.DoesNotExist:
-                return Response({"detail": "There's no issue with this id"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"detail": "No hay ningun issue con este identificador"}, status=status.HTTP_404_NOT_FOUND)
 
             # Obtener los watchers del issue 
             watchers = [
@@ -1256,7 +1226,7 @@ class PriorityListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        priorities = Priority.objects.all()
+        priorities = Priority.objects.all().order_by('position')
         serializer = PrioritySerializer(priorities, many=True)
         return Response(serializer.data)
     
@@ -1350,17 +1320,17 @@ class MovePriorityUpView(APIView):
                 priority.save()
 
                 return Response(
-                    {"message": "Priority moved up successfully."},
+                    {"message": "Prioridad movida hacia arriba con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No higher priority to move."},
+                    {"detail": "No se puede mover más arriba"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Priority is already at the top."},
+                {"detail": "La prioridad ya está en la parte superior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -1383,17 +1353,17 @@ class MovePriorityDownView(APIView):
                 priority.save()
 
                 return Response(
-                    {"message": "Priority moved down successfully."},
+                    {"message": "Prioridad movida hacia abajo con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No lower priority to move."},
+                    {"detail": "No se puede mover más abajo"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Priority is already at the bottom."},
+                {"detail": "La prioridad ya está en la parte inferior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -1401,7 +1371,7 @@ class TypeListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        types = Type.objects.all()
+        types = Type.objects.all().order_by('position')
         serializer = TypeSerializer(types, many=True)
         return Response(serializer.data)
     
@@ -1494,17 +1464,17 @@ class MoveTypeUpView(APIView):
                 type.save()
 
                 return Response(
-                    {"message": "Type moved up successfully."},
+                    {"message": "Tipo movido hacia arriba con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No higher type to move."},
+                    {"detail": "No se puede mover más arriba"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Type is already at the top."},
+                {"detail": "El tipo ya está en la parte superior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -1527,17 +1497,17 @@ class MoveTypeDownView(APIView):
                 type.save()
 
                 return Response(
-                    {"message": "Type moved down successfully."},
+                    {"message": "Tipo movido hacia abajo con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No lower type to move."},
+                    {"detail": "No se puede mover más abajo"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Type is already at the bottom."},
+                {"detail": "El tipo ya está en la parte inferior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -1545,7 +1515,7 @@ class StatusListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        statuses = Status.objects.all()
+        statuses = Status.objects.all().order_by('position')
         serializer = StatusSerializer(statuses, many=True)
         return Response(serializer.data)
     
@@ -1653,17 +1623,17 @@ class MoveStatusUpView(APIView):
                 status_obj.save()
 
                 return Response(
-                    {"message": "Status moved up successfully."},
+                    {"message": "Estado movido hacia arriba con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No higher status to move."},
+                    {"detail": "No se puede mover más arriba"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Status is already at the top."},
+                {"detail": "El estado ya está en la parte superior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -1686,17 +1656,17 @@ class MoveStatusDownView(APIView):
                 status_obj.save()
 
                 return Response(
-                    {"message": "Status moved down successfully."},
+                    {"message": "Estado movido hacia abajo con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No lower status to move."},
+                    {"detail": "No se puede mover más abajo"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Status is already at the bottom."},
+                {"detail": "El estado ya está en la parte inferior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -1704,7 +1674,7 @@ class SeverityListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        severities = Severity.objects.all()
+        severities = Severity.objects.all().order_by('position')
         serializer = SeveritySerializer(severities, many=True)
         return Response(serializer.data)
 
@@ -1793,17 +1763,17 @@ class MoveSeverityUpView(APIView):
                 severity.save()
 
                 return Response(
-                    {"message": "Severity moved up successfully."},
+                    {"message": "Severidad movida hacia arriba con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No higher severity to move."},
+                    {"detail": "No se puede mover más arriba"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Severity is already at the top."},
+                {"detail": "La severidad ya está en la parte superior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -1822,17 +1792,17 @@ class MoveSeverityDownView(APIView):
                 severity.save()
 
                 return Response(
-                    {"message": "Severity moved down successfully."},
+                    {"message": "Severidad movida hacia abajo con éxito"},
                     status=status.HTTP_200_OK
                 )
             else:
                 return Response(
-                    {"detail": "No lower severity to move."},
+                    {"detail": "No se puede mover más abajo"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         else:
             return Response(
-                {"detail": "Severity is already at the bottom."},
+                {"detail": "La severidad ya está en la parte inferior"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -1843,7 +1813,7 @@ class AssignedIssuesView(APIView):
         try:
             user = SocialAccount.objects.get(pk=user_id)
         except SocialAccount.DoesNotExist:
-            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
         valid_sort_fields = {
         'status': 'issue__status__position', 
@@ -1867,7 +1837,7 @@ class AssignedIssuesView(APIView):
         ).select_related('issue').order_by(sort_field)
 
         issues = [a.issue for a in assigned_qs]
-        serializer = IssueSerializer(issues, many=True)
+        serializer = IssueMinimalSerializer(issues, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class WatchedIssuesView(APIView):
@@ -1877,7 +1847,7 @@ class WatchedIssuesView(APIView):
         try:
             user = SocialAccount.objects.get(pk=user_id)
         except SocialAccount.DoesNotExist:
-            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
         valid_sort_fields = {
         'status': 'issue__status__position', 
@@ -1900,7 +1870,7 @@ class WatchedIssuesView(APIView):
         ).select_related('issue').order_by(sort_field)
 
         issues = [a.issue for a in assigned_qs]
-        serializer = IssueSerializer(issues, many=True)
+        serializer = IssueMinimalSerializer(issues, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class UserProfileListView(APIView):
@@ -1918,7 +1888,7 @@ class UserDetailView(APIView):
         try:
             user = UserProfile.objects.get(pk=user_id)
         except UserProfile.DoesNotExist:
-            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = UserProfileDetailSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -1932,7 +1902,7 @@ class UserDetailView(APIView):
         try:
             user = UserProfile.objects.get(pk=user_id)
         except UserProfile.DoesNotExist:
-            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
         if 'avatar' in request.FILES:
             try:
@@ -1940,7 +1910,7 @@ class UserDetailView(APIView):
                     user.delete_avatar()
                 user.avatar = request.FILES['avatar']
                 user.save()
-                return Response({"message": "Avatar uploaded successfully!"}, status=status.HTTP_200_OK)
+                return Response({"message": "Avatar subido con éxito!"}, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1949,10 +1919,10 @@ class UserDetailView(APIView):
             if serializer.is_valid():
                 user.bio = serializer.validated_data['bio']
                 user.save()
-                return Response({"message": "Bio updated successfully!"}, status=status.HTTP_200_OK)
+                return Response({"message": "Bio actualizada con éxito!"}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"error": "No valid data provided."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "No se proporcionaron datos válidos"}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserCommentsView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1961,7 +1931,7 @@ class UserCommentsView(APIView):
         try:
             user = SocialAccount.objects.get(pk=user_id)
         except SocialAccount.DoesNotExist:
-            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
         comments_qs = Comments.objects.filter(user_id=user).select_related('issue')
         issues = set(comment.issue for comment in comments_qs)
