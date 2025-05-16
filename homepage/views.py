@@ -1074,7 +1074,7 @@ class IssueDetailView(APIView):
             ]
 
             # Obtener los comentarios del issue
-            comments = Comments.objects.filter(issue_id=id).select_related('user')
+            comments = Comments.objects.filter(issue_id=id).select_related('user').order_by('-created_at')
 
             comments_data = []
             for comment in comments:
