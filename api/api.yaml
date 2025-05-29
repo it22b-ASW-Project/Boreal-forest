@@ -106,7 +106,6 @@ paths:
         - Issues
       summary: Crear un nuevo issue
       requestBody:
-        required: true
         content:
           multipart/form-data:
             schema:
@@ -1836,7 +1835,6 @@ components:
             format: binary  
       required:
         - subject
-        - description
         - status
         - type
         - severity
@@ -1995,9 +1993,12 @@ components:
     UsersResponse:
       type: object
       properties:
-        user:
+        user_id:
           type: integer
           example: 1
+        user_full_name:
+          type: string
+          example: "Juan Pérez Salamanca"
         avatar:
           type: string
           format: uri
