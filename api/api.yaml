@@ -106,6 +106,7 @@ paths:
         - Issues
       summary: Crear un nuevo issue
       requestBody:
+        required: true
         content:
           multipart/form-data:
             schema:
@@ -1456,6 +1457,22 @@ paths:
                     type: string
                     example: 
                       $ref: '#/components/examples/error404' 
+  /api/users/self/:
+    get:
+      summary: Obtener un usuario por su ID
+      tags:
+        - Users
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        
+        
     post:
       summary: Actualizar avatar o biografía del usuario
       tags:
@@ -1463,11 +1480,6 @@ paths:
       security:
         - ApiKeyAuth: []
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
       requestBody:
         content:
           multipart/form-data:
@@ -1835,6 +1847,7 @@ components:
             format: binary  
       required:
         - subject
+        - description
         - status
         - type
         - severity
