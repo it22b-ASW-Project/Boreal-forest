@@ -138,11 +138,12 @@ class SeveritySerializer(serializers.ModelSerializer):
    
 class UserProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
 
     class Meta:
         model = UserProfile
-        fields = ['full_name', 'avatar']
-        read_only_fields = ['full_name']
+        fields = ['user_id', 'full_name', 'avatar']
+        read_only_fields = ['full_name', 'user_id']
 
     def get_full_name(self, obj):
         try:
