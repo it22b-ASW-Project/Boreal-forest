@@ -106,7 +106,6 @@ paths:
         - Issues
       summary: Crear un nuevo issue
       requestBody:
-        required: true
         content:
           multipart/form-data:
             schema:
@@ -1837,7 +1836,6 @@ components:
             format: binary  
       required:
         - subject
-        - description
         - status
         - type
         - severity

@@ -21,6 +21,8 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
 
 class IssueInputSerializer(serializers.ModelSerializer):
+    description = serializers.CharField(required=False)
+
     class Meta:
         model = Issue
         fields = ['subject', 'description', 'status', 'type', 'severity', 'priority', 'created_by']
