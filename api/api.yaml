@@ -1847,7 +1847,6 @@ components:
             format: binary  
       required:
         - subject
-        - description
         - status
         - type
         - severity
